@@ -19,9 +19,14 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
   if (action.type === "build" && !Object.hasOwn(BUILDINGS, action.building)) return state;
   if (action.type === "choose-event" && !Object.hasOwn(EVENTS, action.event)) return state;
   if (action.type === "research" && !Object.hasOwn(RESEARCH, action.research)) return state;
-  if (action.type === "gather-food" && gatheringWaitMs(state, now) > 0) return state;
+  if ((action.type === "gather-food" || action.type === "render-oil") && gatheringWaitMs(state, now) > 0) return state;
   let next = reconcile(state, now).state;
   switch (action.type) {
+    case "render-oil":
+      if (next.resources.food < BALANCE.emergencyOilFood) return next;
+      next = { ...next, lastGatheredAt: now, resources: { ...next.resources, food: next.resources.food - BALANCE.emergencyOilFood,
+        oil: Math.min(Number.MAX_SAFE_INTEGER, next.resources.oil + BALANCE.emergencyOil) } };
+      break;
     case "gather-food":
       next = { ...next, lastGatheredAt: now, resources: { ...next.resources, food: Math.min(Number.MAX_SAFE_INTEGER, next.resources.food + BALANCE.gatheringFood) } };
       break;

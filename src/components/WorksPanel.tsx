@@ -1,0 +1,24 @@
+import { BUILDINGS } from "@/content/buildings";
+import { buildingCost, buildingRequirements, costText } from "@/game/requirements";
+import type { BuildingId, GameAction, GameState } from "@/game/types";
+
+export function WorksPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
+  return <section aria-labelledby="works-heading">
+    <div className="region-heading"><h2 id="works-heading" className="machine-label">Works / Civic machinery</h2><span className="telemetry">Immediate construction</span></div>
+    {(Object.keys(BUILDINGS) as BuildingId[]).filter((id) => id !== "oil-press" || state.buildings.fields > 0).map((id) => {
+      const building = BUILDINGS[id];
+      const unmet = buildingRequirements(state, id);
+      const level = state.buildings[id];
+      return <article key={id} className="operation-row">
+        <div className="operation-heading"><h3>{building.name}</h3><span className="telemetry">Level {String(level).padStart(2, "0")} / {building.maxLevel}</span></div>
+        <p className="narrative">{building.description}</p>
+        <p className="effect-readout">{id === "fields" ? `Each level: +${BUILDINGS.fields.foodPerForager.toFixed(2)} Food/s per Forager` : `Each level: +${BUILDINGS["oil-press"].oilPerSecond.toFixed(2)} Oil/s automatically`}</p>
+        <button className="machine-button" aria-describedby={`build-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "build", building: id })}>
+          {level >= building.maxLevel ? "Opening limit reached" : `${level === 0 ? "Construct" : "Expand"} // ${costText(buildingCost(state, id))}`}
+        </button>
+        <p id={`build-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Stores sufficient / ready"}</p>
+      </article>;
+    })}
+    <p className="module-note machine-label">Oil Press output is halved during Food shortages.</p>
+  </section>;
+}

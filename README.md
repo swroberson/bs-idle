@@ -22,6 +22,7 @@ npm run lint       # ESLint and React/Next rules
 npm run typecheck  # TypeScript
 npm test           # Engine and save tests (Vitest)
 npm run check      # All three checks above
+npm run simulate:opening # Development-only progression and pacing harness
 npm run build      # Static export + generated offline service worker
 npm run preview    # Serve out/ locally on port 3000
 ```
@@ -41,19 +42,23 @@ scripts/         Build-time generation of the offline app shell
 
 The application needs no API, server actions, database, authentication or server simulation. Browser APIs stay in client-side lifecycle code; the game modules remain independent of React and storage.
 
-## Scaffold status
+## Opening sequence status
 
-Implemented: Ward/Chronicle navigation, five initial inhabitants, Food/Oil/Authority stores, a cooldown-limited manual gathering action, version-1 JSON saves, text/file import and export, confirmed reset, damaged-save recovery, and single-writer tabs using the Web Locks API. A waiting tab reads the latest save when it acquires the lock after the active tab closes. Browsers without Web Locks are prevented from writing.
+Implemented: Forager/Lamplighter assignments, elapsed-time Food consumption and Oil/Authority production, Fields and Oil Press construction, a one-time household arrival, the lamplighter’s report, and a deliberate lamp examination. Works and Studies appear as they unlock. Costs, unmet requirements, net rates, next obligations, and completed discoveries are visible in the terminal interface. New inhabitants arrive idle.
 
-The scaffold deliberately has **no automated economy or offline production yet**. Stores remain unchanged while away. `lastSimulatedAt` is reserved for reconciliation; the eight-hour cap is defined in balance data but takes effect only when the economy is implemented. Current and future systems remain hidden. The initial save schema covers only implemented systems; extend it with validation and a migration when adding jobs, buildings, research, events, expeditions or completion.
+Foragers retain full output during Food shortages; other productive output falls to 50%. At zero Oil, lamp output follows the available Oil Press flow. Manual provisions gathering and emergency rendering (5 Food → 2 Oil) share a 30-second recovery interval, so poor allocations or spending cannot permanently strand the opening without fuel.
 
-Next increment: elapsed-time economy, worker assignments, recoverable Food/Oil shortages, and net production rates. Then follow the milestones in the design brief. Test equivalent foreground/offline intervals and depletion boundaries before enabling idle gains.
+The pure engine splits intervals at depletion boundaries and uses the same rules in foreground and away play. Hidden tabs stop production callbacks; launch/resume reconciles elapsed time, caps a single absence at eight hours, consumes the whole timestamp, and reports net changes. Eligible narrative reports await the player. Saves now use version 2. Existing version-1 records migrate without charging Food for time before the economy existed.
+
+This increment ends at **Examine the Old Lamps**. The remaining research, expeditions, full content, chamber restoration, Current, and Phase 1 finale are still to be built. Current remains hidden. Opening building levels stop at three while later construction balance is developed.
 
 ## Interface
 
-The interface follows the industrial terminal direction in `AGENTS.md`: a single structural frame, persistent store telemetry, rectangular machine controls, and a connected inhabitant register. Chronicle and save maintenance use the same frame. Monospace quantities contrast with narrative serif prose; amber marks readiness and activity, and muted red marks record faults and reset controls. Gathering shows its recovery interval and announces successful storage without reading every countdown tick aloud. Motion respects the device's reduced-motion setting. Only implemented systems appear; the foundation build's automatic net rates are zero.
+The interface follows the industrial terminal direction in `AGENTS.md`: a single structural frame, persistent store telemetry, rectangular machine controls, and a connected inhabitant register. Chronicle and save maintenance use the same frame. Monospace quantities contrast with narrative serif prose; amber marks readiness and activity, and muted red marks record faults and reset controls. Gathering shows its recovery interval and announces successful storage without reading every countdown tick aloud. Motion respects the device's reduced-motion setting. Only implemented systems appear. Store telemetry updates once per second; touch-sized assignment controls, construction, pending reports, and the return summary share the terminal’s structural borders.
 
 ## Saves
+
+Version-2 records include assignments, building levels, lifetime Authority, queued/resolved reports, investigations, and the Chronicle. Import validates IDs, finite nonnegative values, worker counts, levels, and consistent one-time records. Version-1 imports migrate automatically. Successful imports reconcile elapsed time; invalid imports preserve the current record.
 
 Progress is stored in this browser under `buried-sun.save`. It does not transfer between devices or origins automatically. Open **Save & settings** to download a JSON backup or copy its text, import a file or pasted JSON, and reset with confirmation. Invalid imports leave the existing save intact. If a stored save cannot be loaded, the recovery view retains its raw text for backup before a confirmed replacement.
 
@@ -68,6 +73,14 @@ On iPhone Safari, visit the deployed site and use **Share → Add to Home Screen
 Verified locally on October 1, 2026: lint, TypeScript, 13 engine/save tests, and the production static build. In the Codex browser, checked the 390px phone layout and horizontal overflow at 320, 768, 1024 and 1440px; gathering/reload persistence; rejected malformed text imports; backup round-trip; Chronicle navigation; exclusive tab ownership and automatic transfer of the latest save after tab closure; and cached reopening with the preview server stopped. The browser console was clear during these checks. This verifies the scaffold, not the full Phase 1 experience or real-device Safari behavior.
 
 The terminal UI rework was also verified locally on October 1, 2026: the same validation commands pass, with browser checks for the 390px layout, overflow at 320/768/1024/1440px, visible keyboard focus, gathering feedback and cooldown recovery, reload persistence, malformed import preservation, backup restoration, Chronicle navigation, and cached reopening with the production preview server stopped. The production console showed no warnings or errors during the online checks. iPhone Safari and home-screen PWA checks remain unverified.
+
+### Opening sequence verification
+
+Verified locally on October 1, 2026: lint, TypeScript, **36 tests**, and production static build/offline-shell generation. Tests cover depleted Food/Oil, recovery, Oil flow at zero stores, short-tick/long-interval equivalence, the eight-hour cap, duplicate reconciliation, worker conservation, building prerequisites/costs, pending choices, one-time effects, migration, and malformed saves.
+
+`npm run simulate:opening` reaches the first discovery from a fresh save with three Foragers and two Lamplighters, no resource grants and no manual gathering. Provisional milestones: Fields at 25 seconds, Oil Press at 75, household at 136, lamplighter’s report at 176, examination at 201. This checks reachability; it does not establish the complete Phase 1 pacing target or enjoyment.
+
+In the Codex browser, completed a fresh opening through ordinary controls at a 390px viewport. Checked zero horizontal overflow at 320/768/1024/1440px, visible keyboard focus, emergency Oil rendering, persisted progress after reload, malformed-import preservation, backup restoration, a 12-hour import reporting exactly eight hours of production, exclusive tab ownership and transfer, and the updated cached shell reopening with the preview server stopped. The production console was clear during online checks. Real iPhone Safari and home-screen PWA behavior remain unverified.
 
 ## Vercel
 

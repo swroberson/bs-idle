@@ -5,6 +5,18 @@ import { applyAction } from "./actions";
 import { economyRates, reconcile } from "./simulation";
 
 describe("elapsed-time economy", () => {
+  it("recovers lamp output when Oil and Authority are exhausted before an Oil Press", () => {
+    const state = createInitialState(0);
+    state.resources.oil = 0;
+    state.jobs = { forager: 3, lamplighter: 1 };
+    const fuel = applyAction(state, { type: "render-oil" }, 0);
+    expect(fuel.resources.food).toBe(25);
+    expect(fuel.resources.oil).toBe(2);
+    expect(reconcile(fuel, 20_000).state.resources.authority).toBeCloseTo(2);
+    expect(applyAction(fuel, { type: "render-oil" }, 1000)).toBe(fuel);
+    state.resources.food = 0;
+    expect(applyAction(state, { type: "render-oil" }, 0)).toBe(state);
+  });
   it("accounts for every inhabitant and produces from assigned workers only", () => {
     const state = createInitialState(0);
     state.jobs = { forager: 2, lamplighter: 1 };

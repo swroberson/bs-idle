@@ -5,6 +5,8 @@ export const BALANCE = {
   startingResources: { food: 30, oil: 20, authority: 0 },
   gatheringFood: 2,
   gatheringCooldownMs: 30_000,
+  emergencyOil: 2,
+  emergencyOilFood: 5,
   offlineProductionCapMs: 8 * 60 * 60 * 1000,
   foodPerInhabitant: 0.025,
   shortageOutputMultiplier: 0.5,

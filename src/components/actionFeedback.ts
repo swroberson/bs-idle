@@ -1,0 +1,15 @@
+import { BALANCE } from "@/content/balance";
+import { BUILDINGS } from "@/content/buildings";
+import { JOBS } from "@/content/jobs";
+import type { GameAction } from "@/game/types";
+
+export function actionFeedback(action: GameAction): string {
+  switch (action.type) {
+    case "gather-food": return `Provisions stored // +${BALANCE.gatheringFood} Food`;
+    case "render-oil": return `Lamp fuel rendered // +${BALANCE.emergencyOil} Oil`;
+    case "assign-worker": return `${JOBS[action.job].name} // ${action.delta === 1 ? "assigned" : "released"}`;
+    case "build": return `${BUILDINGS[action.building].name} // construction recorded`;
+    case "choose-event": return "Response recorded // Chronicle updated";
+    case "research": return "Examination recorded // opening sequence complete";
+  }
+}

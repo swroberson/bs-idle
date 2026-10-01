@@ -99,9 +99,9 @@ export function useLocalGame() {
   }, [advance, commit]);
 
   const dispatch = (action: GameAction) => {
-    if (!current.current || status !== "active") return;
-    try { advance(false); commit(applyAction(current.current!, action, Date.now())); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : "Progress could not be saved."); }
+    if (!current.current || status !== "active") return false;
+    try { advance(false); commit(applyAction(current.current!, action, Date.now())); return true; }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Progress could not be saved."); return false; }
   };
 
   return {

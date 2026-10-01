@@ -30,6 +30,7 @@ export interface GameState {
 
 export type GameAction =
   | { type: "gather-food" }
+  | { type: "render-oil" }
   | { type: "assign-worker"; job: JobId; delta: 1 | -1 }
   | { type: "build"; building: BuildingId }
   | { type: "choose-event"; event: EventId }
