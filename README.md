@@ -84,6 +84,22 @@ In the Codex browser, completed a fresh opening through ordinary controls at a 3
 
 ## Vercel
 
-`next.config.ts` uses `output: "export"`; `npm run build` writes the site into `out/`. `vercel.json` specifies npm installation, the build command, `out` as the output directory, and a no-cache header for the service worker. This follows [Next.js static export guidance](https://nextjs.org/docs/app/guides/static-exports).
+`next.config.ts` uses `output: "export"`; `npm run build` writes the site into `out/`. `vercel.json` selects Vercel’s **Other** hosting preset (`framework: null`), specifies `npm ci`, `npm run build`, `out` as the output directory, and a no-cache header for the service worker. The app still builds with Next.js; Vercel publishes its static export without a runtime server. Using the Next.js hosting preset with an `out` override failed in the cloud because that adapter expected server build manifests there. The Other preset serves the exported files directly. See [Vercel static configuration](https://vercel.com/docs/project-configuration/vercel-json) and [Next.js static export guidance](https://nextjs.org/docs/app/guides/static-exports).
 
-When deployment is requested, connect this Git repository to Vercel and verify a preview before production. No server-side environment secrets are required. **No Vercel project, deployment or production URL has been established or verified by this scaffold.** Record the actual settings and URL here after deployment and device testing.
+Production: **[bs-idle.vercel.app](https://bs-idle.vercel.app)**. Deployed and verified on October 1, 2026. The Vercel project is `bs-idle` in `swrobersons-projects`, linked to [swroberson/bs-idle](https://github.com/swroberson/bs-idle). Root directory is `.`, Node.js is 24.x, and `vercel.json` supplies the install/build/output settings above. No game environment variables or server-side secrets are required.
+
+The first live release contains commit `383d396` from `codex/opening-economy`. Its successful preview was promoted to production; [production deployment](https://vercel.com/swrobersons-projects/bs-idle/EK62cRS2bEwxeYUkX7Vj8zDdoEVf). Vercel's automatic production branch is `main`; the opening-economy branch has not been merged into `main`. Pushes to other branches generate previews. Merge the reviewed game changes into `main` before relying on automatic production releases from that branch.
+
+For an explicit release from the current checkout, the following CLI workflow was verified with Vercel CLI 62.1.0 (the older globally installed CLI was rejected). Authenticate with the project owner's Vercel account, connect its GitHub identity, and grant the Vercel GitHub app access to this repository. Local project linkage stays in ignored `.vercel/` files.
+
+```sh
+npx --yes vercel@62.1.0 link --project bs-idle --scope swrobersons-projects --yes
+npx --yes vercel@62.1.0 deploy --scope swrobersons-projects --yes --target preview
+# Inspect and check the preview URL returned above before promotion:
+npx --yes vercel@62.1.0 inspect PREVIEW_URL --scope swrobersons-projects
+npx --yes vercel@62.1.0 promote PREVIEW_URL --scope swrobersons-projects --yes
+```
+
+Verified on production: anonymous HTTP 200 for the app and service worker; `Cache-Control: no-cache` for `sw.js`; working worker assignments, gathering, Food/Oil/Authority progression, and reload persistence; offline-shell readiness; a 390px phone layout without horizontal overflow; and no game-origin console warnings or errors. The manifest was checked on the successful preview. Real iPhone Safari, home-screen installation, offline reopening, and background/resume behavior still require device verification.
+
+If a later release breaks the game, use Vercel's production rollback to a previously verified deployment and check the public URL again. Keep the saved record intact. Older game code must support the player's save version before rollback; export a backup before any intentional save migration. Saves belong to their origin, so localhost and preview progress do not transfer to the production URL automatically.
