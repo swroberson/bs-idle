@@ -49,6 +49,10 @@ The scaffold deliberately has **no automated economy or offline production yet**
 
 Next increment: elapsed-time economy, worker assignments, recoverable Food/Oil shortages, and net production rates. Then follow the milestones in the design brief. Test equivalent foreground/offline intervals and depletion boundaries before enabling idle gains.
 
+## Interface
+
+The interface follows the industrial terminal direction in `AGENTS.md`: a single structural frame, persistent store telemetry, rectangular machine controls, and a connected inhabitant register. Chronicle and save maintenance use the same frame. Monospace quantities contrast with narrative serif prose; amber marks readiness and activity, and muted red marks record faults and reset controls. Gathering shows its recovery interval and announces successful storage without reading every countdown tick aloud. Motion respects the device's reduced-motion setting. Only implemented systems appear; the foundation build's automatic net rates are zero.
+
 ## Saves
 
 Progress is stored in this browser under `buried-sun.save`. It does not transfer between devices or origins automatically. Open **Save & settings** to download a JSON backup or copy its text, import a file or pasted JSON, and reset with confirmation. Invalid imports leave the existing save intact. If a stored save cannot be loaded, the recovery view retains its raw text for backup before a confirmed replacement.
@@ -62,6 +66,8 @@ On iPhone Safari, visit the deployed site and use **Share → Add to Home Screen
 ### Scaffold verification
 
 Verified locally on October 1, 2026: lint, TypeScript, 13 engine/save tests, and the production static build. In the Codex browser, checked the 390px phone layout and horizontal overflow at 320, 768, 1024 and 1440px; gathering/reload persistence; rejected malformed text imports; backup round-trip; Chronicle navigation; exclusive tab ownership and automatic transfer of the latest save after tab closure; and cached reopening with the preview server stopped. The browser console was clear during these checks. This verifies the scaffold, not the full Phase 1 experience or real-device Safari behavior.
+
+The terminal UI rework was also verified locally on October 1, 2026: the same validation commands pass, with browser checks for the 390px layout, overflow at 320/768/1024/1440px, visible keyboard focus, gathering feedback and cooldown recovery, reload persistence, malformed import preservation, backup restoration, Chronicle navigation, and cached reopening with the production preview server stopped. The production console showed no warnings or errors during the online checks. iPhone Safari and home-screen PWA checks remain unverified.
 
 ## Vercel
 
