@@ -52,7 +52,7 @@ export function GameShell() {
       {game.status === "waiting" && <div role="status" className="terminal-notice"><p className="machine-label">Access / held by another tab</p><h2>The register is open elsewhere.</h2><p>Close the other Buried Sun tab to continue here. This tab will then load your latest progress.</p></div>}
       {(section === "settings" || recovery) && game.status !== "loading" && <SavePanel state={game.state} damagedSave={game.damagedSave} disabled={game.status === "waiting"} importSave={game.importSave} reset={game.reset} />}
       {game.state && !recovery && section === "ward" && <>
-        <WardPanel state={game.state} wait={wait} active={game.status === "active"} gather={() => game.dispatch({ type: "gather-food" })} />
+        <WardPanel state={game.state} wait={wait} active={game.status === "active"} gather={() => game.dispatch({ type: "gather-food" })} dispatch={game.dispatch} />
         {game.state.chronicle.length > 0 && <div className="record-strip"><span className="machine-label">Last entry</span><p>{CHRONICLE[game.state.chronicle[game.state.chronicle.length - 1]].title}</p><button className="record-link" onClick={() => setSection("chronicle")}>Read record <span aria-hidden="true">↗</span></button></div>}
       </>}
       {game.state && section === "chronicle" && <section aria-labelledby="chronicle-heading" className="chronicle-region">

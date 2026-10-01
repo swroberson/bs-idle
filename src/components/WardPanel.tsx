@@ -1,23 +1,32 @@
 import { BALANCE } from "@/content/balance";
-import type { GameState } from "@/game/types";
+import type { GameAction, GameState } from "@/game/types";
+import { WorkerPanel } from "./WorkerPanel";
+import { currentObjective } from "@/game/objective";
+import { economyRates } from "@/game/simulation";
 
-export function WardPanel({ state, wait, active, gather }: {
+export function WardPanel({ state, wait, active, gather, dispatch }: {
   state: GameState;
   wait: number;
   active: boolean;
   gather: () => void;
+  dispatch: (action: GameAction) => void;
 }) {
   const seconds = Math.ceil(wait / 1000);
   const ready = wait === 0;
   const progress = 1 - Math.min(wait / BALANCE.gatheringCooldownMs, 1);
+  const objective = currentObjective(state);
+  const rates = economyRates(state);
 
   return <div className="ward-layout">
     <section aria-labelledby="ward-heading" className="ward-operations">
       <div className="region-heading"><span className="machine-label">01 / Keeper’s station</span><span className="machine-label">Outer Ward</span></div>
       <div className="obligation">
-        <p className="machine-label">Standing obligation</p>
-        <h2 id="ward-heading">Keep the lamps burning.</h2>
+        <p className="machine-label">Next obligation</p>
+        <h2 id="ward-heading">{objective.title}</h2>
+        <p className="objective-copy">{objective.text}</p>
         <p className="narrative">Beyond the last inhabited street, the road climbs toward the Citadel. At dusk, its windows disappear. The lamps of the Ward must not.</p>
+        {rates.starving && <p className="shortage-warning" role="status">Food exhausted / other output halved. Assign Foragers or gather provisions.</p>}
+        {rates.lampsLimited && <p className="shortage-warning" role="status">Oil supply limited / lamps use only the available flow. Reduce Lamplighters or expand the Oil Press.</p>}
       </div>
       <section aria-labelledby="provisions-heading" className="gathering-station">
         <div className="region-heading"><h3 id="provisions-heading" className="machine-label">Manual / Provisions</h3><span className={`machine-label ${active && ready ? "activity-text" : ""}`}>{!active ? "Unavailable" : ready ? "Ready" : "Recovering"}</span></div>
@@ -33,16 +42,6 @@ export function WardPanel({ state, wait, active, gather }: {
         <p className="sr-only" role="status">{!active ? "Gathering unavailable." : ready ? "Ready to gather provisions." : `${BALANCE.gatheringFood} Food stored. Gathering is recovering.`}</p>
       </section>
     </section>
-    <aside aria-labelledby="inhabitants-heading" className="inhabitants-region">
-      <div className="region-heading"><h2 id="inhabitants-heading" className="machine-label">02 / Inhabitants</h2><span className="machine-label">Register</span></div>
-      <div className="population-total"><span className="telemetry">{String(state.population).padStart(2, "0")}</span><span className="machine-label">Those who<br />remain</span></div>
-      <div className="population-marks" aria-hidden="true">{Array.from({ length: state.population }, (_, index) => <span key={index} />)}</div>
-      <dl className="worker-readout">
-        <div><dt>Assigned</dt><dd>0</dd></div>
-        <div><dt>Available</dt><dd>{state.population}</dd></div>
-      </dl>
-      <p className="narrative register-note">The register has room for more names.</p>
-      <p className="machine-label module-note">Work assignments / not yet available</p>
-    </aside>
+    <WorkerPanel state={state} active={active} dispatch={dispatch} />
   </div>;
 }

@@ -80,6 +80,14 @@ button, a, input, textarea { outline-offset: 4px; }
 .worker-readout dt { font-size: .75rem; color: var(--color-muted); }
 .worker-readout dd { font-size: .875rem; }
 .register-note { margin: 1rem; font-style: italic; }
+.objective-copy { margin-bottom: 1rem; font-size: .875rem; line-height: 1.7; color: var(--color-muted); }
+.shortage-warning { margin-top: 1rem; font-size: .875rem; line-height: 1.6; color: var(--color-warning); }
+.job-row { padding: 1rem; border-top: 1px solid var(--color-line); }
+.job-row h3 { font-size: .875rem; text-transform: uppercase; letter-spacing: .05em; }
+.job-row > p { margin-top: .5rem; color: var(--color-muted); font-size: .75rem; line-height: 1.7; }
+.assignment-control { display: flex; align-items: center; gap: .75rem; margin-top: .75rem; }
+.assignment-control button { width: 3rem; font-size: 1.25rem; }
+.assignment-control .telemetry { text-align: center; flex: 1; font-size: 1.5rem; color: var(--color-ink); }
 .module-note { margin: 1rem; font-size: .5625rem; }
 .record-strip { display: flex; align-items: center; flex-wrap: wrap; gap: .25rem 1rem; padding: .5rem 1rem; border-block: 1px solid var(--color-line); background: var(--color-panel); }
 .record-strip > p { font-size: .875rem; flex: 1; }
