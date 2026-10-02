@@ -738,11 +738,24 @@ Use these general approaches:
 
 ### Image-generation guidance
 
+Read `docs/ART.md` for the accepted assets, current style reference and reusable
+surface-rendering guidance before generating or editing illustrations.
+
 When prompting an image model, explicitly reinforce the following concepts where relevant:
 
 > dark historical realism, heavy chiaroscuro, localized oil-lamp or fire illumination, deep surrounding darkness, weathered tactile materials, cramped or enclosed composition, restrained desaturated palette, ancient inhabited environment, human-scale viewpoint, subtle unexplained architectural anomalies, monumental structures disappearing beyond the frame, grounded clothing and tools, no overt fantasy spectacle, no recognizable science-fiction technology, no panoramic establishing view
 
 Do not rely on the phrase "dark fantasy" alone. Image models frequently interpret it as conventional fantasy art and introduce castles, armor, magical symbols, dramatic skylines, or other inappropriate imagery. Describe the physical scene and lighting explicitly.
+
+Keep material wear irregular and specific to each material. Preserve the
+accepted original color grade and lighting. Stone pits and pores should vary
+in size, depth, density and spacing, with clustered erosion alternating with
+less pitted areas. Timber grain follows the wood; wear gathers around edges
+and use. Avoid repeated stippling, embossed curls, uniform procedural bump
+patterns, canvas texture, impasto and oversharpening. Do not substitute global
+smoothing, blur, polished or plastic surfaces, recoloring or relighting. Use
+the accepted current artwork as a reference; superseded smoothing trials are
+not style anchors.
 
 ### Final test
 
@@ -756,5 +769,6 @@ Before accepting an illustration, ask:
 6. Does anything look generically high-fantasy or conventionally science-fictional?
 7. If something strange appears, is it subtle enough that an inhabitant might accept it as part of the world?
 8. Does the image reveal something while leaving a larger question unanswered?
+9. At full resolution and phone size, do pits, pores and wear vary naturally rather than repeat a uniform pattern, while preserving the accepted colors and lighting?
 
 If an image fails these tests, revise it before adding it to the game.
