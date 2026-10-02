@@ -8,7 +8,7 @@ describe("elapsed-time economy", () => {
   it("recovers lamp output when Oil and Authority are exhausted before an Oil Press", () => {
     const state = createInitialState(0);
     state.resources.oil = 0;
-    state.jobs = { forager: 3, lamplighter: 1 };
+    state.jobs = { ...state.jobs, forager: 3, lamplighter: 1 };
     const fuel = applyAction(state, { type: "render-oil" }, 0);
     expect(fuel.resources.food).toBe(25);
     expect(fuel.resources.oil).toBe(2);
@@ -19,7 +19,7 @@ describe("elapsed-time economy", () => {
   });
   it("accounts for every inhabitant and produces from assigned workers only", () => {
     const state = createInitialState(0);
-    state.jobs = { forager: 2, lamplighter: 1 };
+    state.jobs = { ...state.jobs, forager: 2, lamplighter: 1 };
     const result = reconcile(state, 10_000).state;
     expect(result.resources.food).toBeCloseTo(31.15);
     expect(result.resources.oil).toBeCloseTo(19.25);
@@ -30,8 +30,8 @@ describe("elapsed-time economy", () => {
 
   it("agrees across short foreground ticks and a single interval through both shortages", () => {
     const state = createInitialState(0);
-    state.jobs = { forager: 0, lamplighter: 5 };
-    state.resources = { food: 2, oil: 3, authority: 0 };
+    state.jobs = { ...state.jobs, forager: 0, lamplighter: 5 };
+    state.resources = { ...state.resources, food: 2, oil: 3, authority: 0 };
     const away = reconcile(state, 300_000).state;
     let foreground = state;
     for (let time = 137; time < 300_000; time += 137) foreground = reconcile(foreground, time).state;
@@ -44,7 +44,7 @@ describe("elapsed-time economy", () => {
 
   it("uses Oil as it is pressed at zero stores, independent of tick frequency", () => {
     const state = createInitialState(0);
-    state.jobs = { forager: 2, lamplighter: 3 };
+    state.jobs = { ...state.jobs, forager: 2, lamplighter: 3 };
     state.buildings["oil-press"] = 1;
     state.resources.oil = 0;
     const result = reconcile(state, 60_000).state;
@@ -58,7 +58,7 @@ describe("elapsed-time economy", () => {
   it("recovers from starvation by foraging and manual gathering", () => {
     const state = createInitialState(0);
     state.resources.food = 0;
-    state.jobs = { forager: 2, lamplighter: 1 };
+    state.jobs = { ...state.jobs, forager: 2, lamplighter: 1 };
     expect(reconcile(state, 10_000).state.resources.food).toBeGreaterThan(0);
     state.jobs.forager = 0;
     expect(economyRates(state).starving).toBe(true);

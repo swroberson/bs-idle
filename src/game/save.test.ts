@@ -14,24 +14,24 @@ describe("save validation", () => {
   it("migrates a scaffold save without charging for time before the economy existed", () => {
     const old = { version: 1, resources: { food: 30, oil: 20, authority: 0 }, population: 5, chronicle: ["appointment"], lastSimulatedAt: 1000, lastGatheredAt: null };
     const migrated = decodeSave(JSON.stringify(old), 500_000);
-    expect(migrated.version).toBe(2);
+    expect(migrated.version).toBe(3);
     expect(migrated.lastSimulatedAt).toBe(500_000);
-    expect(migrated.jobs).toEqual({ forager: 0, lamplighter: 0 });
-    expect(migrated.resources).toEqual(old.resources);
+    expect(migrated.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0 });
+    expect(migrated.resources).toEqual({ ...createInitialState(0).resources, ...old.resources });
     expect(decodeSave(encodeSave(migrated))).toEqual(migrated);
   });
 
   it.each([
-    { jobs: { forager: 6, lamplighter: 0 } },
-    { jobs: { forager: -1, lamplighter: 0 } },
-    { jobs: { forager: 1.5, lamplighter: 0 } },
-    { buildings: { fields: 4, "oil-press": 0 } },
+    { jobs: { forager: 6, lamplighter: 0, scrivener: 0 } },
+    { jobs: { forager: -1, lamplighter: 0, scrivener: 0 } },
+    { jobs: { forager: 1.5, lamplighter: 0, scrivener: 0 } },
+    { buildings: { ...createInitialState(0).buildings, fields: 4 } },
     { pendingEvents: ["household"] },
     { triggeredEvents: ["household", "household"] },
     { research: ["unknown"] },
     { research: ["examine-old-lamps"] },
     { lifetimeAuthority: -1 },
-    { resources: { food: 30, oil: 20, authority: 5 }, lifetimeAuthority: 0 },
+    { resources: { ...createInitialState(0).resources, authority: 5 }, lifetimeAuthority: 0 },
   ])("rejects impossible assignments and inconsistent one-time records: %j", (patch) => {
     expect(() => decodeSave(JSON.stringify({ ...createInitialState(1000), ...patch }))).toThrow();
   });

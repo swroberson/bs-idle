@@ -32,7 +32,8 @@ export function GameShell() {
   const status = { loading: "Opening", waiting: "Read only", active: "Active", error: "Fault" }[game.status];
   const worksOpen = !!game.state && game.state.lifetimeAuthority >= BALANCE.worksAuthority;
   const studiesOpen = !!game.state?.chronicle.includes("lamp-complaint");
-  const visibleSections = (Object.keys(SECTIONS) as (Section)[]).filter((id) => (id !== "works" || worksOpen) && (id !== "studies" || studiesOpen));
+  const expeditionsOpen = !!game.state && game.state.buildings["ruined-cistern"] > 0;
+  const visibleSections = (Object.keys(SECTIONS) as (Section)[]).filter((id) => (id !== "works" || worksOpen) && (id !== "studies" || studiesOpen) && (id !== "expeditions" || expeditionsOpen));
   const shownSection = visibleSections.includes(section) ? section : "ward";
   const dispatch = (action: GameAction) => {
     if (game.dispatch(action)) setFeedback(actionFeedback(action));
@@ -62,8 +63,8 @@ export function GameShell() {
       <GamePages game={game} section={shownSection} wait={wait} dispatch={dispatch} setSection={setSection} clearFeedback={() => setFeedback("")} />
     </main>
     <footer className="terminal-footer">
-      <div className="footer-readout machine-label"><span>Phase I / Opening sequence</span><span>{game.status === "active" ? "Local record / autosaves every 15s" : "Local record / unavailable"}</span></div>
-      <p>Production continues while away, up to eight hours. This build ends with the first lamp examination.</p>
+      <div className="footer-readout machine-label"><span>Phase I / The Outer Ward</span><span>{game.status === "active" ? "Local record / autosaves every 15s" : "Local record / unavailable"}</span></div>
+      <p>Production continues while away, up to eight hours. This build reaches the survey beneath the chapel.</p>
       {offlineStatus && <p className="machine-label">{offlineStatus}</p>}
     </footer>
   </div>;

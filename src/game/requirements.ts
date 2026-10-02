@@ -1,12 +1,14 @@
 import { BALANCE } from "../content/balance";
 import { BUILDINGS } from "../content/buildings";
+import { JOBS } from "../content/jobs";
 import { EVENTS } from "../content/events";
 import { RESEARCH } from "../content/research";
+import { EXPEDITIONS } from "../content/expeditions";
 import { RESOURCES } from "../content/resources";
-import type { BuildingId, Cost, EventId, GameState, ResearchId, ResourceId } from "./types";
+import type { BuildingId, ContentRequirements, Cost, EventId, ExpeditionId, GameState, JobId, ResearchId, ResourceId } from "./types";
 
 export function availableWorkers(state: GameState): number {
-  return state.population - state.jobs.forager - state.jobs.lamplighter;
+  return state.population - Object.values(state.jobs).reduce((sum, count) => sum + count, 0) - (state.activeExpedition?.workers ?? 0);
 }
 
 export function costText(cost: Cost): string {
@@ -24,17 +26,26 @@ export function payCost(state: GameState, cost: Cost): GameState {
   return { ...state, resources };
 }
 
+export function prerequisiteRequirements(state: GameState, requirements: ContentRequirements): string[] {
+  const unmet: string[] = [];
+  for (const [id, level] of Object.entries(requirements.buildings ?? {})) {
+    if (state.buildings[id as BuildingId] < level) unmet.push(`Requires ${BUILDINGS[id as BuildingId].name} level ${level}`);
+  }
+  for (const id of requirements.research ?? []) if (!state.research.includes(id as ResearchId)) unmet.push(`Complete ${RESEARCH[id as ResearchId].name}`);
+  for (const id of requirements.chronicle ?? []) if (!state.chronicle.includes(id as GameState["chronicle"][number])) unmet.push("Await the lamplighter’s report");
+  for (const id of requirements.expeditions ?? []) if (!state.completedExpeditions.includes(id as ExpeditionId)) unmet.push(`Return from ${EXPEDITIONS[id as ExpeditionId].name}`);
+  if (state.lifetimeAuthority < (requirements.lifetimeAuthority ?? 0)) unmet.push(`Earn ${requirements.lifetimeAuthority} lifetime Authority to open Works`);
+  return unmet;
+}
+
 export function buildingCost(state: GameState, id: BuildingId): Cost {
   const building = BUILDINGS[id];
   return Object.fromEntries(Object.entries(building.cost).map(([resource, amount]) => [resource, Math.ceil(amount * building.costGrowth ** state.buildings[id])])) as Cost;
 }
 
 export function buildingRequirements(state: GameState, id: BuildingId): string[] {
-  if (state.buildings[id] >= BUILDINGS[id].maxLevel) return ["Opening limit reached"];
-  const requirements = costRequirements(state, buildingCost(state, id));
-  if (state.lifetimeAuthority < BALANCE.worksAuthority) requirements.unshift(`Earn ${BALANCE.worksAuthority} lifetime Authority to open Works`);
-  if (id === "oil-press" && state.buildings.fields === 0) requirements.unshift("Construct Fields first");
-  return requirements;
+  if (state.buildings[id] >= BUILDINGS[id].maxLevel) return ["Construction limit reached"];
+  return [...prerequisiteRequirements(state, BUILDINGS[id].requirements), ...costRequirements(state, buildingCost(state, id))];
 }
 
 export function eventRequirements(state: GameState, id: EventId): string[] {
@@ -46,8 +57,32 @@ export function eventRequirements(state: GameState, id: EventId): string[] {
 }
 
 export function researchRequirements(state: GameState, id: ResearchId): string[] {
-  if (state.research.includes(id)) return ["Examination complete"];
-  const requirements = costRequirements(state, RESEARCH[id].cost);
-  if (!state.chronicle.includes("lamp-complaint")) requirements.unshift("Await the lamplighter’s report");
-  return requirements;
+  if (state.research.includes(id)) return ["Investigation complete"];
+  return [...prerequisiteRequirements(state, RESEARCH[id].requirements), ...costRequirements(state, RESEARCH[id].cost)];
+}
+
+export function jobUnlocked(state: GameState, id: JobId): boolean {
+  return prerequisiteRequirements(state, JOBS[id].requirements).length === 0;
+}
+
+export function expeditionCost(id: ExpeditionId, workers: number): Cost {
+  return { food: EXPEDITIONS[id].foodPerWorker * workers };
+}
+
+export function expeditionRequirements(state: GameState, id: ExpeditionId, workers: number): string[] {
+  const unmet = prerequisiteRequirements(state, EXPEDITIONS[id].requirements);
+  if (!Number.isInteger(workers) || workers < 1 || workers > BALANCE.expeditionMaxWorkers) return [...unmet, "Assign 1–3 inhabitants"];
+  if (state.activeExpedition) unmet.push("A party is already away");
+  if (availableWorkers(state) < workers) unmet.push(`Available inhabitants ${availableWorkers(state)} / ${workers}; release workers in Ward`);
+  return [...unmet, ...costRequirements(state, expeditionCost(id, workers))];
+}
+
+export function resourceVisible(state: GameState, id: ResourceId): boolean {
+  if (state.resources[id] > 0) return true;
+  switch (id) {
+    case "coin": return state.research.includes("ledger-keeping");
+    case "knowledge": return state.buildings["scrivener-house"] > 0;
+    case "relics": return state.buildings["ruined-cistern"] > 0;
+    default: return true;
+  }
 }

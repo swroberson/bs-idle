@@ -8,7 +8,7 @@ describe("opening progression", () => {
   it("requires unlocks and pays escalating building costs without spending milestones", () => {
     const initial = createInitialState(0);
     expect(applyAction(initial, { type: "build", building: "fields" }, 0)).toBe(initial);
-    const state = { ...initial, lifetimeAuthority: 30, resources: { food: 100, oil: 20, authority: 30 } };
+    const state = { ...initial, lifetimeAuthority: 30, resources: { ...initial.resources, food: 100, oil: 20, authority: 30 } };
     expect(applyAction(state, { type: "build", building: "oil-press" }, 0)).toBe(state);
     const first = applyAction(state, { type: "build", building: "fields" }, 0);
     expect(first.buildings.fields).toBe(1);
@@ -23,7 +23,7 @@ describe("opening progression", () => {
   it("queues offline eligibility, preserves it on reload, and never admits automatically", () => {
     const initial = createInitialState(0);
     initial.buildings.fields = 1;
-    initial.jobs = { forager: 3, lamplighter: 2 };
+    initial.jobs = { ...initial.jobs, forager: 3, lamplighter: 2 };
     const state = reconcile(initial, 90_000).state;
     expect(state.pendingEvents).toEqual(["household"]);
     expect(state.population).toBe(5);
@@ -52,7 +52,7 @@ describe("opening progression", () => {
     state.resources.authority = 50;
     state.lifetimeAuthority = 50;
     expect(applyAction(state, { type: "research", research: "examine-old-lamps" }, 0)).toBe(state);
-    state.buildings = { fields: 1, "oil-press": 1 };
+    state.buildings = { ...state.buildings, fields: 1, "oil-press": 1 };
     state.triggeredEvents = ["household", "lamp-complaint"];
     state.pendingEvents = ["lamp-complaint"];
     state.chronicle.push("household");

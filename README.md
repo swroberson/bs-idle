@@ -22,7 +22,8 @@ npm run lint       # ESLint and React/Next rules
 npm run typecheck  # TypeScript
 npm test           # Engine and save tests (Vitest)
 npm run check      # All three checks above
-npm run simulate:opening # Development-only progression and pacing harness
+npm run simulate:opening # Development-only opening progression harness
+npm run simulate:foundations # Fresh-save path through the foundation survey
 npm run build      # Static export + generated offline service worker
 npm run preview    # Serve out/ locally on port 3000
 ```
@@ -42,15 +43,19 @@ scripts/         Build-time generation of the offline app shell
 
 The application needs no API, server actions, database, authentication or server simulation. Browser APIs stay in client-side lifecycle code; the game modules remain independent of React and storage.
 
-## Opening sequence status
+## Progression status
 
 Implemented: Forager/Lamplighter assignments, elapsed-time Food consumption and Oil/Authority production, Fields and Oil Press construction, a one-time household arrival, the lamplighter’s report, and a deliberate lamp examination. Works and Studies appear as they unlock. Costs, unmet requirements, net rates, next obligations, and completed discoveries are visible in the terminal interface. New inhabitants arrive idle.
 
 Foragers retain full output during Food shortages; other productive output falls to 50%. At zero Oil, lamp output follows the available Oil Press flow. Manual provisions gathering and emergency rendering (5 Food → 2 Oil) share a 30-second recovery interval, so poor allocations or spending cannot permanently strand the opening without fuel.
 
-The pure engine splits intervals at depletion boundaries and uses the same rules in foreground and away play. Hidden tabs stop production callbacks; launch/resume reconciles elapsed time, caps a single absence at eight hours, consumes the whole timestamp, and reports net changes. Eligible narrative reports await the player. Saves now use version 2. Existing version-1 records migrate without charging Food for time before the economy existed.
+The pure engine splits intervals at depletion boundaries and uses the same rules in foreground and away play. Hidden tabs stop production callbacks; launch/resume reconciles elapsed time, caps a single absence at eight hours, consumes the whole timestamp, and reports net changes. Eligible narrative reports await the player. Saves now use version 3. Existing version-1 records migrate without charging Food for time before the economy existed. Version-2 opening records preserve their economy timestamp and migrate new stores, buildings, jobs, and expedition records with empty defaults.
 
-This increment ends at **Examine the Old Lamps**. The remaining research, expeditions, full content, chamber restoration, Current, and Phase 1 finale are still to be built. Current remains hidden. Opening building levels stop at three while later construction balance is developed.
+The next increment extends play through **Survey the Foundations**. Ledger Keeping unlocks automatic Coin production at the Market Stall and Knowledge production by assigned Scriveners. The Ruined Cistern opens two destinations: Old Cistern (three minutes, Relics) and Abandoned Farmstead (four minutes, Food/Coin). Send 1–3 idle inhabitants; each costs 10 Food. Party size scales ordinary rewards. One party may be away at a time; all inhabitants continue consuming Food. Workers return idle and rewards arrive automatically in foreground and away play, with a guaranteed first finding recorded once.
+
+Build the House of Antiquities after the first cistern return, Catalog the Relics, and Survey the Foundations. Crop Rotation (+25% Food output) and Better Wicks (−25% Oil consumption) offer optional improvements. Modifiers multiply after base worker/building output is added. Completed investigations remain readable; the expedition log retains the latest 20 returns while discoveries remain permanent. Resource instruments and destinations appear as their systems unlock.
+
+This build ends at the foundation survey. Tracing the conduits, remaining buildings/research/events/destinations, chamber restoration, Current, and the Phase 1 finale remain to be built. Current remains hidden. Ordinary buildings currently stop at three levels; the new story installations are unique.
 
 ## Interface
 
@@ -58,7 +63,7 @@ The interface follows the industrial terminal direction in `AGENTS.md`: a single
 
 ## Saves
 
-Version-2 records include assignments, building levels, lifetime Authority, queued/resolved reports, investigations, and the Chronicle. Import validates IDs, finite nonnegative values, worker counts, levels, and consistent one-time records. Version-1 imports migrate automatically. Successful imports reconcile elapsed time; invalid imports preserve the current record.
+Version-3 records include assignments, building levels, lifetime Authority, queued/resolved reports, investigations, the Chronicle, an active expedition, visited destinations, and bounded return history. Import validates IDs, finite nonnegative values, shared worker counts, levels, timer durations, research prerequisites, and consistent one-time records. Version-1 and version-2 imports migrate automatically. Successful imports reconcile elapsed time; invalid imports preserve the current record.
 
 Progress is stored in this browser under `buried-sun.save`. It does not transfer between devices or origins automatically. Open **Save & settings** to download a JSON backup or copy its text, import a file or pasted JSON, and reset with confirmation. Invalid imports leave the existing save intact. If a stored save cannot be loaded, the recovery view retains its raw text for backup before a confirmed replacement.
 
@@ -81,6 +86,16 @@ Verified locally on October 1, 2026: lint, TypeScript, **36 tests**, and product
 `npm run simulate:opening` reaches the first discovery from a fresh save with three Foragers and two Lamplighters, no resource grants and no manual gathering. Provisional milestones: Fields at 25 seconds, Oil Press at 75, household at 136, lamplighter’s report at 176, examination at 201. This checks reachability; it does not establish the complete Phase 1 pacing target or enjoyment.
 
 In the Codex browser, completed a fresh opening through ordinary controls at a 390px viewport. Checked zero horizontal overflow at 320/768/1024/1440px, visible keyboard focus, emergency Oil rendering, persisted progress after reload, malformed-import preservation, backup restoration, a 12-hour import reporting exactly eight hours of production, exclusive tab ownership and transfer, and the updated cached shell reopening with the preview server stopped. The production console was clear during online checks. Real iPhone Safari and home-screen PWA behavior remain unverified.
+
+### Scholarship and expedition verification
+
+Verified locally on October 2, 2026: lint, TypeScript, **53 tests**, and the static production build. New tests cover scholarship gates/modifiers, worker reservation, invalid party sizes and costs, repeat returns and one-time findings, foreground/offline equivalence through an expedition Food reward, timers beyond the production cap, bounded return history, version-2 migration, and inconsistent saves.
+
+`npm run simulate:foundations` reaches the survey from a fresh save without grants or manual gathering. Provisional milestones: Ledger Keeping at 343 seconds, Market Stall at 455, Scrivener’s House at 576, cistern departure at 726, House of Antiquities/catalog at 975, and foundation survey at 1,175 (about 19½ minutes). The harness uses three Foragers, two Lamplighters, one Scrivener, and two expedition inhabitants. Optional improvements are not purchased. This is a reachability check, not a verified full Phase 1 pacing or enjoyment result.
+
+In the Codex browser, played a fresh opening through the lamp examination at a 390px viewport, then exercised the new stage through its controls using timestamp-adjusted backups to represent away intervals. Verified version-2 migration, an unsupported import preserving an active party, active-timer reload persistence, idle-worker reservation limits, offline return rewards and findings, the foundation survey, and persisted survey completion. The expanded terminal had no horizontal overflow at 320/768/1024/1440px; navigation targets remained 48px tall. The production console showed no warnings or errors during online checks. The cached game reopened with the static preview server stopped.
+
+The new increment is local and has not been deployed. A full fresh-save playthrough at normal speed, balance/enjoyment assessment, and real iPhone Safari/home-screen PWA behavior remain unverified.
 
 ## Vercel
 

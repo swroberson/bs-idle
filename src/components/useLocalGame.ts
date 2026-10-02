@@ -31,7 +31,7 @@ export function useLocalGame() {
   const advance = useCallback((persist: boolean) => {
     if (!current.current || !ownsLock.current) return;
     const result = reconcile(current.current, Date.now());
-    if (result.summary.elapsedMs >= BALANCE.returnSummaryAfterMs) setReturnSummary(result.summary);
+    if ((result.summary.elapsedMs >= BALANCE.returnSummaryAfterMs || result.summary.completedExpeditions.length > 0)) setReturnSummary(result.summary);
     if (result.state !== current.current || persist) commit(result.state, persist);
   }, [commit]);
 
@@ -59,7 +59,7 @@ export function useLocalGame() {
           const now = Date.now();
           const result = reconcile(stored === null ? createInitialState(now) : decodeSave(stored, now), now);
           commit(result.state);
-          if (result.summary.elapsedMs >= BALANCE.returnSummaryAfterMs) setReturnSummary(result.summary);
+          if ((result.summary.elapsedMs >= BALANCE.returnSummaryAfterMs || result.summary.completedExpeditions.length > 0)) setReturnSummary(result.summary);
         } catch (cause) {
           setStatus("error");
           setError(cause instanceof Error ? cause.message : "The stored save could not be loaded.");
@@ -111,7 +111,7 @@ export function useLocalGame() {
       const now = Date.now();
       const result = reconcile(decodeSave(text, now), now);
       commit(result.state);
-      setReturnSummary(result.summary.elapsedMs >= BALANCE.returnSummaryAfterMs ? result.summary : null);
+      setReturnSummary((result.summary.elapsedMs >= BALANCE.returnSummaryAfterMs || result.summary.completedExpeditions.length > 0) ? result.summary : null);
     },
     reset: () => { commit(createInitialState(Date.now())); setReturnSummary(null); },
   };

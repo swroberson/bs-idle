@@ -3,8 +3,9 @@ import type { GameAction, GameState } from "./types";
 import { BUILDINGS } from "../content/buildings";
 import { JOBS } from "../content/jobs";
 import { EVENTS } from "../content/events";
+import { EXPEDITIONS } from "../content/expeditions";
 import { RESEARCH } from "../content/research";
-import { availableWorkers, buildingCost, buildingRequirements, eventRequirements, payCost, researchRequirements } from "./requirements";
+import { availableWorkers, buildingCost, buildingRequirements, eventRequirements, payCost, researchRequirements, jobUnlocked, expeditionCost, expeditionRequirements } from "./requirements";
 import { reconcile } from "./simulation";
 import { queueEvents } from "./progression";
 
@@ -19,6 +20,7 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
   if (action.type === "build" && !Object.hasOwn(BUILDINGS, action.building)) return state;
   if (action.type === "choose-event" && !Object.hasOwn(EVENTS, action.event)) return state;
   if (action.type === "research" && !Object.hasOwn(RESEARCH, action.research)) return state;
+  if (action.type === "start-expedition" && !Object.hasOwn(EXPEDITIONS, action.destination)) return state;
   if ((action.type === "gather-food" || action.type === "render-oil") && gatheringWaitMs(state, now) > 0) return state;
   let next = reconcile(state, now).state;
   switch (action.type) {
@@ -31,6 +33,7 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
       next = { ...next, lastGatheredAt: now, resources: { ...next.resources, food: Math.min(Number.MAX_SAFE_INTEGER, next.resources.food + BALANCE.gatheringFood) } };
       break;
     case "assign-worker":
+      if (!jobUnlocked(next, action.job)) return next;
       if ((action.delta === 1 && availableWorkers(next) === 0) || (action.delta === -1 && next.jobs[action.job] === 0)) return next;
       next = { ...next, jobs: { ...next.jobs, [action.job]: next.jobs[action.job] + action.delta } };
       break;
@@ -42,6 +45,14 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
       if (next.pendingEvents[0] !== action.event || eventRequirements(next, action.event).length) return next;
       const event = EVENTS[action.event];
       next = { ...payCost(next, event.cost), population: next.population + event.population, pendingEvents: next.pendingEvents.slice(1), chronicle: [...next.chronicle, event.chronicle] };
+      break;
+    }
+    case "start-expedition": {
+      if (expeditionRequirements(next, action.destination, action.workers).length) return next;
+      const returnsAt = now + EXPEDITIONS[action.destination].durationMs;
+      if (!Number.isSafeInteger(returnsAt)) return next;
+      next = { ...payCost(next, expeditionCost(action.destination, action.workers)),
+        activeExpedition: { destination: action.destination, workers: action.workers, startedAt: now, returnsAt } };
       break;
     }
     case "research":
