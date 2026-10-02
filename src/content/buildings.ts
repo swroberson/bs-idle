@@ -21,19 +21,18 @@ export const BUILDINGS = {
   },
   "scrivener-house": {
     name: "Scrivener’s House", description: "The room has shelves enough for a thousand books. Only the dust has been disturbed.",
-    effect: "Unlocks Scriveners: each assigned inhabitant produces 0.08 Knowledge/s.",
+    completedEffect: "Each assigned Scrivener produces 0.08 Knowledge/s.",
     cost: { coin: 12, authority: 10 }, costGrowth: 1, maxLevel: 1,
     requirements: { buildings: { "market-stall": 1 }, research: ["ledger-keeping"] },
   },
   "ruined-cistern": {
     name: "Ruined Cistern", description: "Clear the upper stair and fix a rope to the ring in the stone. The ring is uncorroded.",
-    effect: "Opens Expeditions. Send 1–3 idle inhabitants; one party may be away at a time.",
+    completedEffect: "Parties of 1–3 idle inhabitants; one party may be away at a time.",
     cost: { coin: 15, food: 20, authority: 10 }, costGrowth: 1, maxLevel: 1,
     requirements: { buildings: { "scrivener-house": 1 }, research: ["examine-old-lamps"] },
   },
   "antiquities-house": {
     name: "House of Antiquities", description: "Recovered objects are set apart from ordinary stores. Nothing placed here is called a tool.",
-    effect: "Enables Catalog the Relics and archaeological study of the foundations.",
     cost: { coin: 25, authority: 15 }, costGrowth: 1, maxLevel: 1,
     requirements: { expeditions: ["old-cistern"] },
   },

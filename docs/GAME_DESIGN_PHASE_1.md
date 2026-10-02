@@ -118,7 +118,7 @@ Target **10 buildings**, unlocked in stages. Ordinary economic buildings can hav
 | Subterranean Works | Enables excavation and access beneath the chapel |
 | The Buried Engine | Final restoration structure; produces Current after awakening |
 
-Every building card should show its level or stage, effect, cost, and unmet requirements. Descriptions can imply an unfamiliar origin before mechanics reveal it.
+Every building card should show its level or stage, cost, and unmet requirements. Ordinary production rates remain explicit; new roles and systems appear after construction without an unlock preview. Descriptions can imply an unfamiliar origin before mechanics reveal it.
 
 Avoid overtly technological names early. A later name such as “Luminary Junction” is optional and should appear only when the discovery justifies it.
 
@@ -146,7 +146,7 @@ The required story chain is:
 
 Other research and expedition discoveries can supply prerequisites along this chain. The final restoration cost should take approximately 10–20 minutes to accumulate at the expected late-game production level, subject to playtesting.
 
-Keep completed research accessible so the player can reread discoveries. Show exact mechanical effects alongside atmospheric prose. Mystery should come from the setting, not unexplained arithmetic.
+Keep completed research accessible so the player can reread discoveries. Before completion, show the activity, exact cost, and unmet requirements without previewing findings, effects, or future unlocks. After completion, show findings and exact mechanical effects alongside atmospheric prose. Existing economy rules remain understandable.
 
 ## 7. Narrative events
 
@@ -191,7 +191,7 @@ An early expedition can last about **3 minutes** with two workers. Later duratio
 
 Use guaranteed first-time story discoveries so progression never depends on a rare drop. Repeat expeditions can supply ordinary resources. Phase 1 does not need combat, equipment, injury, worker death, or procedural destinations.
 
-Complete expeditions automatically when their timers expire, return workers to the available pool, and record rewards in a log. They also complete offline. Do not automatically send workers on another expedition.
+Complete expeditions automatically when their timers expire, return workers to the available pool, and record rewards in a log. Before dispatch, show the destination description, provisioning cost, duration, and worker commitment; reveal rewards and findings only after return. Never preview later unlocks. Expeditions also complete offline. Do not automatically send workers on another expedition.
 
 ## 9. Finale: The Awakening
 

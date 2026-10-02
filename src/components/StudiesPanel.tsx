@@ -12,7 +12,7 @@ export function StudiesPanel({ state, active, dispatch }: { state: GameState; ac
       return <article key={id} className="operation-row">
         <div className="operation-heading"><h3>{research.name}</h3><span className={`machine-label ${complete ? "activity-text" : ""}`}>{complete ? "Recorded" : "Available"}</span></div>
         <p className="narrative">{complete ? research.text : research.description}</p>
-        <p className="effect-readout">{research.effect}</p>
+        {complete && <p className="effect-readout">{research.effect}</p>}
         {!complete && <>
           <button className="machine-button" aria-describedby={`study-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "research", research: id })}>Investigate // {costText(research.cost)}</button>
           <p id={`study-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Stores sufficient / ready"}</p>

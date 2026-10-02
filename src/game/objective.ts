@@ -19,7 +19,7 @@ export function currentObjective(state: GameState) {
   if (!state.research.includes("examine-old-lamps")) return { title: "Examine the third lamp.", text: `Open Studies. The examination requires ${costText(RESEARCH["examine-old-lamps"].cost)} and records the discovery in the Chronicle.` };
   if (!state.research.includes("ledger-keeping")) return { title: "Give the findings a ledger.", text: `Investigate Ledger Keeping in Studies: ${costText(RESEARCH["ledger-keeping"].cost)}. Trade and scholarship will follow.` };
   for (const id of ["market-stall", "scrivener-house", "ruined-cistern"] as const) {
-    if (state.buildings[id] === 0) return { title: `Establish the ${BUILDINGS[id].name}.`, text: `Open Works: ${costText(buildingCost(state, id))}. ${BUILDINGS[id].effect}` };
+    if (state.buildings[id] === 0) return { title: `Establish the ${BUILDINGS[id].name}.`, text: `Open Works: ${costText(buildingCost(state, id))}. ${BUILDINGS[id].description}` };
   }
   if (state.jobs.scrivener === 0) return { title: "Put the observations in order.", text: "Assign a Scrivener in Ward to earn Knowledge. Keep Food production positive; new work draws from the same inhabitant register." };
   if (!state.completedExpeditions.includes("old-cistern")) return { title: "Send a party below the waterline.", text: state.activeExpedition ? "The party is away. Its return is automatic, including while the terminal is closed. Returned inhabitants remain idle." : "Release two workers in Ward, then send them to the Old Cistern in Expeditions. Two inhabitants require 20 Food and return in three minutes with two Relics." };

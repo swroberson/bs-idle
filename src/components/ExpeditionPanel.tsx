@@ -31,11 +31,10 @@ export function ExpeditionPanel({ state, active, dispatch }: { state: GameState;
     {(Object.keys(EXPEDITIONS) as ExpeditionId[]).filter(id => prerequisiteRequirements(state, EXPEDITIONS[id].requirements).length === 0).map(id => {
       const destination = EXPEDITIONS[id];
       const unmet = expeditionRequirements(state, id, workers);
-      const rewards = Object.fromEntries(Object.entries(destination.rewardsPerWorker).map(([resource, amount]) => [resource, amount * workers]));
       return <article key={id} className="operation-row">
         <div className="operation-heading"><h3>{destination.name}</h3><span className="machine-label">{state.completedExpeditions.includes(id) ? "Surveyed" : "Unvisited"}</span></div>
         <p className="narrative">{destination.description}</p>
-        <p className="effect-readout">Duration // {duration(destination.durationMs)}<br />Guaranteed return // {costText(rewards)}<br />{state.completedExpeditions.includes(id) ? "Repeat route / ordinary rewards" : "First return / permanent Chronicle finding"}</p>
+        <p className="effect-readout">Duration // {duration(destination.durationMs)}<br />{workers} inhabitants reserved until return</p>
         <button className="machine-button" disabled={!active || unmet.length > 0} aria-describedby={`expedition-${id}-requirements`} onClick={() => dispatch({ type: "start-expedition", destination: id, workers })}>Dispatch // {costText(expeditionCost(id, workers))}</button>
         <p id={`expedition-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || `${workers} inhabitants ready / provisions sufficient`}</p>
       </article>;

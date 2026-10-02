@@ -7,7 +7,7 @@ export const EVENTS = {
   },
   "lamp-complaint": {
     title: "The Lamplighter’s Complaint",
-    text: "Orso reports that the third lamp consumes no oil. He filled its reservoir twice before discovering that it possesses no reservoir at all.",
+    text: "Orso reports that the third lamp consumes no oil. He attempted to fill its reservoir twice before discovering that it possesses no reservoir at all.",
     choice: "Authorize an examination", cost: {}, population: 0,
     lifetimeAuthority: 35, requiredBuilding: "oil-press", chronicle: "lamp-complaint",
   },

@@ -69,7 +69,7 @@ export interface Modifiers {
   oilDemandMultiplier?: number;
 }
 export interface BuildingDefinition {
-  name: string; description: string; effect: string; cost: Cost;
+  name: string; description: string; effect?: string; completedEffect?: string; cost: Cost;
   costGrowth: number; maxLevel: number; requirements: ContentRequirements;
   foodPerForager?: number; oilPerSecond?: number; coinPerSecond?: number;
 }

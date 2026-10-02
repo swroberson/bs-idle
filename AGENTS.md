@@ -3,6 +3,29 @@
 These instructions apply throughout this repository. Read
 `docs/GAME_DESIGN_PHASE_1.md` before implementation.
 
+## Narrative authority
+
+Before writing or changing narrative, lore, character descriptions, discovery
+text, or illustration prompts, read [the story bible](docs/NARRATIVE_BIBLE.md).
+It distinguishes approved canon, proposals, in-world beliefs, existing prose,
+enduring mysteries, and unresolved author decisions. Unanswered questions are
+not permission to invent answers; the six-chapter outline remains provisional.
+
+Preserve mystery throughout the story and beyond its ending. Eerie details do
+not all need explanations, hidden solutions, or later payoffs, even in the
+author's notes. Record what is observed and preserve its consistency without
+settling every interpretation. Future agents must not explain away unresolved
+atmosphere merely to complete the lore. Required discoveries and mechanical
+effects must still be understandable; mystery does not excuse contradictions.
+
+Incidental prose may elaborate established facts without adding consequential
+lore. New major history, character backstory, system purposes, revelations, or
+endings require explicit user approval before becoming canon or player-facing
+content. Record approved changes in the bible's revision log and check their
+effects on clues, chronology, and reveal limits. Flag contradictions rather than
+silently resolving them through new lore. Later-story planning does not expand
+Phase 1 implementation scope.
+
 ## Project goal
 
 Buried Sun is a mobile-first, text-led incremental idle game inspired by the
@@ -462,8 +485,13 @@ new records, empty stores, or record faults. Do not badge ordinary affordable
 purchases or routine cooldown completion as recommended next actions.
 
 Do not show objectives, next-step hints, recommended actions, or tutorial
-prompts. Let players discover what to do. Keep exact costs, effects, timers,
-and unmet requirements understandable; mystery belongs in the world and prose.
+prompts. Let players discover what to do. Before an action, describe the work
+being undertaken and keep exact costs, timers, worker commitments, and unmet
+requirements understandable. Never preview what it will unlock: future studies,
+buildings, worker roles, destinations, systems, or story stages. Reveal study
+results and their effects after completion, and expedition rewards and findings
+after return. Ordinary production rates remain explicit. Mystery belongs in
+the world and its discoveries, not in costs or existing economy rules.
 
 ---
 
