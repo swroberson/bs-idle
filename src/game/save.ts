@@ -40,9 +40,24 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   catch { throw new Error("This is not valid JSON. Choose a Buried Sun save or paste its complete text."); }
   if (!record(value)) throw new Error("The save must contain a game object.");
   if (value.version !== 1 && value.version !== 2 && value.version !== 3) throw new Error("Unsupported save version. This game supports versions 1, 2 and 3.");
+  const chronicle = value.chronicle;
+  const readChronicle = Object.hasOwn(value, "readChronicle") ? value.readChronicle : [];
+  if (!ids(readChronicle, CHRONICLE) || !Array.isArray(chronicle) ||
+      !readChronicle.every(id => chronicle.includes(id))) {
+    throw new Error("Invalid save data: read Chronicle records are malformed.");
+  }
+  // The UI scaffold stored allocations as workers; the economy uses jobs.
+  const hasWorkers = value.version === 1 && Object.hasOwn(value, "workers");
+  if (hasWorkers && (!record(value.workers) || !exactKeys(value.workers, ["forager", "lamplighter"]) ||
+      !Object.values(value.workers).every(timestamp) ||
+      Object.values(value.workers).reduce<number>((sum, count) => sum + (count as number), 0) > (value.population as number))) {
+    throw new Error("Invalid save data: worker assignments exceed the population or are malformed.");
+  }
   const baseKeys = ["version", "resources", "population", "chronicle", "lastSimulatedAt", "lastGatheredAt"];
   const extraKeys = ["jobs", "buildings", "lifetimeAuthority", "triggeredEvents", "pendingEvents", "research"];
   const expeditionKeys = ["activeExpedition", "completedExpeditions", "expeditionLog"];
+  if (Object.hasOwn(value, "readChronicle")) baseKeys.push("readChronicle");
+  if (hasWorkers) baseKeys.push("workers");
   const legacy = value.version !== 3;
   if (!exactKeys(value, value.version === 1 ? baseKeys : value.version === 2 ? [...baseKeys, ...extraKeys] : [...baseKeys, ...extraKeys, ...expeditionKeys]) ||
       !record(value.resources) || !exactKeys(value.resources, legacy ? ["food", "oil", "authority"] : Object.keys(RESOURCES)) ||
@@ -58,6 +73,8 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
     if (migrationAt !== undefined && !timestamp(migrationAt)) throw new Error("Invalid migration timestamp.");
     return { ...createInitialState(Math.max(value.lastSimulatedAt as number, migrationAt ?? 0)),
       resources: { ...createInitialState(0).resources, ...value.resources } as GameState["resources"], population: value.population as number,
+      readChronicle: readChronicle as GameState["readChronicle"],
+      jobs: { ...createInitialState(0).jobs, ...(hasWorkers ? value.workers as object : {}) },
       lifetimeAuthority: value.resources.authority as number, lastGatheredAt: value.lastGatheredAt as number | null };
   }
   if (value.version === 2) {
@@ -125,7 +142,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   }
   if (state.activeExpedition && state.activeExpedition.startedAt < previousReturn) throw new Error("Invalid save: overlapping expeditions.");
   // Validation above covers every field. Return a fresh JSON object, not user references.
-  return value as unknown as GameState;
+  return { ...value, readChronicle } as unknown as GameState;
 }
 
 export function encodeSave(state: GameState): string {

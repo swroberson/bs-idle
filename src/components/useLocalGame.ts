@@ -98,11 +98,11 @@ export function useLocalGame() {
     return () => { stopped = true; controller.abort(); release(); };
   }, [advance, commit]);
 
-  const dispatch = (action: GameAction) => {
-    if (!current.current || status !== "active") return false;
+  const dispatch = useCallback((action: GameAction) => {
+    if (!current.current || !ownsLock.current) return false;
     try { advance(false); commit(applyAction(current.current!, action, Date.now())); return true; }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Progress could not be saved."); return false; }
-  };
+  }, [advance, commit]);
 
   return {
     state, status, error, damagedSave, dispatch, returnSummary,

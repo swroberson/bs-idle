@@ -66,3 +66,58 @@ describe("opening actions", () => {
     expect(applyAction(state, { type: "gather-food" }, NaN)).toBe(state);
   });
 });
+
+describe("Chronicle attention", () => {
+  it("starts unread and preserves acknowledgement through export/import", () => {
+    const initial = createInitialState(1000);
+    expect(initial.readChronicle).toEqual([]);
+    const read = applyAction(initial, { type: "read-chronicle", id: "appointment" }, 1000);
+    expect(read.readChronicle).toEqual(["appointment"]);
+    expect(decodeSave(encodeSave(read))).toEqual(read);
+    expect(initial.readChronicle).toEqual([]);
+    expect(applyAction(read, { type: "read-chronicle", id: "appointment" }, 1001)).toBe(read);
+    expect(read.resources).toEqual(initial.resources);
+    expect(read.lastGatheredAt).toBeNull();
+  });
+
+  it("loads earlier economy saves with their entries unread", () => {
+    const legacy = JSON.parse(encodeSave(createInitialState(1000)));
+    delete legacy.readChronicle;
+    expect(decodeSave(JSON.stringify(legacy)).readChronicle).toEqual([]);
+  });
+
+  it.each([null, "appointment", ["unknown"], ["appointment", "appointment"]])(
+    "rejects malformed read records: %j", (readChronicle) => {
+      expect(() => decodeSave(JSON.stringify({ ...createInitialState(1000), readChronicle }))).toThrow();
+    },
+  );
+
+  it("rejects acknowledgement of an entry absent from the record", () => {
+    const initial = createInitialState(1000);
+    const withoutEntry = { ...initial, chronicle: [] };
+    expect(applyAction(withoutEntry, { type: "read-chronicle", id: "appointment" }, 1000)).toBe(withoutEntry);
+  });
+});
+
+
+describe("UI scaffold migration", () => {
+  const old = { version: 1, resources: { food: 2165, oil: 20, authority: 0 }, population: 5,
+    chronicle: ["appointment"], readChronicle: ["appointment"], workers: { forager: 3, lamplighter: 2 },
+    lastSimulatedAt: 1000, lastGatheredAt: null };
+  it("preserves allocations, exact stores and read entries when enabling the economy", () => {
+    const migrated = decodeSave(JSON.stringify(old), 500_000);
+    expect(migrated.jobs).toEqual({ forager: 3, lamplighter: 2, scrivener: 0 });
+    expect(migrated.readChronicle).toEqual(["appointment"]);
+    expect(migrated.resources.food).toBe(2165);
+    expect(migrated.lastSimulatedAt).toBe(500_000);
+    expect(decodeSave(encodeSave(migrated))).toEqual(migrated);
+  });
+  it.each([null, { forager: 3, lamplighter: 3 }, { forager: -1, lamplighter: 0 }, { forager: 0.5, lamplighter: 0 }])(
+    "rejects invalid scaffold allocations: %j", workers => {
+      expect(() => decodeSave(JSON.stringify({ ...old, workers }))).toThrow();
+    },
+  );
+  it("rejects acknowledgements of a known but absent entry", () => {
+    expect(() => decodeSave(JSON.stringify({ ...old, readChronicle: ["household"] }))).toThrow();
+  });
+});

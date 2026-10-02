@@ -26,6 +26,7 @@ export interface GameState {
   pendingEvents: EventId[];
   research: ResearchId[];
   chronicle: ChronicleId[];
+  readChronicle: ChronicleId[];
   activeExpedition: ActiveExpedition | null;
   completedExpeditions: ExpeditionId[];
   expeditionLog: ExpeditionReturn[];
@@ -34,6 +35,7 @@ export interface GameState {
 }
 
 export type GameAction =
+  | { type: "read-chronicle"; id: ChronicleId }
   | { type: "gather-food" }
   | { type: "render-oil" }
   | { type: "assign-worker"; job: JobId; delta: 1 | -1 }

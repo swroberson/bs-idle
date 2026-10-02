@@ -15,6 +15,10 @@ export function gatheringWaitMs(state: GameState, now: number): number {
 
 export function applyAction(state: GameState, action: GameAction, now: number): GameState {
   if (!Number.isSafeInteger(now) || now < state.lastSimulatedAt || now < 0) return state;
+  if (action.type === "read-chronicle") {
+    if (!state.chronicle.includes(action.id) || state.readChronicle.includes(action.id)) return state;
+    return { ...state, readChronicle: [...state.readChronicle, action.id] };
+  }
   // Reject unknown runtime IDs before indexing content (imports and UI are not trusted).
   if (action.type === "assign-worker" && (!Object.hasOwn(JOBS, action.job) || ![1, -1].includes(action.delta))) return state;
   if (action.type === "build" && !Object.hasOwn(BUILDINGS, action.building)) return state;

@@ -9,7 +9,7 @@ export function ProvisionsPanel({ state, wait, active, gather, dispatch }: {
   const progress = 1 - Math.min(wait / BALANCE.gatheringCooldownMs, 1);
   return <section aria-labelledby="provisions-heading" className="gathering-station">
         <div className="region-heading"><h3 id="provisions-heading" className="machine-label">Manual / Provisions</h3><span className={`machine-label ${active && ready ? "activity-text" : ""}`}>{!active ? "Unavailable" : ready ? "Ready" : "Recovering"}</span></div>
-        <p className="narrative gathering-copy">There is still food growing among the abandoned gardens. Bring a little back for those who remain.</p>
+        <p className="narrative gathering-copy">There is still food growing among the abandoned gardens.</p>
         <button className="machine-button gather-control" disabled={!active || !ready} aria-describedby="gather-status" onClick={gather}>
           <span>Gather provisions</span><span className="control-yield">+{BALANCE.gatheringFood} Food <span aria-hidden="true">↗</span></span>
         </button>

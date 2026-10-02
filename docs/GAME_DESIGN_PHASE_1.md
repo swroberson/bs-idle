@@ -166,7 +166,7 @@ Events introduce households, systems, findings, and the finale. Avoid random eve
 
 > Orso reports that the third lamp consumes no oil.
 >
-> He filled its reservoir twice before discovering that it possesses no reservoir at all.
+> He attempted to fill its reservoir twice before discovering that it possesses no reservoir at all.
 
 **Examine the lamp:** unlocks the first lamp investigation.
 
@@ -225,11 +225,13 @@ Keep these facts easy to find:
 
 - Current resources and net production rates.
 - Population, assigned workers, expedition workers, and available workers.
-- The next story objective and its unmet requirements.
+- Unread records and unresolved situations, signaled on the relevant navigation tab.
 - Purchase costs and the concrete effects of buildings or research.
 - Expedition timers, pending events, and recent discoveries.
 
 Avoid dense desktop tables, hover-only explanations, or tiny assignment buttons. Support keyboard navigation, readable contrast, reduced motion, and status cues that do not depend on color alone. Illustration is optional; no art pipeline is required for the first build.
+
+The terminal should fit within the viewport during ordinary play, keeping stores and navigation visible. Prefer focused views and pagination to growing lists. Preserve scrolling as an accessibility fallback for enlarged text, short landscape screens, and unusually long content. Chronicle badges count unread entries and persist across reloads; viewing an entry acknowledges only that entry. Other sections use the same badge language for situations needing attention, such as unresolved choices or empty stores. Do not flag every affordable purchase or suggest the next action. Mechanical costs, effects and unavailable requirements remain explicit; players discover the path themselves.
 
 ## 11. Technical architecture
 
@@ -307,7 +309,7 @@ Complete each milestone as a working increment. Placeholder balance is acceptabl
 
 1. **App and persistence:** mobile navigation, typed initial state, versioned saves, import/export/reset, and PWA shell.
 2. **Economy:** elapsed-time simulation, Food and Oil consumption, jobs, construction, modifiers, and recoverable shortages.
-3. **Opening progression:** initial buildings, population events, objective guidance, and a playable first few minutes.
+3. **Opening progression:** initial buildings, population events, progressive interface reveals, and a playable first few minutes.
 4. **Research:** data-driven prerequisites, purchases, modifiers, unlocks, and completed discovery records.
 5. **Events:** queued one-time events, explicit choices, household arrivals, and a persistent chronicle.
 6. **Expeditions:** worker reservation, costs, timers, rewards, guaranteed discoveries, and automatic return.

@@ -13,6 +13,7 @@ export function createInitialState(now: number): GameState {
     pendingEvents: [],
     research: [],
     chronicle: ["appointment"],
+    readChronicle: [],
     activeExpedition: null,
     completedExpeditions: [],
     expeditionLog: [],

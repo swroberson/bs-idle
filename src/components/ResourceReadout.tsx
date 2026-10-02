@@ -1,7 +1,11 @@
+"use client";
+
+import { useRef, useState } from "react";
 import { RESOURCES } from "@/content/resources";
 import type { GameState, ResourceId } from "@/game/types";
 import { resourceVisible } from "@/game/requirements";
 import { economyRates } from "@/game/simulation";
+import { formatCompactNumber } from "./formatNumber";
 
 const glyphs: Record<ResourceId, string> = {
   food: "M4 17V9l6-5 6 5v8M7 12h6M10 8v9M3 20h14",
@@ -14,14 +18,28 @@ const glyphs: Record<ResourceId, string> = {
 
 export function ResourceReadout({ state }: { state: GameState }) {
   const { net } = economyRates(state);
-  return <section aria-label="Ward stores" className="resource-readout">
-    {(Object.keys(RESOURCES) as ResourceId[]).filter(id => resourceVisible(state, id)).map((id) => <div key={id} className="resource-cell">
-      <p className="machine-label resource-label">
+  const amountDialog = useRef<HTMLDialogElement>(null);
+  const [selected, setSelected] = useState<ResourceId | null>(null);
+
+  return <><section aria-label="Ward stores" className="resource-readout">
+    {(Object.keys(RESOURCES) as ResourceId[]).filter(id => resourceVisible(state, id)).map((id) => {
+      const exact = state.resources[id].toLocaleString("en-US", { maximumFractionDigits: 20 });
+      return <button key={id} className="resource-cell" title={`${RESOURCES[id].name}: ${exact}`} aria-label={`${RESOURCES[id].name}: ${exact}. View exact amount.`} aria-describedby={`${id}-rate`} aria-haspopup="dialog" aria-controls="resource-details" onClick={() => {
+        setSelected(id);
+        amountDialog.current?.showModal();
+      }}>
+      <span className="machine-label resource-label">
         <svg viewBox="0 0 20 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.2"><path d={glyphs[id]} /></svg>
         {RESOURCES[id].name}
-      </p>
-      <p className="resource-value">{state.resources[id].toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
-      <p className="resource-rate"><span>NET</span> {net[id] >= 0 ? "+" : ""}{net[id].toFixed(3)}<span>/s</span></p>
-    </div>)}
-  </section>;
+      </span>
+      <span className="resource-value"><span key={state.resources[id]}>{formatCompactNumber(state.resources[id])}</span></span>
+      <span id={`${id}-rate`} className="resource-rate" title="Net rate per second"><span className="sr-only">Net </span>{net[id] >= 0 ? "+" : ""}{net[id].toFixed(3)}<span>/s</span></span>
+    </button>;
+    })}
+  </section>
+  <dialog id="resource-details" ref={amountDialog} className="resource-details" aria-labelledby="resource-detail-heading" aria-describedby="resource-detail-amount">
+    <h2 id="resource-detail-heading" className="machine-label">{selected ? RESOURCES[selected].name : "Stores"} / Exact amount</h2>
+    <p id="resource-detail-amount" className="exact-amount">{selected !== null && state.resources[selected].toLocaleString("en-US", { maximumFractionDigits: 20 })}</p>
+    <button className="machine-button" onClick={() => amountDialog.current?.close()}>Close</button>
+  </dialog></>;
 }

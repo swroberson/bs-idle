@@ -45,7 +45,7 @@ The application needs no API, server actions, database, authentication or server
 
 ## Progression status
 
-Implemented: Forager/Lamplighter assignments, elapsed-time Food consumption and Oil/Authority production, Fields and Oil Press construction, a one-time household arrival, the lamplighter’s report, and a deliberate lamp examination. Works and Studies appear as they unlock. Costs, unmet requirements, net rates, next obligations, and completed discoveries are visible in the terminal interface. New inhabitants arrive idle.
+Implemented: Forager/Lamplighter assignments, elapsed-time Food consumption and Oil/Authority production, Fields and Oil Press construction, a one-time household arrival, the lamplighter’s report, and a deliberate lamp examination. Works and Studies appear as they unlock. Costs, unmet requirements, net rates, and completed discoveries are visible in the terminal interface. New inhabitants arrive idle.
 
 Foragers retain full output during Food shortages; other productive output falls to 50%. At zero Oil, lamp output follows the available Oil Press flow. Manual provisions gathering and emergency rendering (5 Food → 2 Oil) share a 30-second recovery interval, so poor allocations or spending cannot permanently strand the opening without fuel.
 
@@ -59,13 +59,19 @@ This build ends at the foundation survey. Tracing the conduits, remaining buildi
 
 ## Interface
 
-The interface follows the industrial terminal direction in `AGENTS.md`: a single structural frame, persistent store telemetry, rectangular machine controls, and a connected inhabitant register. Chronicle and save maintenance use the same frame. Monospace quantities contrast with narrative serif prose; amber marks readiness and activity, and muted red marks record faults and reset controls. Gathering shows its recovery interval and announces successful storage without reading every countdown tick aloud. Motion respects the device's reduced-motion setting. Only implemented systems appear. Store telemetry updates once per second; touch-sized assignment controls, construction, pending reports, and the return summary share the terminal’s structural borders.
+The interface is one viewport-sized terminal with persistent store telemetry and bottom navigation. Ward controls and the inhabitant register share its structure; Chronicle shows one entry per page, and Records separates export, import and replacement operations. Short screens use condensed layouts, with scrolling retained for enlarged text, long content and errors. Rectangular controls, geometric ward seals, monospace readouts and serif narrative prose establish the industrial/civic atmosphere. Muted green marks machinery activity, amber signals unread records, and muted red marks shortages and record faults. No objective prompts, next-step hints or purchase recommendations appear. Costs, yields and timers remain explicit. Gathering announces successful storage without reading each countdown tick aloud. Motion respects reduced-motion settings. Only unlocked systems appear; resource instruments show actual net rates.
+
+Chronicle always opens to the latest entry, regardless of unread status; previous entries remain available through pagination. Chronicle badges count unread entries. Viewing a record in a visible, active tab marks only that entry read, persists the acknowledgement and clears its badge across reloads. Existing saves without `readChronicle` migrate with their entries unread; new backups persist acknowledgement. Ward badges signal pending events and empty Food/Oil stores; expedition badges signal undismissed party returns, and Records badges signal storage/offline-shell faults. Routine purchases and cooldowns receive no badges.
+
+The inhabitant register provides 44px plus/minus controls for unlocked roles. Assigned and Available totals derive from the shared population pool; actions cannot over-assign or release nonexistent workers. Assignments save after each action and survive reload and import/export. Version-1 scaffold allocations in `workers` migrate into economy `jobs`, preserving the shared worker pool. Earlier saves without assignments start with everyone available. Scholarship remains hidden until unlocked. Small mobile screens prioritize allocation controls over the Ward's introductory scene.
+
+Resource counters use the shared compact formatter in `src/components/formatNumber.ts`: k (thousands), m (millions), b (billions), t (trillions) and q (quadrillions). Values truncate to at most one decimal, so 2,165 displays as 2.1k without overstating available stores. Full amounts remain in saves and calculations. Tap or keyboard-activate any resource readout for its exact count; screen readers also receive the exact value. The full readout is the touch target, and the exact-count dialog supports Escape and returns focus to its counter. Rates sit beside resource labels so six-character quantities have the full cell width without enlarging the resource strip.
 
 ## Saves
 
 Version-3 records include assignments, building levels, lifetime Authority, queued/resolved reports, investigations, the Chronicle, an active expedition, visited destinations, and bounded return history. Import validates IDs, finite nonnegative values, shared worker counts, levels, timer durations, research prerequisites, and consistent one-time records. Version-1 and version-2 imports migrate automatically. Successful imports reconcile elapsed time; invalid imports preserve the current record.
 
-Progress is stored in this browser under `buried-sun.save`. It does not transfer between devices or origins automatically. Open **Save & settings** to download a JSON backup or copy its text, import a file or pasted JSON, and reset with confirmation. Invalid imports leave the existing save intact. If a stored save cannot be loaded, the recovery view retains its raw text for backup before a confirmed replacement.
+Progress is stored in this browser under `buried-sun.save`. It does not transfer between devices or origins automatically. Open **Records** to download a JSON backup or copy its text, import a file or pasted JSON, and reset with confirmation. Invalid imports leave the existing save intact. If a stored save cannot be loaded, the recovery view retains its raw text for backup before a confirmed replacement.
 
 ## PWA and offline shell
 
@@ -97,13 +103,17 @@ In the Codex browser, played a fresh opening through the lamp examination at a 3
 
 The new increment is local and has not been deployed. A full fresh-save playthrough at normal speed, balance/enjoyment assessment, and real iPhone Safari/home-screen PWA behavior remain unverified.
 
+### UI integration verification
+
+Verified locally on October 2, 2026 after resolving the UI/gameplay rebase: lint, TypeScript, **104 tests**, and the production static build. Migration tests preserve version-1 UI allocations, exact stores and read entries while retaining version-2/3 gameplay validation. Browser checks on an isolated preview covered real net rates, worker allocation limits, construction, pending-event badges, latest-entry Chronicle opening with older unread entries, compact counts, and exact-count dialog Escape/focus return. Ordinary Ward and Chronicle views fit at 320×568 and 390×844 without page or panel scrolling. The production console was clear. Longer gameplay lists retain an overflow fallback; real iPhone Safari/PWA behavior remains unverified.
+
 ## Vercel
 
 `next.config.ts` uses `output: "export"`; `npm run build` writes the site into `out/`. `vercel.json` selects Vercel’s **Other** hosting preset (`framework: null`), specifies `npm ci`, `npm run build`, `out` as the output directory, and a no-cache header for the service worker. The app still builds with Next.js; Vercel publishes its static export without a runtime server. Using the Next.js hosting preset with an `out` override failed in the cloud because that adapter expected server build manifests there. The Other preset serves the exported files directly. See [Vercel static configuration](https://vercel.com/docs/project-configuration/vercel-json) and [Next.js static export guidance](https://nextjs.org/docs/app/guides/static-exports).
 
 Production: **[bs-idle.vercel.app](https://bs-idle.vercel.app)**. Deployed and verified on October 1, 2026. The Vercel project is `bs-idle` in `swrobersons-projects`, linked to [swroberson/bs-idle](https://github.com/swroberson/bs-idle). Root directory is `.`, Node.js is 24.x, and `vercel.json` supplies the install/build/output settings above. No game environment variables or server-side secrets are required.
 
-The first live release contains commit `383d396` from `codex/opening-economy`. Its successful preview was promoted to production; [production deployment](https://vercel.com/swrobersons-projects/bs-idle/EK62cRS2bEwxeYUkX7Vj8zDdoEVf). Vercel's automatic production branch is `main`; the opening-economy branch has not been merged into `main`. Pushes to other branches generate previews. Merge the reviewed game changes into `main` before relying on automatic production releases from that branch.
+The first live release contains commit `383d396` from `codex/opening-economy`. Its successful preview was promoted to production; [production deployment](https://vercel.com/swrobersons-projects/bs-idle/EK62cRS2bEwxeYUkX7Vj8zDdoEVf). Vercel's automatic production branch is `main`; the opening-economy branch was subsequently merged through PR #2. Pushes to other branches generate previews.
 
 For an explicit release from the current checkout, the following CLI workflow was verified with Vercel CLI 62.1.0 (the older globally installed CLI was rejected). Authenticate with the project owner's Vercel account, connect its GitHub identity, and grant the Vercel GitHub app access to this repository. Local project linkage stays in ignored `.vercel/` files.
 

@@ -446,6 +446,25 @@ The player should be able to visually compare an early-game screenshot with a la
 
 **The UI is effectively the player's base.**
 
+### Attention and viewport
+
+Keep ordinary play within the viewport, with persistent resource readouts and
+navigation. Use focused views and pagination instead of ever-growing lists.
+Retain scrolling as a fallback for enlarged text, very short screens, and long
+content; never clip essential controls to enforce a no-scroll layout.
+
+Chronicle always opens to the latest entry, with older entries available through
+pagination, regardless of which entries are unread.
+Chronicle tabs display a count of unread entries. Persist acknowledgement in
+the save and clear only the entry actually viewed in a visible, active tab.
+Use the same badge convention wherever attention is required: pending choices,
+new records, empty stores, or record faults. Do not badge ordinary affordable
+purchases or routine cooldown completion as recommended next actions.
+
+Do not show objectives, next-step hints, recommended actions, or tutorial
+prompts. Let players discover what to do. Keep exact costs, effects, timers,
+and unmet requirements understandable; mystery belongs in the world and prose.
+
 ---
 
 ## The Buried Sun
@@ -510,3 +529,232 @@ If a component begins drifting toward generic dashboard/SaaS styling, favor **in
 The player is not browsing information about an excavation.
 
 **They are operating the excavation.**
+
+## Art Direction
+
+*Buried Sun* is primarily a text-led game. Illustration is used sparingly to give the player glimpses into the physical world: the opening of a new save, the discovery of a building or location, the appearance of a new kind of worker, a significant investigation, or a major narrative revelation.
+
+Illustrations should feel valuable because they are uncommon. Do not add decorative art merely to fill space.
+
+### Core visual identity: Dark Chronicle
+
+The visual style is **Dark Chronicle**: grounded historical realism presented with heavy chiaroscuro, deep shadow, restrained color, and an atmosphere of age, enclosure, neglect, and imperfect understanding.
+
+The world should feel:
+
+- Ancient rather than conventionally medieval.
+- Material and tactile: stone, soot, timber, iron, leather, wool, parchment, oil, smoke, mud, dust, and worn tools.
+- Dimly illuminated by lamps, candles, furnaces, or narrow sources of natural light.
+- Inhabited and functional rather than picturesque.
+- Claustrophobic more often than expansive.
+- Strange without looking overtly fantastical.
+- Monumental in fragments, never through explanatory establishing shots.
+
+Avoid bright fantasy concept art, picturesque medieval villages, sunny pastoral landscapes, heroic compositions, clean high-fantasy architecture, or generic grimdark spectacle.
+
+### The art does not know more than the characters
+
+This is the most important rule.
+
+**An illustration may depict only what an inhabitant of the world could perceive. It must not visually explain the true nature of the setting to the player.**
+
+The Citadel and its associated structures descend from incomprehensibly old technological infrastructure. The inhabitants do not understand this. Their language and worldview interpret inherited systems as architecture, craft, civic institutions, religion, ruins, and tradition.
+
+Therefore, never depict the Citadel as a recognizable spaceship, space station, technological megastructure, or other comprehensible science-fiction object.
+
+Do not create diagrams, exterior establishing shots, cutaways, aerial views, or other omniscient perspectives that reveal how the Citadel works or what it originally was.
+
+The player should gradually suspect what the world is. The illustrations must not confirm more than the narrative has earned.
+
+### Depict fragments, not answers
+
+When something is ancient, enormous, or technologically incomprehensible, **do not depict it in its entirety**.
+
+Show fragments.
+
+Examples:
+
+- A smooth black wall disappearing beyond the frame.
+- An enormous curved surface exposed beneath ordinary masonry.
+- A conduit whose scale and material make its purpose unclear.
+- A doorway built for proportions that make no obvious human sense.
+- A geometric seam visible behind centuries of plaster.
+- Workers standing beside a tiny exposed portion of a much larger mechanism.
+- Strange light emerging from somewhere the composition does not reveal.
+- Human scaffolding attached to something whose boundaries cannot be seen.
+
+Let darkness, architecture, cropping, fog, depth, obstruction, and the edge of the frame conceal the rest.
+
+**A good Buried Sun illustration reveals one thing while concealing something larger.**
+
+### No conventional science-fiction vocabulary
+
+Ancient technology should not look like modern or cinematic science fiction.
+
+Avoid:
+
+- Holograms.
+- Computer terminals.
+- Screens and control panels.
+- Visible circuit boards.
+- Neon strips.
+- Recognizable electrical equipment.
+- Spaceship corridors.
+- Reactor cores.
+- Sci-fi doors.
+- Clearly mechanical robots.
+- Familiar industrial machinery presented as futuristic technology.
+
+An ancient technological object should initially be difficult to distinguish from architecture, infrastructure, ritual objects, or inexplicable material.
+
+A conduit may simply be a smooth black cylinder passing through stone. A machine may resemble a wall until part of it moves. An ancient lamp may look like an ordinary civic fixture until someone discovers that it has no reservoir.
+
+### Composition and scale
+
+Prefer **intimate, human-scale viewpoints**.
+
+The viewer should usually feel physically present in a room, workshop, passage, excavation, courtyard, or other bounded space.
+
+Favor:
+
+- Cramped interiors.
+- Low ceilings and vaults.
+- Narrow passages.
+- Enclosed courtyards.
+- Workshops.
+- Offices.
+- Cellars.
+- Excavations.
+- Shafts.
+- Partial architectural views.
+- Foreground objects that establish human scale.
+
+Avoid clean horizons and enormous panoramic vistas.
+
+If monumental scale appears, communicate it through contrast with human-scale objects and by allowing the structure to leave the frame. Do not pull the camera backward merely to show the whole thing.
+
+### Light and color
+
+Darkness should be structural, not a dark filter placed over an otherwise bright scene.
+
+Most of the image may be genuinely difficult to see. Important subjects emerge from localized illumination while surrounding architecture disappears into shadow.
+
+Primary light sources should usually be:
+
+- Oil lamps.
+- Candles.
+- Hearths.
+- Furnaces.
+- Torches.
+- Narrow openings.
+- Reflected or indirect daylight.
+
+Use a restrained palette dominated by soot black, charcoal, weathered stone, dirty brown, dull iron, parchment, aged timber, and muted cloth.
+
+Warm amber firelight against cold darkness is appropriate.
+
+Unfamiliar light should be rare and narratively meaningful. As ancient systems awaken, pale or otherwise unnatural illumination can become a visual signal that something fundamental has changed.
+
+Do not casually use glowing technology before the story earns it.
+
+### Human life should remain legible
+
+The ancient world is mysterious. **Human activity is not.**
+
+Human-made objects and practices should be understandable and materially believable: ledgers, tools, ropes, baskets, presses, anvils, shelves, seals, keys, lamps, barrels, scaffolds, simple furniture, patched clothing, and hand-built structures.
+
+This contrast is important.
+
+The inhabitants construct understandable things **on, inside, and around things they do not understand**.
+
+A wooden shelf might be attached to an impossibly smooth ancient wall. A stone workshop might incorporate an unknown structural member as though it were simply a column. Generations of repairs may obscure the boundary between human construction and inherited infrastructure.
+
+Do not make every scene strange. Ordinary life must be convincing enough that anomalies matter.
+
+### People
+
+Avoid conventional RPG character portraits and heroic poses.
+
+When illustrating a worker type, show the person **performing their role in an environment**.
+
+A Smith should be working at an anvil rather than posing with a hammer. A Lamplighter should be tending a lamp. A Scrivener should be hunched over records. A Scavenger should be examining or recovering something.
+
+People should generally appear small relative to their environment. Clothing should be practical, worn, layered, and grounded in the material culture of the Ward.
+
+Characters are inhabitants, laborers, clerks, craftspeople, and custodians, not fantasy heroes.
+
+### Buildings and locations
+
+Building unlock art should communicate **use before spectacle**.
+
+Show how the place functions: its tools, surfaces, stored materials, signs of labor, lighting, and relationship to the surrounding Ward.
+
+Avoid isolated "beauty shots" of buildings.
+
+The player should feel as though they have been permitted to see a particular corner of the Ward rather than being shown a concept-art model of a structure.
+
+### Opening image and the Keeper
+
+The player is the **Keeper of the Outer Ward**, an inherited office combining mundane civic, religious, and bureaucratic responsibilities whose original purpose is no longer understood.
+
+Do not portray the Keeper as a powerful magistrate, noble, military commander, wizard, or senior imperial official.
+
+The Keeper's world should initially feel small.
+
+The visual model for the opening is a cramped, shabby office containing:
+
+- A battered desk.
+- An old household register.
+- An empty chair representing the player's place.
+- An oil lamp.
+- Keys, seals, ink, and a small number of records.
+- Worn shelves and practical storage.
+- Stone and ancient structural material incorporated without explanation.
+- A narrow glimpse into the dark Outer Ward beyond.
+
+The empty chair is preferable to depicting the Keeper directly. It places the player in the role without defining the Keeper's appearance.
+
+The initial impression should be approximately:
+
+**You have inherited an old office, an older register, a nearly abandoned Ward, and a duty to keep its lamps burning.**
+
+Nothing in the opening illustration should announce that this responsibility will eventually lead to the discovery of ancient technological infrastructure.
+
+### Unlock illustration categories
+
+Use these general approaches:
+
+**Buildings:** intimate environmental views showing the building in use.
+
+**Workers:** environmental portraits showing the worker performing their job.
+
+**Research and discoveries:** close observational compositions emphasizing the object, fragment, document, excavation, or anomaly being studied.
+
+**Expeditions and locations:** partial glimpses emphasizing arrival and immediate surroundings rather than comprehensive geography.
+
+**Ancient machinery:** fragments only. Use darkness and cropping aggressively.
+
+**Major revelations:** allow stronger visual contrast and unfamiliar illumination, but preserve ambiguity. A revelation should answer the current question without explaining the entire setting.
+
+### Image-generation guidance
+
+When prompting an image model, explicitly reinforce the following concepts where relevant:
+
+> dark historical realism, heavy chiaroscuro, localized oil-lamp or fire illumination, deep surrounding darkness, weathered tactile materials, cramped or enclosed composition, restrained desaturated palette, ancient inhabited environment, human-scale viewpoint, subtle unexplained architectural anomalies, monumental structures disappearing beyond the frame, grounded clothing and tools, no overt fantasy spectacle, no recognizable science-fiction technology, no panoramic establishing view
+
+Do not rely on the phrase "dark fantasy" alone. Image models frequently interpret it as conventional fantasy art and introduce castles, armor, magical symbols, dramatic skylines, or other inappropriate imagery. Describe the physical scene and lighting explicitly.
+
+### Final test
+
+Before accepting an illustration, ask:
+
+1. Could this image plausibly be seen by someone physically present in the scene?
+2. Does it depict ordinary human life convincingly?
+3. Does it avoid explaining ancient technology that the characters do not understand?
+4. Does darkness conceal meaningful parts of the environment rather than merely tinting the image?
+5. Is the composition intimate rather than unnecessarily panoramic?
+6. Does anything look generically high-fantasy or conventionally science-fictional?
+7. If something strange appears, is it subtle enough that an inhabitant might accept it as part of the world?
+8. Does the image reveal something while leaving a larger question unanswered?
+
+If an image fails these tests, revise it before adding it to the game.
