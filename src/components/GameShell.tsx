@@ -1,20 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CHRONICLE } from "@/content/chronicle";
 import { gatheringWaitMs } from "@/game/actions";
 import { ResourceReadout } from "./ResourceReadout";
-import { SavePanel } from "./SavePanel";
-import { WardPanel } from "./WardPanel";
 import { useLocalGame } from "./useLocalGame";
-
-const sections = { ward: "Ward", chronicle: "Chronicle", settings: "Save & settings" } as const;
+import { BALANCE } from "@/content/balance";
+import { ReturnPanel } from "./ReturnPanel";
+import type { GameAction } from "@/game/types";
+import { GamePages, SECTIONS, type Section } from "./GamePages";
+import { actionFeedback } from "./actionFeedback";
 
 export function GameShell() {
   const game = useLocalGame();
-  const [section, setSection] = useState<keyof typeof sections>("ward");
+  const [section, setSection] = useState<Section>("ward");
   const [now, setNow] = useState(0);
   const [offlineStatus, setOfflineStatus] = useState("");
+  const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
     const clockFrame = window.requestAnimationFrame(() => setNow(Date.now()));
@@ -28,8 +29,15 @@ export function GameShell() {
   }, []);
 
   const wait = game.state ? gatheringWaitMs(game.state, Math.max(now, game.state.lastGatheredAt ?? 0)) : 0;
-  const recovery = game.status === "error" && !game.state;
   const status = { loading: "Opening", waiting: "Read only", active: "Active", error: "Fault" }[game.status];
+  const worksOpen = !!game.state && game.state.lifetimeAuthority >= BALANCE.worksAuthority;
+  const studiesOpen = !!game.state?.chronicle.includes("lamp-complaint");
+  const expeditionsOpen = !!game.state && game.state.buildings["ruined-cistern"] > 0;
+  const visibleSections = (Object.keys(SECTIONS) as (Section)[]).filter((id) => (id !== "works" || worksOpen) && (id !== "studies" || studiesOpen) && (id !== "expeditions" || expeditionsOpen));
+  const shownSection = visibleSections.includes(section) ? section : "ward";
+  const dispatch = (action: GameAction) => {
+    if (game.dispatch(action)) setFeedback(actionFeedback(action));
+  };
 
   return <div className="terminal-shell">
     <a href="#main" className="skip-link">Skip to content</a>
@@ -43,30 +51,20 @@ export function GameShell() {
     <div className="terminal-instruments">
       {game.state && <ResourceReadout state={game.state} />}
       <nav aria-label="Keeper’s records" className="terminal-nav">
-        {(Object.keys(sections) as (keyof typeof sections)[]).map((id, index) => <button key={id} aria-current={section === id ? "page" : undefined} aria-controls="main" onClick={() => setSection(id)}><span aria-hidden="true" className="nav-index">0{index + 1}</span>{sections[id]}</button>)}
+        {visibleSections.map((id) => <button key={id} aria-current={shownSection === id ? "page" : undefined} aria-controls="main" onClick={() => setSection(id)}>{SECTIONS[id]}</button>)}
       </nav>
     </div>
     <main id="main" tabIndex={-1}>
+      {game.returnSummary && <ReturnPanel summary={game.returnSummary} dismiss={game.dismissSummary} />}
+      {feedback && <p role="status" className="action-feedback machine-label">{feedback}</p>}
       {game.error && <div role="alert" className="terminal-alert"><p className="machine-label">Record fault</p><p>{game.error}</p></div>}
       {game.status === "loading" && <p role="status" className="terminal-notice machine-label">Opening the Keeper’s register…</p>}
       {game.status === "waiting" && <div role="status" className="terminal-notice"><p className="machine-label">Access / held by another tab</p><h2>The register is open elsewhere.</h2><p>Close the other Buried Sun tab to continue here. This tab will then load your latest progress.</p></div>}
-      {(section === "settings" || recovery) && game.status !== "loading" && <SavePanel state={game.state} damagedSave={game.damagedSave} disabled={game.status === "waiting"} importSave={game.importSave} reset={game.reset} />}
-      {game.state && !recovery && section === "ward" && <>
-        <WardPanel state={game.state} wait={wait} active={game.status === "active"} gather={() => game.dispatch({ type: "gather-food" })} />
-        {game.state.chronicle.length > 0 && <div className="record-strip"><span className="machine-label">Last entry</span><p>{CHRONICLE[game.state.chronicle[game.state.chronicle.length - 1]].title}</p><button className="record-link" onClick={() => setSection("chronicle")}>Read record <span aria-hidden="true">↗</span></button></div>}
-      </>}
-      {game.state && section === "chronicle" && <section aria-labelledby="chronicle-heading" className="chronicle-region">
-        <div className="region-heading"><span className="machine-label">Archive / Written record</span><span className="telemetry">{String(game.state.chronicle.length).padStart(2, "0")} {game.state.chronicle.length === 1 ? "entry" : "entries"}</span></div>
-        <h2 id="chronicle-heading" className="section-title">The Ward’s chronicle</h2>
-        {game.state.chronicle.map((id, index) => <article key={id} className="chronicle-entry">
-          <p className="machine-label">Entry / {String(index + 1).padStart(3, "0")}</p>
-          <div><h3>{CHRONICLE[id].title}</h3><p className="narrative">{CHRONICLE[id].text}</p></div>
-        </article>)}
-      </section>}
+      <GamePages game={game} section={shownSection} wait={wait} dispatch={dispatch} setSection={setSection} clearFeedback={() => setFeedback("")} />
     </main>
     <footer className="terminal-footer">
-      <div className="footer-readout machine-label"><span>Phase I / Foundation build</span><span>{game.status === "active" ? "Local record / saved in this browser" : "Local record / unavailable"}</span></div>
-      <p>Economy and story progression are still to come. Stores do not yet change while you are away.</p>
+      <div className="footer-readout machine-label"><span>Phase I / The Outer Ward</span><span>{game.status === "active" ? "Local record / autosaves every 15s" : "Local record / unavailable"}</span></div>
+      <p>Production continues while away, up to eight hours. This build reaches the survey beneath the chapel.</p>
       {offlineStatus && <p className="machine-label">{offlineStatus}</p>}
     </footer>
   </div>;

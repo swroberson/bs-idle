@@ -14,6 +14,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "simulate:foundations": "vitest run src/game/foundations.harness.test.ts --reporter=verbose --disableConsoleIntercept",
+    "simulate:opening": "vitest run src/game/opening.harness.test.ts --reporter=verbose",
     "check": "npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {

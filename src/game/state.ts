@@ -3,10 +3,19 @@ import type { GameState } from "./types";
 
 export function createInitialState(now: number): GameState {
   return {
-    version: 1,
+    version: 3,
     resources: { ...BALANCE.startingResources },
     population: BALANCE.startingPopulation,
+    jobs: { forager: 0, lamplighter: 0, scrivener: 0 },
+    buildings: { fields: 0, "oil-press": 0, "market-stall": 0, "scrivener-house": 0, "ruined-cistern": 0, "antiquities-house": 0 },
+    lifetimeAuthority: 0,
+    triggeredEvents: [],
+    pendingEvents: [],
+    research: [],
     chronicle: ["appointment"],
+    activeExpedition: null,
+    completedExpeditions: [],
+    expeditionLog: [],
     lastSimulatedAt: now,
     lastGatheredAt: null,
   };

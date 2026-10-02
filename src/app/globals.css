@@ -44,7 +44,8 @@ button, a, input, textarea { outline-offset: 4px; }
 .resource-value { margin-top: .5rem; font-size: 1.75rem; line-height: 1.2; letter-spacing: -.04em; overflow-wrap: anywhere; animation: readout-settle .5s ease-out; }
 .resource-rate { margin-top: .5rem; color: var(--color-muted); font-size: .625rem; white-space: nowrap; }
 .resource-rate span:first-child { margin-right: .5rem; letter-spacing: .08em; }
-.terminal-nav { display: grid; grid-template-columns: 1fr 1fr 1.25fr; border-bottom: 1px solid var(--color-line); }
+.terminal-nav { display: flex; border-bottom: 1px solid var(--color-line); }
+.terminal-nav button { flex: 1; min-width: 0; }
 .terminal-nav button { min-height: 3rem; padding: .5rem .625rem; border-right: 1px solid var(--color-line); font-size: .6875rem; letter-spacing: .04em; text-transform: uppercase; text-align: left; color: var(--color-muted); }
 .terminal-nav button:last-child { border-right: 0; }
 .terminal-nav button[aria-current] { color: var(--color-ink); background: var(--color-panel); box-shadow: inset 0 -2px 0 var(--color-ink); }
@@ -80,6 +81,29 @@ button, a, input, textarea { outline-offset: 4px; }
 .worker-readout dt { font-size: .75rem; color: var(--color-muted); }
 .worker-readout dd { font-size: .875rem; }
 .register-note { margin: 1rem; font-style: italic; }
+.objective-copy { margin-bottom: 1rem; font-size: .875rem; line-height: 1.7; color: var(--color-muted); }
+.shortage-warning { margin-top: 1rem; font-size: .875rem; line-height: 1.6; color: var(--color-warning); }
+.job-row { padding: 1rem; border-top: 1px solid var(--color-line); }
+.job-row h3 { font-size: .875rem; text-transform: uppercase; letter-spacing: .05em; }
+.job-row > p { margin-top: .5rem; color: var(--color-muted); font-size: .75rem; line-height: 1.7; }
+.assignment-control { display: flex; align-items: center; gap: .75rem; margin-top: .75rem; }
+.assignment-control button { width: 3rem; font-size: 1.25rem; }
+.assignment-control .telemetry { text-align: center; flex: 1; font-size: 1.5rem; color: var(--color-ink); }
+.operation-row { padding: 1.5rem 1rem; border-bottom: 1px solid var(--color-line); }
+.operation-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+.operation-heading h3 { font-size: 1.125rem; letter-spacing: .025em; }
+.operation-row .narrative, .signal-region .narrative { margin-block: 1rem; max-width: 38rem; }
+.operation-row .machine-button, .signal-region .machine-button { width: 100%; text-align: center; }
+.effect-readout { font-family: var(--font-mono); font-size: .75rem; line-height: 1.7; margin-block: 1rem; }
+.requirements-copy { margin-top: .75rem; font-size: .75rem; line-height: 1.7; color: var(--color-muted); }
+.signal-region { padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-lamp); background: #1f2118; }
+.signal-region h2 { margin-top: .75rem; font-family: var(--font-serif); font-size: 1.25rem; font-weight: 400; }
+.return-region { padding: .75rem 1rem 1rem; border-bottom: 1px solid var(--color-line); }
+.return-changes { display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: .75rem; }
+.return-changes > div { display: flex; gap: .5rem; font-size: .75rem; }
+.action-feedback { padding: .75rem 1rem; border-bottom: 1px solid var(--color-line); color: var(--color-ink); }
+.fuel-recovery { margin-top: 1rem; padding: 1rem; border-top: 1px solid var(--color-line); }
+.fuel-recovery .machine-button { margin-top: .75rem; width: 100%; }
 .module-note { margin: 1rem; font-size: .5625rem; }
 .record-strip { display: flex; align-items: center; flex-wrap: wrap; gap: .25rem 1rem; padding: .5rem 1rem; border-block: 1px solid var(--color-line); background: var(--color-panel); }
 .record-strip > p { font-size: .875rem; flex: 1; }
@@ -120,7 +144,7 @@ button, a, input, textarea { outline-offset: 4px; }
   .resource-cell { padding: 1rem 1.5rem; }
   .resource-value { font-size: 2rem; }
   .terminal-nav { display: flex; }
-  .terminal-nav button { padding-inline: 1.5rem; min-width: 9rem; }
+  .terminal-nav button { padding-inline: 1rem; min-width: 0; }
   .terminal-nav button:last-child { border-right: 1px solid var(--color-line); margin-left: auto; border-left: 1px solid var(--color-line); }
   .region-heading { padding-inline: 1.5rem; }
   .obligation { padding: 2rem 1.5rem; }
@@ -131,6 +155,7 @@ button, a, input, textarea { outline-offset: 4px; }
   .record-strip, .terminal-footer, .save-intro, .save-region { padding-inline: 1.5rem; }
   .chronicle-region .section-title { margin-inline: 1.5rem; }
   .chronicle-entry { grid-template-columns: 8rem 1fr; padding-inline: 1.5rem; }
+  .operation-row, .signal-region, .return-region, .action-feedback, .job-row { padding-inline: 1.5rem; }
 }
 @media (min-width: 768px) {
   .terminal-shell { margin-block: 2rem; min-height: calc(100dvh - 4rem); border-block: 1px solid var(--color-line); }
@@ -150,4 +175,25 @@ button, a, input, textarea { outline-offset: 4px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+}
+
+/* Additional instruments retain the shared terminal frame on narrow screens. */
+.resource-readout { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.resource-cell { border-bottom: 1px solid var(--color-line); }
+.resource-cell:nth-child(3n) { border-right: 0; }
+.terminal-nav { flex-wrap: wrap; }
+.terminal-nav button { flex: 1 0 33.333%; border-bottom: 1px solid var(--color-line); }
+.expedition-allocation { padding: 1rem; border-bottom: 1px solid var(--color-line); }
+.expedition-allocation label { display: block; margin-bottom: .75rem; }
+.expedition-allocation select { min-height: 3rem; width: 100%; border: 1px solid #626858; background: var(--color-panel); color: var(--color-ink); padding: .75rem; border-radius: 0; font-family: var(--font-mono); }
+.expedition-progress { display: block; width: 100%; height: .25rem; accent-color: var(--color-lamp); border: 0; background: var(--color-line); }
+.expedition-progress::-webkit-progress-bar { background: var(--color-line); }
+.expedition-progress::-webkit-progress-value { background: var(--color-lamp); }
+.expedition-return { padding: 1rem; border-bottom: 1px solid var(--color-line); }
+.expedition-return .effect-readout { margin-bottom: 0; }
+@media (min-width: 640px) {
+  .resource-readout { grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); }
+  .resource-cell:nth-child(3n) { border-right: 1px solid var(--color-line); }
+  .terminal-nav button { flex: 1; }
+  .expedition-allocation, .expedition-return { padding-inline: 1.5rem; }
 }
