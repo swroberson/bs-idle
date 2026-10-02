@@ -16,7 +16,7 @@ const glyphs: Record<ResourceId, string> = {
   authority: "M4 4h12v12l-6 5-6-5zM7 9h6M7 12h6",
 };
 
-export function ResourceReadout({ state }: { state: GameState }) {
+export function ResourceReadout({ state, onDialogChange }: { state: GameState; onDialogChange?: (open: boolean) => void }) {
   const { net } = economyRates(state);
   const amountDialog = useRef<HTMLDialogElement>(null);
   const [selected, setSelected] = useState<ResourceId | null>(null);
@@ -27,6 +27,7 @@ export function ResourceReadout({ state }: { state: GameState }) {
       return <button key={id} className="resource-cell" title={`${RESOURCES[id].name}: ${exact}`} aria-label={`${RESOURCES[id].name}: ${exact}. View exact amount.`} aria-describedby={`${id}-rate`} aria-haspopup="dialog" aria-controls="resource-details" onClick={() => {
         setSelected(id);
         amountDialog.current?.showModal();
+        onDialogChange?.(true);
       }}>
       <span className="machine-label resource-label">
         <svg viewBox="0 0 20 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.2"><path d={glyphs[id]} /></svg>
@@ -37,7 +38,7 @@ export function ResourceReadout({ state }: { state: GameState }) {
     </button>;
     })}
   </section>
-  <dialog id="resource-details" ref={amountDialog} className="resource-details" aria-labelledby="resource-detail-heading" aria-describedby="resource-detail-amount">
+  <dialog id="resource-details" ref={amountDialog} className="resource-details" aria-labelledby="resource-detail-heading" aria-describedby="resource-detail-amount" onClose={() => onDialogChange?.(false)}>
     <h2 id="resource-detail-heading" className="machine-label">{selected ? RESOURCES[selected].name : "Stores"} / Exact amount</h2>
     <p id="resource-detail-amount" className="exact-amount">{selected !== null && state.resources[selected].toLocaleString("en-US", { maximumFractionDigits: 20 })}</p>
     <button className="machine-button" onClick={() => amountDialog.current?.close()}>Close</button>

@@ -24,7 +24,7 @@ button, a, input, textarea { outline-offset: -3px; }
 
 /* One viewport-sized instrument, with an accessible overflow fallback for
    large text, landscape screens, the software keyboard and lengthy records. */
-.terminal-shell { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto; height: 100dvh; max-width: 72rem; margin: 0 auto; background: var(--color-ward); border-inline: 1px solid var(--color-line); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+.terminal-shell { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto auto; height: 100dvh; max-width: 72rem; margin: 0 auto; background: var(--color-ward); border-inline: 1px solid var(--color-line); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
 .machine-label, .telemetry, .resource-value, .resource-rate, .worker-readout dd { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .machine-label { font-size: .625rem; line-height: 1.6; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); }
 .telemetry { font-size: .75rem; color: var(--color-muted); }
@@ -240,6 +240,24 @@ button, a, input, textarea { outline-offset: -3px; }
 .action-feedback { padding: .375rem 1rem; border-bottom: 1px solid var(--color-line); }
 .action-feedback:empty { display: none; }
 .shortage-warning { color: var(--color-warning); padding: .375rem 1rem; font-size: .6875rem; }
+.illustration-reveal { width: min(38rem, calc(100% - 1.5rem)); max-height: calc(100dvh - 1.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)); margin: auto; overflow: auto; overscroll-behavior: contain; padding: 0; border: 1px solid var(--color-line); border-radius: 0; background: var(--color-ward); color: var(--color-ink); scrollbar-width: thin; }
+.illustration-reveal::backdrop { background: rgb(13 16 14 / .9); }
+.reveal-heading { padding: .75rem 1rem; border-bottom: 1px solid var(--color-line); }
+.reveal-heading h2 { margin-top: .25rem; font-family: var(--font-serif); font-size: 1.25rem; font-weight: 400; }
+.discovery-image { display: block; width: 100%; height: auto; max-height: 38dvh; object-fit: contain; background: #0d100e; }
+.illustrated-record figcaption { padding-block: .75rem; }
+.illustration-reveal .illustrated-record figcaption { padding: .75rem 1rem; }
+.illustration-unavailable { padding: 1rem; font-size: .8125rem; color: var(--color-muted); border-bottom: 1px solid var(--color-line); }
+.reveal-controls { display: flex; flex-direction: column; gap: .5rem; padding: .75rem 1rem; border-top: 1px solid var(--color-line); }
+.reveal-controls .machine-button { min-height: 3rem; }
+.archive-remainder { background: transparent; }
+.chronicle-entry:has(.illustrated-record) { padding-top: .75rem; }
+.chronicle-entry:has(.illustrated-record) h3 { margin-block: .5rem .75rem; }
+/* Enlarged text must not widen the frame behind a focused record. */
+.terminal-header, .terminal-footer { flex-wrap: wrap; }
+.terminal-identity { min-width: 0; }
+.terminal-header h1, .resource-label, .terminal-nav button { overflow-wrap: anywhere; }
+.terminal-nav button > span { min-width: 0; }
 @media (max-width: 767px) {
   .resource-label svg { display: none; }
   .resource-cell { padding-inline: .375rem; }

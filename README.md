@@ -67,9 +67,25 @@ The inhabitant register provides 44px plus/minus controls for unlocked roles. As
 
 Resource counters use the shared compact formatter in `src/components/formatNumber.ts`: k (thousands), m (millions), b (billions), t (trillions) and q (quadrillions). Values truncate to at most one decimal, so 2,165 displays as 2.1k without overstating available stores. Full amounts remain in saves and calculations. Tap or keyboard-activate any resource readout for its exact count; screen readers also receive the exact value. The full readout is the touch target, and the exact-count dialog supports Escape and returns focus to its counter. Rates sit beside resource labels so six-character quantities have the full cell width without enlarging the resource strip.
 
+## Illustrated discoveries
+
+Four selected accomplishments have Dark Chronicle illustrations: a fresh Keeper's
+office, first Oil Press construction, completed lamp examination, and first Old
+Cistern return. A focused reveal shows the record's image and caption while
+production continues. Continue dismisses one reveal; Leave remaining in Chronicle
+files the currently queued illustrations without marking their records read.
+The same artwork and caption remain available through Chronicle pagination.
+
+Return reports appear before queued art. Reveals open only in the visible tab
+that owns the save, and wait for any exact-resource dialog to close. Keyboard
+dismissal uses Escape, focus returns to the prior control, and enlarged text or
+short screens retain a scroll fallback. A failed image leaves its written caption
+and dismissal controls usable. The four local WebP assets total about 614 KB and
+are included in the offline cache. See [art prompts and review](docs/ART.md).
+
 ## Saves
 
-Version-3 records include assignments, building levels, lifetime Authority, queued/resolved reports, investigations, the Chronicle, an active expedition, visited destinations, and bounded return history. Import validates IDs, finite nonnegative values, shared worker counts, levels, timer durations, research prerequisites, and consistent one-time records. Version-1 and version-2 imports migrate automatically. Successful imports reconcile elapsed time; invalid imports preserve the current record.
+Version-4 records include assignments, building levels, lifetime Authority, queued/resolved reports, investigations, the Chronicle, illustration dismissals, an active expedition, visited destinations, and bounded return history. Import validates IDs, finite nonnegative values, shared worker counts, levels, timer durations, research prerequisites, and consistent one-time records. Version-1, version-2 and version-3 imports migrate automatically. Earned illustrations in earlier saves are archived without retroactive popups; an existing Oil Press gains an already-read construction record while prior unread entries remain unchanged. New version-4 saves retain pending reveals through reload and import/export. Successful imports reconcile elapsed time; invalid imports preserve the current record.
 
 Progress is stored in this browser under `buried-sun.save`. It does not transfer between devices or origins automatically. Open **Records** to download a JSON backup or copy its text, import a file or pasted JSON, and reset with confirmation. Invalid imports leave the existing save intact. If a stored save cannot be loaded, the recovery view retains its raw text for backup before a confirmed replacement.
 
@@ -78,6 +94,29 @@ Progress is stored in this browser under `buried-sun.save`. It does not transfer
 Production builds generate `out/sw.js` with a content-hashed cache and precache every exported app asset. Service worker registration is disabled in development. After a successful initial online visit and cache installation, the production shell can reopen offline. Shell updates wait for old tabs to close and never delete localStorage. No remote fonts or runtime asset services are required.
 
 On iPhone Safari, visit the deployed site and use **Share → Add to Home Screen**. Actual iPhone installation, offline reopening and background/resume behavior still require device verification. A desktop browser check is not evidence of those behaviors.
+
+### Illustrated-unlock verification
+
+Verified locally on October 2, 2026: lint, TypeScript, **129 tests**, production
+static export, and inclusion of all four images in the generated service-worker
+cache. New tests cover accomplishment order, failed/repeated actions, individual
+and queue-snapshot dismissal, first offline returns, persistence, versions 1–3
+migration, inconsistent/malformed records, and local WebP size/format.
+
+An isolated Chromium production preview verified actual Oil Press construction,
+all four reveals and decoded images, foreground production during a reveal,
+return-report precedence, queue skipping, separate Chronicle acknowledgement,
+legacy import and malformed-import preservation, read-only tabs, native keyboard
+focus and Escape, pending/dismissed reloads, and phone/desktop widths of
+320/390/768/1024/1440px. A 320×400 screen with 200% text retained reachable dialog
+controls through scrolling without page-width overflow. Simulated visibility
+events verified hidden-page gating. All four image responses were present in the
+cache, and the game/illustrated Chronicle reopened with network access disabled.
+Deliberate image failures preserved captions and controls; a simulated storage
+fault left the pending reveal intact and backups reachable. An expedition return
+waited for both an open resource dialog and its return report without stacking
+modals. Ordinary production checks had no console errors or page exceptions.
+Real iPhone Safari, home-screen installation and PWA resume remain unverified.
 
 ### Scaffold verification
 

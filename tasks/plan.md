@@ -1,24 +1,36 @@
-# Opening economy implementation
+# Illustrated unlocks
 
-Build a fresh-save opening that runs from allocating the five inhabitants to examining an anomalous lamp. Keep the static Next.js app, local saves, single-tab ownership, and connected terminal interface.
+Implement the user-approved four-image batch: Keeper's office at a fresh start,
+Oil Press on first construction, completed lamp examination, and the first Old
+Cistern expedition return. Preserve Dark Chronicle art and situated knowledge.
 
 ## Decisions
 
-- Use a pure elapsed-time engine with exact Food/Oil depletion boundaries. Foraging remains productive during shortages; other output is reduced. Oil supply limits lamp output.
-- Opening buildings and investigation use Food and Authority. Coin, additional jobs, and later content remain for the next increment.
-- Reconcile before actions, on launch/resume, and before saving. Production is capped at eight hours per absence; advance the timestamp through the whole absence.
-- Version-1 saves migrate to version 2 at the current time without retroactive food consumption. Events are queued and choices require player input.
-- Balance is provisional. Use deterministic tests and a development-only progression harness, then inspect a fresh opening in a phone-sized browser.
+- A single native reveal dialog shows a Chronicle title, illustration, caption,
+  and Continue. Production continues. Queue multiple records in Chronicle order;
+  provide Leave remaining in Chronicle for the current queue snapshot.
+- Archive the same images and captions in paginated Chronicle records. Add the
+  one-time `oil-press-built` construction record. Illustration dismissal and
+  Chronicle reading remain separate acknowledgements.
+- Save version 4 persists validated dismissal IDs. Migrate versions 1–3 with
+  earned art dismissed and any backfilled Oil Press record read, avoiding a
+  popup backlog while preserving existing unread entries.
+- Reveal only in the visible save-owning tab, after any return summary, and
+  without stacking over the exact-resource dialog. Suppress Chronicle reading
+  while a reveal is pending or the resource dialog obscures it.
+- Ship four uncropped 1200×900 WebP files, each below 300 KB, through the existing
+  static export and offline cache. No runtime image service or new dependency.
 
-## Ordered slices
+## Delivery order
 
-1. Workers, pure economy, validated saves, and live readouts.
-2. Fields/Oil Press purchases, household choice, and lamp investigation.
-3. Return summary, progression harness, browser checks, and documentation.
+1. Generate/review the office style anchor; match the other three illustrations.
+2. Implement accomplishment records, dismissal actions, migration, and tests.
+3. Integrate accessible reveals and illustrated Chronicle records.
+4. Verify phone layouts, accessibility, replay, migration, failed images, and
+   offline caching; document prompts and evidence.
 
-## Risks
+## Verification
 
-- Shortages must not oscillate depending on timer frequency: account for simultaneous Oil production and lamp demand at zero stores.
-- Background callbacks must not repeatedly bypass the offline cap: hidden tabs stop ticking until reconciliation.
-- New save fields must be strictly validated, including one-time event/chronicle consistency.
-- Browser checks do not establish real iPhone Safari or home-screen behavior.
+Run `npm run check` and `npm run build`. Use an isolated browser on the local
+production preview, including fresh saves and timestamp-adjusted exported saves
+for away intervals. Real-device iPhone Safari/PWA validation remains separate.

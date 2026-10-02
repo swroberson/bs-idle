@@ -1,8 +1,14 @@
-# Opening economy tasks
+# Illustrated unlock tasks
 
-- [x] Workers/economy: conserve worker counts, show net rates, support depletion/recovery, and migrate existing saves. Verify engine tests and type checking.
-- [x] Opening progression: build Fields/Oil Press, admit a household once, queue the lamp complaint, and purchase/reread its investigation. Verify prerequisites, costs, one-time effects, and fresh-save reachability.
-- [x] Reconciliation/UI: cap absence at eight hours, prevent duplicate gains, show a return summary, and preserve pending choices. Verify tests, lint, production build, phone layout, keyboard controls, imports, reload/resume, and cached reopening.
-- [x] Record harness timing and browser evidence in README. Preserve actual Safari/PWA device checks as unverified.
+- [x] Establish and review the Keeper's office style anchor.
+- [x] Add typed art registry, first Oil Press record, validated dismissal actions,
+  version-4 saves and migration tests. Engine checks pass.
+- [x] Add a single native reveal dialog and illustrated Chronicle records with
+  separate acknowledgement, queue controls and visibility/ownership gating.
+- [x] Finish/review the four illustrations and optimize them below 300 KB each.
+- [x] Verify return ordering, queues, focus, text enlargement, missing images,
+  read-only tabs, legacy imports, static output and offline artwork.
+- [x] Run final `npm run check` and `npm run build`; document prompts, narrative
+  continuity and verification evidence.
 
-Device follow-up: real iPhone Safari and home-screen PWA checks remain unverified; desktop phone-sized checks are recorded separately.
+Device follow-up: real iPhone Safari and home-screen PWA checks require a device.
