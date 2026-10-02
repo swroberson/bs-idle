@@ -55,7 +55,7 @@ describe("opening progression", () => {
     state.buildings = { ...state.buildings, fields: 1, "oil-press": 1 };
     state.triggeredEvents = ["household", "lamp-complaint"];
     state.pendingEvents = ["lamp-complaint"];
-    state.chronicle.push("household");
+    state.chronicle.push("oil-press-built", "household");
     const authorized = applyAction(state, { type: "choose-event", event: "lamp-complaint" }, 0);
     expect(authorized.research).toEqual([]);
     const examined = applyAction(authorized, { type: "research", research: "examine-old-lamps" }, 0);

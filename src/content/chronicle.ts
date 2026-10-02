@@ -3,6 +3,10 @@ export const CHRONICLE = {
     title: "The office of Keeper",
     text: "The register is placed before you. Five names remain beneath the heading ‘Outer Ward.’ Beside it lies a ring of keys, most of them without a known lock. Your first duty is written in a newer hand: keep the lamps burning.",
   },
+  "oil-press-built": {
+    title: "Oil Press",
+    text: "The screw turns easily once cleaned. Oil collects in the vessels beneath it. No one remembers who cut its thread.",
+  },
   household: {
     title: "Three more names",
     text: "The woman gives her name as Nera. She places a little bag of seeds beside the register before asking where she should work. Three names are entered beneath the five.",

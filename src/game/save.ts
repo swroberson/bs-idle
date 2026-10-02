@@ -9,6 +9,16 @@ import { EXPEDITIONS } from "../content/expeditions";
 import { prerequisiteRequirements } from "./requirements";
 import { RESEARCH } from "../content/research";
 import { createInitialState } from "./state";
+import { ILLUSTRATIONS } from "../content/illustrations";
+import { pendingIllustrations } from "./illustrations";
+
+function migrateIllustrations(state: GameState): GameState {
+  const backfill = state.buildings["oil-press"] > 0 && !state.chronicle.includes("oil-press-built");
+  const next: GameState = { ...state, version: 4, dismissedIllustrations: [],
+    chronicle: backfill ? [...state.chronicle, "oil-press-built"] : state.chronicle,
+    readChronicle: backfill ? [...state.readChronicle, "oil-press-built"] : state.readChronicle };
+  return { ...next, dismissedIllustrations: pendingIllustrations(next) };
+}
 
 export const SAVE_KEY = "buried-sun.save";
 export const MAX_SAVE_LENGTH = 100_000;
@@ -39,7 +49,8 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   try { value = JSON.parse(text); }
   catch { throw new Error("This is not valid JSON. Choose a Buried Sun save or paste its complete text."); }
   if (!record(value)) throw new Error("The save must contain a game object.");
-  if (value.version !== 1 && value.version !== 2 && value.version !== 3) throw new Error("Unsupported save version. This game supports versions 1, 2 and 3.");
+  if (![1, 2, 3, 4].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–4.");
+  const legacyIllustrations = value.version !== 4;
   const chronicle = value.chronicle;
   const readChronicle = Object.hasOwn(value, "readChronicle") ? value.readChronicle : [];
   if (!ids(readChronicle, CHRONICLE) || !Array.isArray(chronicle) ||
@@ -56,9 +67,10 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   const baseKeys = ["version", "resources", "population", "chronicle", "lastSimulatedAt", "lastGatheredAt"];
   const extraKeys = ["jobs", "buildings", "lifetimeAuthority", "triggeredEvents", "pendingEvents", "research"];
   const expeditionKeys = ["activeExpedition", "completedExpeditions", "expeditionLog"];
+  if (value.version === 4) expeditionKeys.push("dismissedIllustrations");
   if (Object.hasOwn(value, "readChronicle")) baseKeys.push("readChronicle");
   if (hasWorkers) baseKeys.push("workers");
-  const legacy = value.version !== 3;
+  const legacy = value.version === 1 || value.version === 2;
   if (!exactKeys(value, value.version === 1 ? baseKeys : value.version === 2 ? [...baseKeys, ...extraKeys] : [...baseKeys, ...extraKeys, ...expeditionKeys]) ||
       !record(value.resources) || !exactKeys(value.resources, legacy ? ["food", "oil", "authority"] : Object.keys(RESOURCES)) ||
       !Object.values(value.resources).every(finiteNonnegative) ||
@@ -71,11 +83,11 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   if (value.version === 1) {
     if (value.chronicle.length !== 1) throw new Error("Invalid scaffold chronicle.");
     if (migrationAt !== undefined && !timestamp(migrationAt)) throw new Error("Invalid migration timestamp.");
-    return { ...createInitialState(Math.max(value.lastSimulatedAt as number, migrationAt ?? 0)),
+    return migrateIllustrations({ ...createInitialState(Math.max(value.lastSimulatedAt as number, migrationAt ?? 0)),
       resources: { ...createInitialState(0).resources, ...value.resources } as GameState["resources"], population: value.population as number,
       readChronicle: readChronicle as GameState["readChronicle"],
       jobs: { ...createInitialState(0).jobs, ...(hasWorkers ? value.workers as object : {}) },
-      lifetimeAuthority: value.resources.authority as number, lastGatheredAt: value.lastGatheredAt as number | null };
+      lifetimeAuthority: value.resources.authority as number, lastGatheredAt: value.lastGatheredAt as number | null });
   }
   if (value.version === 2) {
     if (!record(value.jobs) || !exactKeys(value.jobs, ["forager", "lamplighter"]) ||
@@ -141,8 +153,16 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
     if (entry.firstDiscovery) firsts.add(entry.destination);
   }
   if (state.activeExpedition && state.activeExpedition.startedAt < previousReturn) throw new Error("Invalid save: overlapping expeditions.");
+  const result = legacyIllustrations ? migrateIllustrations({ ...state, readChronicle } as GameState) : { ...state, readChronicle } as GameState;
+  if ((result.buildings["oil-press"] > 0) !== result.chronicle.includes("oil-press-built")) {
+    throw new Error("Invalid save: Oil Press construction and Chronicle disagree.");
+  }
+  if (!ids(result.dismissedIllustrations, ILLUSTRATIONS) ||
+      !result.dismissedIllustrations.every(id => result.chronicle.includes(ILLUSTRATIONS[id].chronicle))) {
+    throw new Error("Invalid save data: illustration dismissals are malformed or unearned.");
+  }
   // Validation above covers every field. Return a fresh JSON object, not user references.
-  return { ...value, readChronicle } as unknown as GameState;
+  return result;
 }
 
 export function encodeSave(state: GameState): string {

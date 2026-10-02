@@ -8,6 +8,7 @@ import { RESEARCH } from "../content/research";
 import { availableWorkers, buildingCost, buildingRequirements, eventRequirements, payCost, researchRequirements, jobUnlocked, expeditionCost, expeditionRequirements } from "./requirements";
 import { reconcile } from "./simulation";
 import { queueEvents } from "./progression";
+import { ILLUSTRATIONS } from "../content/illustrations";
 
 export function gatheringWaitMs(state: GameState, now: number): number {
   return state.lastGatheredAt === null ? 0 : Math.max(0, state.lastGatheredAt + BALANCE.gatheringCooldownMs - now);
@@ -15,6 +16,12 @@ export function gatheringWaitMs(state: GameState, now: number): number {
 
 export function applyAction(state: GameState, action: GameAction, now: number): GameState {
   if (!Number.isSafeInteger(now) || now < state.lastSimulatedAt || now < 0) return state;
+  if (action.type === "dismiss-illustrations") {
+    if (!Array.isArray(action.ids) || new Set(action.ids).size !== action.ids.length ||
+        !action.ids.every(id => typeof id === "string" && Object.hasOwn(ILLUSTRATIONS, id) && state.chronicle.includes(ILLUSTRATIONS[id].chronicle))) return state;
+    const newlyDismissed = action.ids.filter(id => !state.dismissedIllustrations.includes(id));
+    return newlyDismissed.length ? { ...state, dismissedIllustrations: [...state.dismissedIllustrations, ...newlyDismissed] } : state;
+  }
   if (action.type === "read-chronicle") {
     if (!state.chronicle.includes(action.id) || state.readChronicle.includes(action.id)) return state;
     return { ...state, readChronicle: [...state.readChronicle, action.id] };
@@ -43,6 +50,9 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
       break;
     case "build":
       if (buildingRequirements(next, action.building).length) return next;
+      if (action.building === "oil-press" && next.buildings["oil-press"] === 0) {
+        next = { ...next, chronicle: [...next.chronicle, "oil-press-built"] };
+      }
       next = { ...payCost(next, buildingCost(next, action.building)), buildings: { ...next.buildings, [action.building]: next.buildings[action.building] + 1 } };
       break;
     case "choose-event": {

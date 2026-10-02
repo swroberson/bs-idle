@@ -14,7 +14,7 @@ function prepared() {
   state.buildings = { ...state.buildings, fields: 1, "oil-press": 1, "market-stall": 1, "scrivener-house": 1, "ruined-cistern": 1 };
   state.jobs = { ...state.jobs, forager: 3, lamplighter: 1, scrivener: 1 };
   state.triggeredEvents = ["household", "lamp-complaint"];
-  state.chronicle.push("household", "lamp-complaint", "lamp-examination", "ledger-keeping");
+  state.chronicle.push("oil-press-built", "household", "lamp-complaint", "lamp-examination", "ledger-keeping");
   state.research = ["examine-old-lamps", "ledger-keeping"];
   return state;
 }

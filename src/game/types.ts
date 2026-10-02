@@ -5,6 +5,7 @@ import type { BUILDINGS } from "../content/buildings";
 import type { EVENTS } from "../content/events";
 import type { EXPEDITIONS } from "../content/expeditions";
 import type { RESEARCH } from "../content/research";
+import type { ILLUSTRATIONS } from "../content/illustrations";
 
 export type ResourceId = keyof typeof RESOURCES;
 export type ChronicleId = keyof typeof CHRONICLE;
@@ -13,10 +14,11 @@ export type BuildingId = keyof typeof BUILDINGS;
 export type EventId = keyof typeof EVENTS;
 export type ResearchId = keyof typeof RESEARCH;
 export type ExpeditionId = keyof typeof EXPEDITIONS;
+export type IllustrationId = keyof typeof ILLUSTRATIONS;
 export type Cost = Partial<Record<ResourceId, number>>;
 
 export interface GameState {
-  version: 3;
+  version: 4;
   resources: Record<ResourceId, number>;
   population: number;
   jobs: Record<JobId, number>;
@@ -27,6 +29,7 @@ export interface GameState {
   research: ResearchId[];
   chronicle: ChronicleId[];
   readChronicle: ChronicleId[];
+  dismissedIllustrations: IllustrationId[];
   activeExpedition: ActiveExpedition | null;
   completedExpeditions: ExpeditionId[];
   expeditionLog: ExpeditionReturn[];
@@ -35,6 +38,7 @@ export interface GameState {
 }
 
 export type GameAction =
+  | { type: "dismiss-illustrations"; ids: IllustrationId[] }
   | { type: "read-chronicle"; id: ChronicleId }
   | { type: "gather-food" }
   | { type: "render-oil" }

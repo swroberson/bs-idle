@@ -7,7 +7,7 @@ import type { GameAction } from "@/game/types";
 
 export function actionFeedback(action: GameAction): string {
   switch (action.type) {
-    case "read-chronicle": return "";
+    case "read-chronicle": case "dismiss-illustrations": return "";
     case "gather-food": return `Provisions stored // +${BALANCE.gatheringFood} Food`;
     case "render-oil": return `Lamp fuel rendered // +${BALANCE.emergencyOil} Oil`;
     case "assign-worker": return `${JOBS[action.job].name} // ${action.delta === 1 ? "assigned" : "released"}`;
