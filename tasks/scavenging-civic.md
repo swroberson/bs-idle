@@ -56,5 +56,7 @@ transaction. No named backstory, major history, new mystery or interpretation.
 - [x] `npm run check`, `npm run build`, production-browser phone controls,
   reload/import preservation, keyboard use and cached reopening.
 - [x] Update main checklist, README and narrative continuity inventory.
+- [x] October 3 combined production deployment (`c36ee64`), live controls,
+  version-4 → version-7 save preservation and replacement offline cache.
 
 Human playtesting, tuning and real iPhone/PWA acceptance remain deferred.

@@ -70,7 +70,7 @@ A shared-table report after Provision Stores offers 30 Food for 10 Authority or 
 
 Activation commits the ending once, introduces Current (+0.02/s, halved during Food shortages), and removes Oil demand from restored civic lamp tending while retaining Authority output and its existing shortage rules. Fuel stores are preserved. The three ending passages save their acknowledgement separately from Chronicle reading, resume after reload, and do not repeat effects. The story-complete readout remains visible while management continues. Current is hidden and produces nothing before deliberate activation.
 
-This completes the approved story spine, not all Phase 1 acceptance work. The original 20–30 studies and 10–15 events targets, a normal-speed fresh-save mobile playthrough, balance/enjoyment assessment, and actual iPhone/PWA checks remain outstanding. The new local increment has not been deployed.
+This completes the approved story spine, not all Phase 1 acceptance work. The original 20–30 studies and 10–15 events targets, a normal-speed fresh-save mobile playthrough, balance/enjoyment assessment, and actual iPhone/PWA checks remain outstanding. The awakening, construction labor, second household, Scavengers and first civic batch are included in the October 3 production release.
 
 ## Interface
 
@@ -155,7 +155,7 @@ Verified locally on October 2, 2026: lint, TypeScript, **53 tests**, and the sta
 
 In the Codex browser, played a fresh opening through the lamp examination at a 390px viewport, then exercised the new stage through its controls using timestamp-adjusted backups to represent away intervals. Verified version-2 migration, an unsupported import preserving an active party, active-timer reload persistence, idle-worker reservation limits, offline return rewards and findings, the foundation survey, and persisted survey completion. The expanded terminal had no horizontal overflow at 320/768/1024/1440px; navigation targets remained 48px tall. The production console showed no warnings or errors during online checks. The cached game reopened with the static preview server stopped.
 
-The new increment is local and has not been deployed. A full fresh-save playthrough at normal speed, balance/enjoyment assessment, and real iPhone Safari/home-screen PWA behavior remain unverified.
+This increment was local at this checkpoint and is now included in the October 3 production release. A full fresh-save playthrough at normal speed, balance/enjoyment assessment, and real iPhone Safari/home-screen PWA behavior remain unverified.
 
 ### UI integration verification
 
@@ -169,7 +169,7 @@ Verified locally on October 2, 2026: lint, TypeScript, **139 tests**, static pro
 
 An isolated Chromium production preview verified actual activation through the Studies control, all three passages, production during presentation, passage resumption after reload, focused keyboard Enter/Escape advancement, independent Chronicle acknowledgement, preserved population, malformed-import preservation, continued management, and a read-only second tab. Direct selection and Previous/Next catalog controls worked. Catalogs and the ending had no horizontal page overflow at 320/390/768/1024/1440px; expanded Ward and long records retain vertical scrolling. A 320×400 screen at 200% text retained reachable ending controls. Away reports preceded a pending ending, and pending artwork appeared after it with at most one open dialog. Cached completion/Chronicle reopened with networking disabled. The production console had no warnings or errors.
 
-A full normal-speed mobile playthrough, Safari/home-screen installation, real-device background/resume, and deployment of this increment remain unverified. Browser checks used the ordinary controls with timestamp-aligned harness backups to reach the new story stage; they do not substitute for fresh-save human playtesting.
+A full normal-speed mobile playthrough, Safari/home-screen installation and real-device background/resume remain unverified. This increment was deployed and checked on October 3. Browser checks used the ordinary controls with timestamp-aligned harness backups to reach the new story stage; they do not substitute for fresh-save human playtesting.
 
 ### Construction labor and household validation
 
@@ -185,15 +185,19 @@ The full no-grant/no-gathering harness now assigns Scavengers through ordinary a
 
 An isolated Chromium production preview verified dispatch from assigned Scavengers, costs and completed study effects, both civic responses, keyboard Enter selection, persisted Chronicle transactions, reload/import behavior, legacy-party migration, malformed-import preservation and cached reopening with networking disabled. Ordinary Daily work, Fieldwork and Scholarship views fit without panel scrolling at 320/390/768/1024/1440px width and 844px height. Long reports retain a scroll fallback; enlarged text at 320×400 keeps response and worker controls reachable. There was no horizontal overflow and the production console was clear. Checks used engine-generated backups through ordinary browser controls, not a normal-speed human playthrough.
 
-Human playtesting and tuning are deferred at the user's request. Real iPhone Safari/home-screen PWA checks remain unverified. This increment has not been deployed.
+Human playtesting and tuning are deferred at the user's request. Real iPhone Safari/home-screen PWA checks remain unverified. This increment is included in the October 3 production release.
 
 ## Vercel
 
 `next.config.ts` uses `output: "export"`; `npm run build` writes the site into `out/`. `vercel.json` selects Vercel’s **Other** hosting preset (`framework: null`), specifies `npm ci`, `npm run build`, `out` as the output directory, and a no-cache header for the service worker. The app still builds with Next.js; Vercel publishes its static export without a runtime server. Using the Next.js hosting preset with an `out` override failed in the cloud because that adapter expected server build manifests there. The Other preset serves the exported files directly. See [Vercel static configuration](https://vercel.com/docs/project-configuration/vercel-json) and [Next.js static export guidance](https://nextjs.org/docs/app/guides/static-exports).
 
-Production: **[bs-idle.vercel.app](https://bs-idle.vercel.app)**. Deployed and verified on October 1, 2026. The Vercel project is `bs-idle` in `swrobersons-projects`, linked to [swroberson/bs-idle](https://github.com/swroberson/bs-idle). Root directory is `.`, Node.js is 24.x, and `vercel.json` supplies the install/build/output settings above. No game environment variables or server-side secrets are required.
+Production: **[bs-idle.vercel.app](https://bs-idle.vercel.app)**. Latest release deployed and verified on October 3, 2026. The Vercel project is `bs-idle` in `swrobersons-projects`, linked to [swroberson/bs-idle](https://github.com/swroberson/bs-idle). Root directory is `.`, Node.js is 24.x, and `vercel.json` supplies the install/build/output settings above. No game environment variables or server-side secrets are required.
 
 The first live release contains commit `383d396` from `codex/opening-economy`. Its successful preview was promoted to production; [production deployment](https://vercel.com/swrobersons-projects/bs-idle/EK62cRS2bEwxeYUkX7Vj8zDdoEVf). Vercel's automatic production branch is `main`; the opening-economy branch was subsequently merged through PR #2. Pushes to other branches generate previews.
+
+The October 3 release contains commit `c36ee64` from the published `codex/outer-ward-awakening` branch, including all five completed commits beyond `main`: the awakening spine, construction labor and second household, and Scavengers with three civic studies and two explicit-response situations. The authenticated [preview](https://vercel.com/swrobersons-projects/bs-idle/GqJZTHhuRQU9HhbdogX3rsr2EE5A) was promoted to this [production deployment](https://vercel.com/swrobersons-projects/bs-idle/jyoLohZPpHYoYiMLh2acFXM3ZuoF). Promotion created a separate production build; wait for it to become Ready and verify the public alias before running release checks.
+
+October 3 production checks: anonymous HTTP 200 for the app, manifest and service worker, with `Cache-Control: no-cache` for `sw.js`. An isolated browser save created on the previous live version migrated from version 4 to 7, preserving five inhabitants, worker assignments, Chronicle/read records and illustration acknowledgements. Its old cache was replaced by `buried-sun-shell-5dc68bb09670525c`; networking-disabled reopening preserved the migrated progress. Live browser checks also covered Scavenger dispatch/reservation, study prices and completed effects, both civic responses and receipts, malformed-import preservation, awakening passages and reloads, one-time completion, Current production, exclusive tab ownership, responsive/enlarged-text controls and cached reopening, with no console warnings or errors. These checks used ordinary controls and isolated harness backups. Local lint, TypeScript, 165 tests and the static production build passed before deployment; both cloud builds succeeded. The production dependency audit reported zero vulnerabilities. The full audit reported five high-severity findings in build-time lint tooling through `braces`; its suggested forced fix would downgrade `eslint-config-next` and was not applied. Real iPhone/PWA behavior and human playtesting remain unverified.
 
 For an explicit release from the current checkout, the following CLI workflow was verified with Vercel CLI 62.1.0 (the older globally installed CLI was rejected). Authenticate with the project owner's Vercel account, connect its GitHub identity, and grant the Vercel GitHub app access to this repository. Local project linkage stays in ignored `.vercel/` files.
 
@@ -203,8 +207,11 @@ npx --yes vercel@62.1.0 deploy --scope swrobersons-projects --yes --target previ
 # Inspect and check the preview URL returned above before promotion:
 npx --yes vercel@62.1.0 inspect PREVIEW_URL --scope swrobersons-projects
 npx --yes vercel@62.1.0 promote PREVIEW_URL --scope swrobersons-projects --yes
+# Promotion may create another build; wait for the returned deployment URL:
+npx --yes vercel@62.1.0 inspect PRODUCTION_DEPLOYMENT_URL --scope swrobersons-projects --wait
+npx --yes vercel@62.1.0 inspect https://bs-idle.vercel.app --scope swrobersons-projects
 ```
 
 Verified on production: anonymous HTTP 200 for the app and service worker; `Cache-Control: no-cache` for `sw.js`; working worker assignments, gathering, Food/Oil/Authority progression, and reload persistence; offline-shell readiness; a 390px phone layout without horizontal overflow; and no game-origin console warnings or errors. The manifest was checked on the successful preview. Real iPhone Safari, home-screen installation, offline reopening, and background/resume behavior still require device verification.
 
-If a later release breaks the game, use Vercel's production rollback to a previously verified deployment and check the public URL again. Keep the saved record intact. Older game code must support the player's save version before rollback; export a backup before any intentional save migration. Saves belong to their origin, so localhost and preview progress do not transfer to the production URL automatically.
+If a later release breaks the game, use Vercel's production rollback only to a verified deployment that supports the player's save version, then check the public URL again. Keep the saved record intact. The pre-October-3 version-4 release cannot read new version-7 saves; use a compatible forward fix rather than rolling those players back to it. Export a backup before any intentional save migration. Saves belong to their origin, so localhost and preview progress do not transfer to the production URL automatically.
