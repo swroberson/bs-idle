@@ -1,6 +1,7 @@
 # Buried Sun: Narrative Bible
 
-**Edition:** 1.1 — October 2, 2026  
+**Edition:** 1.2 — October 2, 2026
+
 **Audience:** authors and agents; contains end-of-story spoilers  
 **Status:** approved story foundations, provisional chapter outline, and an audit of existing content
 
@@ -51,17 +52,19 @@ story's destination is approved.
 
 - [Chronicle](../src/content/chronicle.ts): opening and persistent narrative records.
 - [Events](../src/content/events.ts): household arrival and lamp complaint.
-- [Research](../src/content/research.ts): six implemented investigations/improvements; several repeat Chronicle text.
-- [Expeditions](../src/content/expeditions.ts): two destinations and their record references.
+- [Research](../src/content/research.ts): thirteen implemented investigations/improvements; several repeat Chronicle text.
+- [Expeditions](../src/content/expeditions.ts): six destinations and their record references.
 - [Buildings](../src/content/buildings.ts), [jobs](../src/content/jobs.ts), and [resources](../src/content/resources.ts): descriptions and local terminology.
 - [Ward scene](../src/components/WardPanel.tsx): the road toward the Citadel; [app metadata](../src/app/layout.tsx): public premise.
 - [Initial state](../src/game/state.ts), [event progression](../src/game/progression.ts), [actions](../src/game/actions.ts), [requirements](../src/game/requirements.ts), and [expedition completion](../src/game/expeditions.ts): actual order and triggers.
 
-**EXISTING:** the playable narrative currently ends at research
-`survey-foundations`, recorded as `foundation-survey`. The later conduit,
-chamber, restoration, Current, and awakening sequence is specified in the design
-brief but is not implemented. There are currently six buildings, six research
-entries, two events, two expedition destinations, and twelve Chronicle entries.
+**EXISTING:** the playable Outer Ward now reaches the deliberate
+`awaken-junction` action, recorded as `junction-awakened`. Current and Oil-free
+restored lamp tending follow activation, while management continues. There are
+currently ten buildings, thirteen research entries, two queued-choice events,
+six expedition destinations, and twenty-eight Chronicle entries. The remaining
+Phase 1 content-count targets, playtesting, and real-device checks are separate
+from this implemented story endpoint.
 
 Document references such as `C01`, `CL01`, and `Q01` below are editorial IDs, not
 save IDs or runtime content IDs. Later chapters do not authorize new gameplay,
@@ -323,7 +326,7 @@ number.
 | Recover cistern fragments — EXISTING, required | Send inhabitants to `old-cistern` after clearing `ruined-cistern`; first return adds `cistern-find`. | Pale fragments and a groove matching the lamp seam create a basis for comparison. No bodily, alien, or specific electrical explanation is established. |
 | Visit the farmstead — EXISTING, optional | `abandoned-farmstead` requires the cistern building and completed `old-cistern`; first return adds `farmstead-find`. | Intact stores, coins, a doorless house, and inward-facing chairs are observations. The chairs' cause and the inhabitants' fate are unknown, and this is not established as Nera's home. |
 | Catalog recovered objects — EXISTING, required | Build `antiquities-house` after `old-cistern`; research `catalog-relics` requires both and adds `relic-catalog`. | Matching lining and six channels strengthen the physical connection. The scrivener's refusal to call them veins does not establish living machinery. |
-| Survey foundations — EXISTING, current endpoint | Research `survey-foundations` requires `examine-old-lamps`, `catalog-relics`, and `antiquities-house`; adds `foundation-survey`. | The chapel crosses an older opening; the seam continues through it and sockets face down. There is a reason to trace the connection farther. The chamber has not yet been opened. |
+| Survey foundations — EXISTING, continuation point | Research `survey-foundations` requires `examine-old-lamps`, `catalog-relics`, and `antiquities-house`; adds `foundation-survey`. | The chapel crosses an older opening; the seam continues through it and sockets face down. There is a reason to trace the connection farther. The chamber has not yet been opened. |
 
 The early implemented sequence guarantees the household record before the lamp
 complaint, and ledger work before the cistern expedition. After the cistern
@@ -332,40 +335,50 @@ Do not write either as depending on the other. Research discovery text is
 duplicated in Chronicle entries; a future approved wording revision must update
 both representations consistently.
 
-### Remaining Phase 1 beats from the brief
+### Implemented continuation — approved October 2, 2026
 
-These are **retained design requirements, not implemented content**. Display
-names below come from the brief; no runtime IDs are assigned here. The minimum
-causal links follow that brief. Additional evidence, dialogue, exact gates, and
-rewards still require a content pass.
+The user explicitly approved the [survey-to-awakening draft](PHASE_1_AWAKENING_DRAFT.md)
+for implementation. The following local observations are accepted; their wider
+interpretations remain open. Provisional numerical balance is not canon.
 
-| Required beat | Action/evidence that must precede the discovery | What it may establish; what remains concealed |
+| Beat / runtime ID | Required action and evidence | What is established; reveal limits |
 |---|---|---|
-| Trace the Buried Conduits | Follow the survey's physical connection through a deliberate investigation. The planned Ruined Aqueduct expedition can provide infrastructure evidence. | Connections continue beyond the first observed seam. Do not identify a ship-wide power grid or assign a technical specification. |
-| Open the Sealed Chamber | Tracing, excavation/access through Subterranean Works, and the planned Foundations Beneath the Chapel finding provide the way to the chamber. | Workers reach a previously inaccessible space. A sealed space alone does not establish sabotage, a prison, or a forbidden intelligence. |
-| Study the Buried Engine | Inspect what is accessible inside the opened chamber before restoration. | Enough local understanding to attempt repair; only fragments of the machinery are visible or understood. |
-| Restore the Conduit | Apply the study's findings through a deliberate restoration action and its stated costs. | The local connection has been repaired. This is not yet the awakening and does not reveal Current early. |
-| Awaken the Junction | After restoration, the player deliberately initiates awakening. | A response beneath the Ward and oil-independent restored lamps establish a functioning system. Reveal Current and preserve Authority output. |
-| Record the outcome | Completion and its record follow awakening once; subsequent management continues. | A local obligation has been met in an unexpected way. Larger purpose and origin remain unanswered; this is Phase 1's conclusion, not the whole story's departure. |
+| Aqueduct return / `ruined-aqueduct` → `aqueduct-find` | Survey the foundations, then dispatch a party through existing expedition access. | Older black material lies beneath a watercourse; a branch passes beneath the chapel. Ends remain unseen; no complete network map. |
+| Trace / `trace-conduits` → `conduit-trace` | Survey + aqueduct return, followed by deliberate measurement/clearance. | Measurements join; a gap and pale broken faces are recorded. Extent, contents, and power source stay unknown. |
+| Subterranean Works / `subterranean-works` → `subterranean-works-built` | Tracing, then shoring and tackle construction. | Safe local access through ordinary labor. This does not open the chamber automatically. |
+| Chapel return / `chapel-foundations` → `chapel-find` | Works + tracing, then dispatch. | A fitted slab and accessible movable catch below the sockets. Socket purpose remains unknown. |
+| Open / `open-chamber` → `chamber-opened` | Chapel return + Works + tracing; brace the slab and operate its catch. | Workers reach only the nearest cleared part of a dark chamber. No sabotage, prison, hidden intelligence, or whole-system purpose. |
+| Engine installation / `buried-engine` → `engine-works-built` | Open chamber, then install an inspection platform and supports. | Buried Engine is a local ledger heading. The machinery already exists; building purchases working access, not a newly manufactured engine. |
+| Study / `study-engine` → `engine-study` | Chamber open + inspection platform; compare a loose joining piece and test a movable stone. | Local fit and repeatable movement constraint. Orso compares inner lamp surfaces without secret expertise. |
+| Restore / `restore-conduit` → `conduit-restored` | Completed study + engine installation; seat and support the joining piece. | Repaired local connection. Ordinary oil fittings remain in place until deliberate awakening; no early Current. |
+| Awaken / `awaken-junction` → `junction-awakened` | Completed restoration + study + engine installation; explicit action. | Remove marked fixtures' oil fittings, then draw the tested stone to its stop. Local response and white lamps without flame; Current appears and Lamplighter Oil demand becomes zero. |
+| Retain the ending | Completion and ending record committed once; three presentation passages acknowledged independently. | Continued management; rereading and reload never repeat effects. No later chapter, vessel, voyage, or stellar diagnosis. |
 
-The brief's remaining destinations have limited intended roles: **Collapsed
-Gatehouse** supplies salvage/material evidence; **Barrow Field** supplies an
-unusual relic or historical contradiction; **Ruined Aqueduct** supplies an
-infrastructure connection; **Foundations Beneath the Chapel** supplies access
-evidence. They have no implemented IDs or approved detailed discovery prose.
-In particular, a Barrow Field contradiction must not reveal ancestral arrival
-in Phase 1. Its actual claim and underlying truth remain open.
+**Accepted lamp relationship (Q08):** marked civic fixtures along the
+Processional Way are older wall casings with subsequently fitted oil vessels
+and wick holders. Orso observes matching pale linings and seams after study.
+Activation removes those fittings and returns any remaining fuel to the stores
+without a resource refund or consumption. White light comes from the restored
+fixtures; other handheld/workshop lamps may still use Oil. Lamplighter now
+represents tending the restored civic fixtures, with Authority retained and
+ordinary Food-shortage rules still applying. The third lamp stays where it is
+and is not dismantled, moved, filled, or given a wick. Its prior light, lack of
+fittings, and Orso's caution are not explained by this observation.
 
-The planned **Lamp House** and **Smithy** support ordinary civic production;
-**Subterranean Works** supports excavation; **The Buried Engine** is the final
-restoration structure. These roles do not establish their original vessel-era
-functions. The brief's other research titles are candidates for improvements,
-not already completed chapters or sources of new canon.
+**Optional, independent branches:** `collapsed-gatehouse` → `gatehouse-find`
+follows relic cataloging. Salvaged stone contains an embedded dark strip;
+`study-black-metal` → `black-metal-study` compares it with cistern fragments
+without asserting an alloy, indestructibility, or original use. `barrow-field`
+→ `barrow-find` follows the gatehouse return and supplies a footless unmarked
+cup found beneath an exposed bank. No burial, occupant, dating, ritual, or
+historical contradiction is established. Its shape and provenance may remain
+unexplained; it is not a required repair part or key.
 
-The brief's ending image uses Orso, the Lamp House, and lamps along the
-Processional Way. Its prose is draft material. Preserve the local awakening's
-meaning; do not assume the Buried Engine propels the vessel, that all ordinary
-lamps everywhere convert, or that the physical conversion mechanism is settled.
+Lamp House, Smithy, Iron Tools, and Improved Presses support ordinary work and
+remain optional. None of their records is required by the main sequence. The
+Buried Engine is not identified with the titular Buried Sun or propulsion.
+The Processional Way supplies only a local inhabited passage; no vessel
+footprint or comprehensive Ward geography is approved by this work.
 
 ## 5. Continuity reference
 
@@ -395,8 +408,8 @@ lamps everywhere convert, or that the physical conversion mechanism is settled.
 | Ruined Cistern / Old Cistern | EXISTING building `ruined-cistern` enables expedition `old-cistern`; stair, ring, silt, and recovered fragments connect their descriptions. | Treat as the access works and expedition associated with the cistern, not two invented distant sites. Precise geometry remains open. |
 | Abandoned Farmstead | EXISTING `abandoned-farmstead` / `farmstead-find`: beyond the cistern road, planted fruit trees, no door, intact stores, coins, inward-facing chairs. | Do not identify it as the western village, specify its abandonment cause, or infer a vanished family. |
 | Western village | BELIEF: Nera says it has been abandoned. | Name, location, cause, and relation to other destinations are open. |
-| Processional Way / Lamp House | Design brief's draft awakening scene. | Not yet implemented; exact layout and which fixtures are restored remain undecided. |
-| Chamber / Subterranean Works / Buried Engine | Required future Phase 1 access and restoration settings. | No comprehensive map, propulsion identification, or architectural cutaway is approved. |
+| Processional Way / Lamp House | Approved local passage with marked restored civic fixtures; optional Lamp House organizes oil tending. | No comprehensive layout or vessel relation. The ending does not require construction of the optional Lamp House. |
+| Chamber / Subterranean Works / Buried Engine | Implemented local shoring, fitted closure, inspection platform, joining piece, and tested movable stone. | Only a fragment is exposed; no comprehensive map, propulsion identification, or architectural cutaway. |
 
 ### Terminology
 
@@ -445,7 +458,13 @@ current prose in this documentation change.
 | CL12 — research `survey-foundations` / Chronicle `foundation-survey` | Older opening, continuous seam, sockets facing down. | A connected structure predates the chapel's current masonry. | Required continuation is conduit tracing. Socket purpose and exact orientation in a larger structure remain open. |
 | CL13 — buildings `oil-press`, `market-stall`, `scrivener-house`, `antiquities-house` | Forgotten screw-maker, worn coin face, many shelves, objects not called tools. | Candidate ordinary signs of age and imperfect classification. | No major payoff assigned. Do not promote each description into a lost ruler, hidden library, or taboo. Ordinary work must remain believable. |
 | CL14 — Ward scene | Road climbs toward the Citadel; its windows disappear at dusk. | Human-scale view of a nearby inhabited structure in failing light. | Atmospheric framing, not proof of active concealment. Vessel footprint and Ward relationship are open. |
-| CL15 — brief, planned awakening | Low sound, white lamps on the Processional Way, empty oil vessels. | Restored local systems operate without the previous fuel requirement. | Required Phase 1 payoff. Exact staging and how ordinary fixtures relate to the restored network remain open; not a launch sequence. |
+| CL15 — approved `junction-awakened` | Platform transmits a low sound; pale linings become white; empty oil vessels stand nearby; no flame. | Restored local civic lamps operate without Oil. | Implemented Phase 1 payoff; no global conversion or launch sequence. |
+| CL16 — `aqueduct-find` / `conduit-trace` | Cropped black lengths, local branch, measured gap and pale faces. | Actionable local connection; neither end of the aqueduct length is seen. | Supports access and repair without selecting a power source or unseen system layout. |
+| CL17 — `chapel-find` / `chamber-opened` | Downward sockets, fitted slab, movable catch, nearest floor. | A repeatable physical access method. | No purpose assigned to sockets, no historical reason for closure. |
+| CL18 — `engine-study` / `conduit-restored` | Joining piece fits broken faces; movable stone constrains lowering; support holds the repaired joint. | Practical observations permit a local test. | No modern technical account, propulsion, or titular Sun identification. |
+| CL19 — `engine-study` / `junction-awakened` | Ordinary civic fixtures contain pale inner surfaces and seams beneath removable oil fittings. | Approved local lamp relationship supports the Oil-free demonstration. | Does not explain the third lamp's earlier illumination, different fittings, or Orso's motive. |
+| CL20 — `gatehouse-find` / `black-metal-study` | Embedded dark strip; marks on nearby stone, none corresponding on the strip. | Optional material comparison only. | No indestructibility, chronology, original role, or required repair use. |
+| CL21 — `barrow-find` | Unmarked footless cup, dry earth, will not sit flat. | Optional unusual relic. | MYSTERY: no burial, history, ritual, provenance, or required payoff assigned. |
 
 ### Audit conclusions
 
@@ -467,8 +486,8 @@ current prose in this documentation change.
 - **Geography remains unresolved:** the design's settlement beneath the Citadel
   and the road toward it do not tell us which terrain, structures, or inhabitants
   are aboard the vessel at departure. Do not silently answer through a map.
-- **Release boundary checked:** the survey is the current endpoint; the planned
-  awakening is still future content. The existing `currentObjective` helper in
+- **Release boundary checked:** the awakening is the implemented story endpoint;
+  the overall Phase 1 content and real-device acceptance checks remain incomplete. The existing `currentObjective` helper in
   `src/game/objective.ts` is not the narrative authority and must not justify
   restoring player-facing hints prohibited by AGENTS.md.
 
@@ -488,7 +507,7 @@ New proposals should reference the affected question and observations.
 | Q05 | Sun type, decline mechanism, observable symptoms, and time available for generational restoration. | New decline prose, scientific diagnosis, deadlines, or calendar dates. No real-world mechanism has been selected. |
 | Q06 | Chapter boundaries, number of generations, succession practice, and recurring character arcs. | Naming successors, aging characters, placing handovers, or designing time-passage mechanics. |
 | Q07 | Whether a future action needs additional facts about a Phase 1 observation. Orso's motive, roots, chairs, and gestures may remain mysteries. | Only when an approved action depends on an answer or new writing proposes to establish a cause. Their continued presence does not require resolution. See CL03–CL12. |
-| Q08 | The detailed investigation evidence between survey and awakening, including the Barrow Field contradiction and physical relationship of ordinary/restored lamps. | Authoring the remaining Phase 1 research, expeditions, and finale prose. |
+| Q08 | Local survey-to-awakening evidence and the marked civic lamp relationship are now approved and implemented. Barrow Field uses the unusual-relic alternative; no historical contradiction is selected. | Later changes that add consequential facts still need approval. The wider system and surrounding mysteries remain open. |
 | Q09 | What makes renewed travel feasible, how a destination is chosen, and what the final preparations require. | Later restoration systems and departure prerequisites. Do not assume faster-than-light travel, stasis, or a known refuge. |
 | Q10 | Additional costs beyond lifetimes, representation of those left behind if any, and the departure scene. | Sacrifice plots or a final script. Limited rescue capacity and forced abandonment are not approved premises. |
 
@@ -561,17 +580,17 @@ Before delivering a narrative change:
 
 ### Next authoring pass
 
-Develop the evidence and actions necessary to carry the Outer Ward from survey
-to awakening (Q08), consulting Q07 only where those actions need additional
-facts. Preserve the surrounding mysteries without requiring explanations for
-roots, chairs, gestures, or motives. Define only enough machinery and geography
-to avoid incompatible claims (Q01/Q03), then draft the remaining beats for
-approval. Later passes can develop chapter evidence and human arcs, answering
-the relevant portions of Q02/Q04–Q06 when a scene or transition depends on them.
-Neither the opening nor the full story needs to settle all of these questions.
+[Survey-to-awakening authoring spec](PHASE_1_AWAKENING_DRAFT.md) was explicitly
+approved by the user and implemented. Future authoring should preserve these
+local observations, review the remaining Phase 1 catalog needs, and leave the
+surrounding mysteries open.
 
-This is an order for collaborative authoring, not authorization to implement
-the open answers or rewrite existing narrative automatically.
+Later passes can develop chapter evidence and human arcs, answering relevant
+portions of Q02/Q04–Q06 only when a scene or transition depends on them. Neither
+the opening nor the full story needs to settle all of these questions. Further
+consequential lore still requires approval; this order for collaborative
+authoring does not authorize implementing open answers or rewriting existing
+narrative automatically.
 
 ## 9. Revision log
 
@@ -582,3 +601,4 @@ the open answers or rewrite existing narrative automatically.
 | 2026-10-02 | User approved implementation of the illustrated-unlock plan: office, first Oil Press construction, lamp examination and first cistern discovery. Adds the incidental `oil-press-built` caption to record an established building's operation. | Four Dark Chronicle illustrations, accomplishment reveals, and Chronicle replay implemented. Existing office/lamp/cistern captions reused. Lamp artwork corrected to avoid depicting an oil reservoir. Art and prompts documented in `docs/ART.md`; no major lore, chronology, mysteries or reveal limits changed. |
 | 2026-10-02 | User requested removal of messages forecasting what studies, expeditions, and other actions unlock, preserving suspense while accumulating their costs. | Study effects appear after completion; construction no longer previews new roles or systems; the lamp-report choice does not name its unlock; expedition rewards and findings appear after return. Existing findings, progression, costs, timers, and ordinary production rates are preserved. No new lore or revelations added. |
 | 2026-10-02 | User approved the narrative audit's three consistency fixes: the reservoir wording, Knowledge terminology, and Chronicle inventory. | Event `lamp-complaint` now says "attempted to fill," matching the brief and repairing CL03; the Knowledge description no longer places observations in the household register; the inventory now counts twelve Chronicle entries. No triggers, chronology, clues, reveal limits, or unresolved environmental symptoms changed. |
+| 2026-10-02 | Edition 1.2: user replied “approved!” to the completed survey-to-awakening draft and its implementation approval question. Accepts local access/repair evidence, removable oil fittings in older civic lamps, the optional Barrow relic, and staged awakening wording. | Implemented ten buildings, thirteen studies, six destinations, and the deliberate awakening with Current, Oil-free restored lamp tending, version-5 persistence and independent presentation acknowledgements. Costs tuned provisionally through the full harness. No vessel/stellar/ancestral reveal, new major history, or explanations of enduring mysteries. |
