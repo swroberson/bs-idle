@@ -12,7 +12,7 @@ function prepared() {
   state.resources = { ...state.resources, food: 100, coin: 100, knowledge: 100, authority: 100 };
   state.lifetimeAuthority = 100;
   state.buildings = { ...state.buildings, fields: 1, "oil-press": 1, "market-stall": 1, "scrivener-house": 1, "ruined-cistern": 1 };
-  state.jobs = { ...state.jobs, forager: 3, lamplighter: 1, scrivener: 1 };
+  state.jobs = { ...state.jobs, forager: 3, lamplighter: 1, scrivener: 1, scavenger: 2 };
   state.triggeredEvents = ["household", "lamp-complaint"];
   state.chronicle.push("oil-press-built", "household", "lamp-complaint", "lamp-examination", "ledger-keeping");
   state.research = ["examine-old-lamps", "ledger-keeping"];
@@ -20,13 +20,13 @@ function prepared() {
 }
 
 describe("expedition lifecycle", () => {
-  it("reserves idle inhabitants, pays provisions, and permits only one expedition", () => {
+  it("transfers assigned Scavengers, pays provisions, and permits only one expedition", () => {
     const state = prepared();
     const sent = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 2 }, 0);
     expect(sent.activeExpedition?.workers).toBe(2);
     expect(availableWorkers(sent)).toBe(1);
     expect(sent.resources.food).toBe(100 - EXPEDITIONS["old-cistern"].foodPerWorker * 2);
-    expect(sent.jobs).toEqual(state.jobs);
+    expect(sent.jobs).toEqual({ ...state.jobs, scavenger: 0 });
     const full = applyAction(sent, { type: "assign-worker", job: "forager", delta: 1 }, 0);
     expect(availableWorkers(full)).toBe(0);
     expect(applyAction(full, { type: "assign-worker", job: "scrivener", delta: 1 }, 0)).toBe(full);
@@ -42,8 +42,10 @@ describe("expedition lifecycle", () => {
       expect(applyAction(state, { type: "start-expedition", destination: "old-cistern", workers }, 0)).toBe(state);
     }
     const state = prepared();
+    state.jobs.scavenger = 0;
     state.jobs.forager = 6;
     expect(applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, 0)).toBe(state);
+    state.jobs.scavenger = 2;
     state.jobs.forager = 3;
     state.resources.food = 0;
     expect(applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, 0)).toBe(state);
@@ -64,7 +66,8 @@ describe("expedition lifecycle", () => {
     expect(returned.state.chronicle.filter(id => id === "cistern-find")).toHaveLength(1);
     expect(returned.summary.completedExpeditions).toEqual(["old-cistern"]);
     expect(reconcile(returned.state, end).state).toBe(returned.state);
-    const repeat = applyAction(returned.state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, end);
+    const reassigned = applyAction(returned.state, { type: "assign-worker", job: "scavenger", delta: 1 }, end);
+    const repeat = applyAction(reassigned, { type: "start-expedition", destination: "old-cistern", workers: 1 }, end);
     const again = reconcile(repeat, repeat.activeExpedition!.returnsAt).state;
     expect(again.resources.relics).toBe(3);
     expect(again.chronicle.filter(id => id === "cistern-find")).toHaveLength(1);
@@ -106,6 +109,7 @@ describe("expedition lifecycle", () => {
   it("bounds return history without losing discoveries or duplicating rewards", () => {
     let state = prepared();
     for (let trip = 0; trip < 22; trip++) {
+      if (!state.jobs.scavenger) state = applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, state.lastSimulatedAt);
       state = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, state.lastSimulatedAt);
       state = reconcile(state, state.activeExpedition!.returnsAt).state;
     }

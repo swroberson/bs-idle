@@ -1,11 +1,22 @@
+"use client";
+
+import { useState } from "react";
 import { JOBS } from "@/content/jobs";
 import { BALANCE } from "@/content/balance";
 import { availableWorkers, constructionDiscount, jobUnlocked } from "@/game/requirements";
 import type { GameAction, GameState, JobId } from "@/game/types";
 
 export function WorkerPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
+  const [selected, setSelected] = useState("daily");
   const available = availableWorkers(state);
   const discount = constructionDiscount(state);
+  const groups = [
+    { id: "daily", label: "Daily work", roles: ["forager", "lamplighter"] },
+    { id: "field", label: "Fieldwork", roles: ["laborer", "scavenger"] },
+    { id: "study", label: "Scholarship", roles: ["scrivener"] },
+  ].map(group => ({ ...group, roles: group.roles.filter(id => jobUnlocked(state, id as JobId)) as JobId[] }))
+    .filter(group => group.roles.length > 0);
+  const group = groups.find(group => group.id === selected) ?? groups[0];
   return <aside aria-labelledby="inhabitants-heading" className="inhabitants-region">
     <div className="region-heading"><h2 id="inhabitants-heading" className="machine-label">02 / Inhabitants</h2><span className="machine-label">Register</span></div>
     <div className="population-register">
@@ -17,15 +28,19 @@ export function WorkerPanel({ state, active, dispatch }: { state: GameState; act
         <div><dt>Available</dt><dd>{available}</dd></div>
       </dl>
     </div>
+    {groups.length > 1 && <div className="module-selector worker-selector" aria-label="Staffing views" style={{ gridTemplateColumns: `repeat(${groups.length}, minmax(0, 1fr))` }}>
+      {groups.map(item => <button key={item.id} aria-pressed={group.id === item.id} onClick={() => setSelected(item.id)}>{item.label}</button>)}
+    </div>}
     <div className="worker-allocations">
-      {(Object.keys(JOBS) as JobId[]).filter(id => jobUnlocked(state, id)).map((id) => <div className="worker-allocation" key={id}>
-        <div className="worker-role"><p id={`job-${id}`}>{JOBS[id].name}</p><p className="machine-label">{id === "forager" ? "Gardens" : id === "lamplighter" ? "Ward lamps" : id === "laborer" ? `Coin −${Math.round(discount.laborer * 100)}% / cap ${BALANCE.laborerDiscountCap * 100}%` : "Scriptorium"}</p></div>
+      {group.roles.map((id) => <div className="worker-allocation" key={id}>
+        <div className="worker-role"><p id={`job-${id}`}>{JOBS[id].name}</p><p className="machine-label">{id === "forager" ? "Gardens" : id === "lamplighter" ? "Ward lamps" : id === "laborer" ? `Coin −${Number((discount.laborer * 100).toFixed(2))}% / cap ${BALANCE.laborerDiscountCap * 100}%` : id === "scavenger" ? "Expedition readiness" : "Scriptorium"}</p></div>
         <button className="worker-step" disabled={!active || state.jobs[id] === 0} aria-label={`Release one ${JOBS[id].name}`} onClick={() => dispatch({ type: "assign-worker", job: id, delta: -1 })}>−</button>
         <span className="worker-count" aria-label={`${state.jobs[id]} assigned ${JOBS[id].name}s`}>{String(state.jobs[id]).padStart(2, "0")}</span>
         <button className="worker-step" disabled={!active || available === 0} aria-label={`Assign one ${JOBS[id].name}`} onClick={() => dispatch({ type: "assign-worker", job: id, delta: 1 })}>+</button>
       </div>)}
     </div>
-    {jobUnlocked(state, "laborer") && <p className="allocation-note machine-label">Building Coin: −{BALANCE.laborerCoinDiscount * 100}% per Laborer. Other costs unchanged.</p>}
+    {group.roles.includes("laborer") && <p className="allocation-note machine-label">Building Coin: −{Number((discount.perLaborer * 100).toFixed(2))}% per Laborer. Other costs unchanged.</p>}
+    {group.roles.includes("scavenger") && <p className="allocation-note machine-label">Archaeological parties draw from Scavengers. Return idle.</p>}
     <p className="allocation-note machine-label">All inhabitants consume Food.</p>
   </aside>;
 }

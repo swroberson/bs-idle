@@ -90,6 +90,8 @@ button, a, input, textarea { outline-offset: -3px; }
 .worker-readout dt { font-size: .6875rem; color: var(--color-muted); }
 .worker-readout dd { font-size: .75rem; }
 .worker-allocations { border-top: 1px solid var(--color-line); padding-inline: 1rem; }
+.worker-selector { padding-inline: .5rem; }
+.module-selector.worker-selector button { font-size: .5625rem; letter-spacing: .03em; padding-inline: .5rem; }
 .worker-allocation { display: grid; grid-template-columns: minmax(0, 1fr) 2.75rem 1.75rem 2.75rem; gap: .5rem; align-items: center; min-height: 3.5rem; padding-block: .375rem; border-bottom: 1px solid var(--color-line); }
 .worker-allocation:last-child { border-bottom: 0; }
 .ward-with-labor .worker-allocation { min-height: 3rem; padding-block: .125rem; }
@@ -145,6 +147,7 @@ button, a, input, textarea { outline-offset: -3px; }
 .requirements-copy { margin-top: .75rem; font-size: .75rem; line-height: 1.7; color: var(--color-muted); }
 .signal-region { padding: 1.25rem 1rem; border-bottom: 1px solid var(--color-lamp); background: #1f2118; }
 .signal-region h2 { margin-top: .75rem; font-family: var(--font-serif); font-size: 1.25rem; font-weight: 400; }
+.event-response + .event-response { margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--color-line); }
 .return-region { padding: .75rem 1rem 1rem; border-bottom: 1px solid var(--color-line); }
 .return-changes { display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: .75rem; }
 .return-changes > div { display: flex; gap: .5rem; font-size: .75rem; }

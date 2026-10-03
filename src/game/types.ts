@@ -18,7 +18,7 @@ export type IllustrationId = keyof typeof ILLUSTRATIONS;
 export type Cost = Partial<Record<ResourceId, number>>;
 
 export interface GameState {
-  version: 6;
+  version: 7;
   resources: Record<ResourceId, number>;
   population: number;
   jobs: Record<JobId, number>;
@@ -26,6 +26,7 @@ export interface GameState {
   lifetimeAuthority: number;
   triggeredEvents: EventId[];
   pendingEvents: EventId[];
+  eventChoices: Partial<Record<EventId, string>>;
   research: ResearchId[];
   chronicle: ChronicleId[];
   readChronicle: ChronicleId[];
@@ -48,7 +49,7 @@ export type GameAction =
   | { type: "render-oil" }
   | { type: "assign-worker"; job: JobId; delta: 1 | -1 }
   | { type: "build"; building: BuildingId }
-  | { type: "choose-event"; event: EventId }
+  | { type: "choose-event"; event: EventId; choice?: string }
   | { type: "research"; research: ResearchId }
   | { type: "start-expedition"; destination: ExpeditionId; workers: number };
 
@@ -70,6 +71,9 @@ export interface ContentRequirements {
 }
 export interface Modifiers {
   constructionCoinMultiplier?: number;
+  laborerDiscountBonus?: number;
+  expeditionFoodMultiplier?: number;
+  knowledgeMultiplier?: number;
   foodMultiplier?: number;
   oilDemandMultiplier?: number;
   oilOutputMultiplier?: number;
@@ -84,14 +88,21 @@ export interface ResearchDefinition {
   name: string; text: string; description: string; effect: string; cost: Cost;
   chronicle: ChronicleId; requirements: ContentRequirements; modifiers?: Modifiers;
 }
-export interface EventDefinition {
-  title: string; text: string; choice: string; cost: Cost; population: number;
+interface EventBase {
+  title: string; text: string; population: number;
   chronicle: ChronicleId; requirements: ContentRequirements;
-  provisionedArrival?: boolean;
+}
+export type EventDefinition = EventBase & (
+  { choice: string; cost: Cost; provisionedArrival?: boolean; choices?: never } |
+  { choices: readonly EventChoice[]; choice?: never; cost?: never; provisionedArrival?: never }
+);
+export interface EventChoice {
+  id: string; label: string; cost: Cost; rewards: Cost;
 }
 export interface ExpeditionDefinition {
   name: string; description: string; durationMs: number; foodPerWorker: number;
   rewardsPerWorker: Cost; requirements: ContentRequirements; chronicle: ChronicleId;
+  staffing: "scavenger" | "idle";
 }
 export interface ActiveExpedition {
   destination: ExpeditionId; workers: number; startedAt: number; returnsAt: number;

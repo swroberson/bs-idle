@@ -54,7 +54,7 @@ awakening and understandable costs. Existing mysteries stay unresolved.
 
 Work initially toward the lower content targets: at least 20 studies and ten
 one-time queued events, using the existing ten buildings and six destinations.
-There are currently thirteen studies and two queued events. Research records,
+There are currently seventeen studies and five queued events. Research records,
 expedition returns and the ending remain separate from the queued-event count.
 Count targets do not justify repetitive bonuses or mandatory interruptions.
 
@@ -85,9 +85,9 @@ Count targets do not justify repetitive bonuses or mandatory interruptions.
    approved effects. Favor options that change allocation or spending choices;
    distinguish them from existing Food/Oil multipliers. No new storage system
    or expedition-speed mechanic is assumed by the names.
-5. **Remaining content batches:** fill the rest of the seven-study/eight-event
-   shortfall in small groups, accounting for Stoneworking and the household
-   already delivered. Place civic work around early growth, scholarship,
+5. **Remaining content batches:** fill the three-study/five-event shortfall in
+   small groups, accounting for the studies and events already delivered.
+   Place civic work around early growth, scholarship,
    exploration and restoration. Each item needs an authored purpose, exact
    effects, prerequisites, costs and a continuity check. Keep the required
    investigation path valid without optional discoveries. Review human play
@@ -99,10 +99,11 @@ Count targets do not justify repetitive bonuses or mandatory interruptions.
    remain manageable on a phone. Verify real iPhone Safari, installation,
    offline reopening and background/resume. Deploy only when requested.
 
-The immediate next deliverable is a concrete Laborer/Stoneworking specification
-with cost examples and an additional-household draft; implement construction
-staffing as the first complete, tested slice. Further content should respond to
-how that slice plays.
+Construction staffing, the additional household, Scavengers and the first
+three-study/two-event civic batch are implemented. The user explicitly requested
+Scavengers and that batch before human playtesting/tuning on October 3. See
+`tasks/scavenging-civic.md` for the delivered rules and verification. The next
+checkpoint is human play and tuning, followed by the remaining small batches.
 
 ## Verification and checkpoints
 
@@ -130,8 +131,9 @@ Harness time remains reachability evidence, not a claim about human enjoyment.
   choice dialog merely to raise the count.
 - Additional staffing can exceed the current Ward viewport. Use focused views
   or pagination, with scrolling retained for long content and enlarged text.
-- Exact role gates, discount values, study effects and event content are still
-  proposals. New consequential lore requires explicit approval under AGENTS;
+- Delivered staffing gates, discounts and first-batch effects are specified in
+  `tasks/scavenging-civic.md`; numerical balance remains provisional. Further
+  content remains proposed. New consequential lore requires approval under AGENTS;
   routine civic detail can elaborate established life without inventing history.
 - Real-device validation requires an iPhone; it must not be marked complete by
   Chromium checks. Deployment is a separate requested action.

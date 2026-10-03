@@ -33,7 +33,7 @@ export function ExpeditionPanel({ state, active, dispatch }: { state: GameState;
       <p className="requirements-copy">Automatic return, including while away. Returned workers remain idle. Rewards and findings appear in the return log.</p>
     </div>}
     {view === "destinations" && <><div className="expedition-allocation">
-      <label htmlFor="expedition-workers" className="machine-label">Party size // available inhabitants only</label>
+      <label htmlFor="expedition-workers" className="machine-label">Party size // 1–3 inhabitants</label>
       <select id="expedition-workers" value={workers} disabled={!active || !!party} onChange={event => setWorkers(Number(event.target.value))}>
         {Array.from({ length: BALANCE.expeditionMaxWorkers }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1} {i === 0 ? "inhabitant" : "inhabitants"}</option>)}
       </select>
@@ -41,12 +41,13 @@ export function ExpeditionPanel({ state, active, dispatch }: { state: GameState;
     {items.slice(index, index + 1).map(id => {
       const destination = EXPEDITIONS[id];
       const unmet = expeditionRequirements(state, id, workers);
+      const staffing = destination.staffing === "scavenger" ? "assigned Scavengers" : "idle inhabitants";
       return <article key={id} className="operation-row">
         <div className="operation-heading"><h3>{destination.name}</h3><span className="machine-label">{state.completedExpeditions.includes(id) ? "Surveyed" : "Unvisited"}</span></div>
         <p className="narrative">{destination.description}</p>
-        <p className="effect-readout">Duration // {duration(destination.durationMs)}<br />{workers} inhabitants reserved until return</p>
-        <button className="machine-button" disabled={!active || unmet.length > 0} aria-describedby={`expedition-${id}-requirements`} onClick={() => dispatch({ type: "start-expedition", destination: id, workers })}>Dispatch // {costText(expeditionCost(id, workers))}</button>
-        <p id={`expedition-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || `${workers} inhabitants ready / provisions sufficient`}</p>
+        <p className="effect-readout">Duration // {duration(destination.durationMs)}<br />{workers} {staffing} reserved until return</p>
+        <button className="machine-button" disabled={!active || unmet.length > 0} aria-describedby={`expedition-${id}-requirements`} onClick={() => dispatch({ type: "start-expedition", destination: id, workers })}>Dispatch // {costText(expeditionCost(state, id, workers))}</button>
+        <p id={`expedition-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || `${workers} ${staffing} ready / provisions sufficient`}</p>
       </article>;
     })}
     <CatalogPager name="Destinations" labels={items.map(id => EXPEDITIONS[id].name)} index={index} select={setPage} /></>}

@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { CHRONICLE } from "@/content/chronicle";
-import type { ChronicleId, GameAction, GameState } from "@/game/types";
+import { EVENTS } from "@/content/events";
+import { costText, eventChoices } from "@/game/requirements";
+import type { ChronicleId, EventId, GameAction, GameState } from "@/game/types";
 import { illustrationForRecord } from "@/game/illustrations";
 import { IllustratedRecord } from "./IllustratedRecord";
 
@@ -18,6 +20,8 @@ export function ChroniclePanel({ state, active, dispatch }: {
   const id = state.chronicle[index];
   const unread = !state.readChronicle.includes(id);
   const illustration = id ? illustrationForRecord(id) : undefined;
+  const event = (Object.keys(EVENTS) as EventId[]).find(event => EVENTS[event].chronicle === id && state.eventChoices[event]);
+  const response = event ? eventChoices(event).find(choice => choice.id === state.eventChoices[event]) : undefined;
 
   useEffect(() => {
     if (!active || !id || !unread) return;
@@ -37,6 +41,7 @@ export function ChroniclePanel({ state, active, dispatch }: {
       <p className="machine-label">Entry / {String(index + 1).padStart(3, "0")}</p>
       <h3>{CHRONICLE[id].title}</h3>
       {illustration ? <IllustratedRecord key={illustration} id={illustration} /> : <p className="narrative">{CHRONICLE[id].text}</p>}
+      {response && <p className="effect-readout">Response // {response.label}<br />Issued // {costText(response.cost)}<br />Received // {costText(response.rewards)}</p>}
     </article>}
     <div className="archive-controls" aria-label="Chronicle entries">
       <button className="machine-button" disabled={index === 0} onClick={() => setSelected(state.chronicle[index - 1])}>← Previous</button>

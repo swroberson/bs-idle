@@ -15,6 +15,7 @@ function restoredWard(): GameState {
   const build = (building: BuildingId) => { state = applyAction(state, { type: "build", building }, state.lastSimulatedAt); };
   const study = (research: ResearchId) => { state = applyAction(state, { type: "research", research }, state.lastSimulatedAt); };
   const travel = (destination: ExpeditionId, duration: number) => {
+    state = applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, state.lastSimulatedAt);
     state = applyAction(state, { type: "start-expedition", destination, workers: 1 }, state.lastSimulatedAt);
     state = reconcile(state, state.lastSimulatedAt + duration).state;
   };
@@ -114,13 +115,13 @@ describe("deliberate local awakening", () => {
     old.research = ["examine-old-lamps", "ledger-keeping", "catalog-relics", "survey-foundations"];
     old.completedExpeditions = ["old-cistern"];
     old.expeditionLog = old.expeditionLog.filter((entry: { destination: string }) => entry.destination === "old-cistern");
-    old.version = 4; delete old.resources.current; delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer;
+    old.version = 4; delete old.resources.current; delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices;
     for (const id of ["lamp-house", "smithy", "subterranean-works", "buried-engine"]) delete old.buildings[id];
     old.readChronicle = ["appointment"];
     old.dismissedIllustrations = ["keeper-office"];
     old.activeExpedition = { destination: "abandoned-farmstead", workers: 2, startedAt: old.lastSimulatedAt, returnsAt: old.lastSimulatedAt + 240000 };
     state = decodeSave(JSON.stringify(old));
-    expect(state.version).toBe(6);
+    expect(state.version).toBe(7);
     expect(state.resources).toEqual({ ...old.resources, current: 0 });
     expect(state.activeExpedition).toEqual(old.activeExpedition);
     expect(state.lastSimulatedAt).toBe(old.lastSimulatedAt);
@@ -156,6 +157,7 @@ describe("deliberate local awakening", () => {
       const record = destination === "collapsed-gatehouse" ? "gatehouse-find" : "barrow-find";
       for (let trip = 0; trip < 2; trip++) {
         const now = state.lastSimulatedAt;
+        if (destination === "barrow-field") for (let n = 0; n < 2; n++) state = applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, now);
         const sent = applyAction(state, { type: "start-expedition", destination, workers: 2 }, now);
         expect(sent.activeExpedition?.workers).toBe(2);
         state = reconcile(sent, now + 43200000).state;

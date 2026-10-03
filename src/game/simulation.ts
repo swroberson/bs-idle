@@ -8,13 +8,14 @@ import { completeExpedition } from "./expeditions";
 import type { GameState, Modifiers, ResearchDefinition, ResourceId, ReturnSummary } from "./types";
 
 // Production bonuses multiply after the base worker + building output is added.
-export function economyModifiers(state: GameState): Required<Pick<Modifiers, "foodMultiplier" | "oilDemandMultiplier" | "oilOutputMultiplier">> {
+export function economyModifiers(state: GameState): Required<Pick<Modifiers, "foodMultiplier" | "oilDemandMultiplier" | "oilOutputMultiplier" | "knowledgeMultiplier">> {
   return state.research.reduce((modifiers, id) => {
     const research: ResearchDefinition = RESEARCH[id];
     return { foodMultiplier: modifiers.foodMultiplier * (research.modifiers?.foodMultiplier ?? 1),
       oilDemandMultiplier: modifiers.oilDemandMultiplier * (research.modifiers?.oilDemandMultiplier ?? 1),
-      oilOutputMultiplier: modifiers.oilOutputMultiplier * (research.modifiers?.oilOutputMultiplier ?? 1) };
-  }, { foodMultiplier: 1, oilDemandMultiplier: 1, oilOutputMultiplier: 1 });
+      oilOutputMultiplier: modifiers.oilOutputMultiplier * (research.modifiers?.oilOutputMultiplier ?? 1),
+      knowledgeMultiplier: modifiers.knowledgeMultiplier * (research.modifiers?.knowledgeMultiplier ?? 1) };
+  }, { foodMultiplier: 1, oilDemandMultiplier: 1, oilOutputMultiplier: 1, knowledgeMultiplier: 1 });
 }
 
 export function economyRates(state: GameState) {
@@ -35,7 +36,7 @@ export function economyRates(state: GameState) {
       oil: oilOutput - oilDemand * lampFraction,
       authority: state.jobs.lamplighter * (JOBS.lamplighter.authorityPerSecond + state.buildings["lamp-house"] * BUILDINGS["lamp-house"].authorityPerLamplighter) * efficiency * lampFraction,
       coin: state.buildings["market-stall"] * BUILDINGS["market-stall"].coinPerSecond * efficiency,
-      knowledge: state.jobs.scrivener * JOBS.scrivener.knowledgePerSecond * efficiency,
+      knowledge: state.jobs.scrivener * JOBS.scrivener.knowledgePerSecond * efficiency * modifiers.knowledgeMultiplier,
       relics: 0,
       current: state.awakenedAt !== null ? AWAKENING.currentPerSecond * efficiency : 0,
     },

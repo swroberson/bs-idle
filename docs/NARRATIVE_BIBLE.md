@@ -1,6 +1,6 @@
 # Buried Sun: Narrative Bible
 
-**Edition:** 1.3 — October 2, 2026
+**Edition:** 1.4 — October 3, 2026
 
 **Audience:** authors and agents; contains end-of-story spoilers  
 **Status:** approved story foundations, provisional chapter outline, and an audit of existing content
@@ -51,8 +51,8 @@ story's destination is approved.
 ### Source map and implementation boundary
 
 - [Chronicle](../src/content/chronicle.ts): opening and persistent narrative records.
-- [Events](../src/content/events.ts): household arrivals and lamp complaint.
-- [Research](../src/content/research.ts): fourteen implemented investigations/improvements; several repeat Chronicle text.
+- [Events](../src/content/events.ts): household arrivals, lamp complaint and civic transactions.
+- [Research](../src/content/research.ts): seventeen implemented investigations/improvements; several repeat Chronicle text.
 - [Expeditions](../src/content/expeditions.ts): six destinations and their record references.
 - [Buildings](../src/content/buildings.ts), [jobs](../src/content/jobs.ts), and [resources](../src/content/resources.ts): descriptions and local terminology.
 - [Ward scene](../src/components/WardPanel.tsx): the road toward the Citadel; [app metadata](../src/app/layout.tsx): public premise.
@@ -61,8 +61,8 @@ story's destination is approved.
 **EXISTING:** the playable Outer Ward now reaches the deliberate
 `awaken-junction` action, recorded as `junction-awakened`. Current and Oil-free
 restored lamp tending follow activation, while management continues. There are
-currently ten buildings, fourteen research entries, three queued-choice events,
-six expedition destinations, and thirty Chronicle entries. The remaining
+currently ten buildings, seventeen research entries, five queued-choice events,
+six expedition destinations, and thirty-five Chronicle entries. The remaining
 Phase 1 content-count targets, playtesting, and real-device checks are separate
 from this implemented story endpoint.
 
@@ -360,6 +360,39 @@ clue meanings, the retained story chronology, author-level truths or reveal
 limits. The first household still precedes Orso's complaint; the later household
 may precede or follow optional expeditions and is unnecessary for the awakening.
 
+### Scavenging and civic work — October 3, 2026
+
+The user requested Scavengers and the first civic batch before human playtesting
+and tuning. These optional Chapter 1 developments elaborate established Ward
+life and do not change the archaeological evidence or reveal sequence. Exact
+mechanics are recorded in [the batch specification](../tasks/scavenging-civic.md).
+
+- `scavenger` unlocks when the cistern stair is cleared. Assignment prepares
+  inhabitants for archaeological dispatch; it establishes no guild, history,
+  ancestry or expertise beyond the work shown. Supply/salvage parties retain
+  ordinary idle inhabitants, and all returned workers are idle.
+- `provision-stores` measures and wraps food at the existing stair. Its record
+  concerns missing handfuls and a better tally, not a new storage institution.
+- `apprenticed-hands` pairs existing workers at the stone bench; apprenticeship
+  means ordinary shared work. It establishes no school or named apprentice.
+- `collated-records` bundles observational leaves and copies, preserving their
+  original hands. It gives no new interpretation of relics or old measurements.
+- `shared-table` follows Provision Stores and the first household record. An
+  unnamed household borrows a table and bowls for a shared meal beneath the
+  arch. Both responses issue Food and support civic standing. The record stays
+  neutral about the size of the meal; the selected transaction is retained
+  separately. No feast tradition, new arrival or named family is established.
+- `spare-oil` follows Apprenticed Hands, Oil Press and the first household
+  record. An unnamed household exchanges spare ordinary lamp oil for Food or
+  Coin. Two jars are measured into the Ward stores. Even after awakening this
+  does not imply restored civic lamps consume Oil; household/workshop lamps
+  remain ordinary, as already permitted by Q08. No origin of the oil is given.
+
+These studies/events are independent of optional sibling discoveries and never
+required for restoration. Both reports await explicit response and remain
+readable in the Chronicle. The first household still precedes Orso's complaint;
+no clue disposition, larger history, character backstory or mystery is settled.
+
 ### Implemented continuation — approved October 2, 2026
 
 The user explicitly approved the [survey-to-awakening draft](PHASE_1_AWAKENING_DRAFT.md)
@@ -629,3 +662,4 @@ narrative automatically.
 | 2026-10-02 | User approved the narrative audit's three consistency fixes: the reservoir wording, Knowledge terminology, and Chronicle inventory. | Event `lamp-complaint` now says "attempted to fill," matching the brief and repairing CL03; the Knowledge description no longer places observations in the household register; the inventory now counts twelve Chronicle entries. No triggers, chronology, clues, reveal limits, or unresolved environmental symptoms changed. |
 | 2026-10-02 | Edition 1.2: user replied “approved!” to the completed survey-to-awakening draft and its implementation approval question. Accepts local access/repair evidence, removable oil fittings in older civic lamps, the optional Barrow relic, and staged awakening wording. | Implemented ten buildings, thirteen studies, six destinations, and the deliberate awakening with Current, Oil-free restored lamp tending, version-5 persistence and independent presentation acknowledgements. Costs tuned provisionally through the full harness. No vessel/stellar/ancestral reveal, new major history, or explanations of enduring mysteries. |
 | 2026-10-02 | Edition 1.3: user requested Laborers + Stoneworking followed by another household event, grounded in Ward life and preserving the larger mysteries. | Implemented the capped construction job, optional stone reuse study and two-person household choice/record. Adds incidental ordinary work and belongings only; no major history, character backstory, system purpose, revelation, ending or clue interpretation changed. Fourteen studies, three events and thirty Chronicle records. |
+| 2026-10-03 | Edition 1.4: user requested Scavenger implementation and the first civic studies/events batch, deferring human playtesting/tuning. | Implemented archaeological staffing, Provision Stores, Apprenticed Hands, Collated Records, shared-table and spare-oil choices, and version-7 persistence. Incidental food packing, paired stonework, copied leaves, a shared meal and ordinary oil exchange only; no new major history, backstory, system purpose, revelation or clue explanation. Seventeen studies, five events and thirty-five Chronicle records. |

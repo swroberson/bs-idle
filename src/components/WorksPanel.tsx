@@ -28,7 +28,7 @@ export function WorksPanel({ state, active, dispatch }: { state: GameState; acti
       </article>;
     })}
     <CatalogPager name="Works" labels={items.map(id => BUILDINGS[id].name)} index={index} select={setPage} />
-    {jobUnlocked(state, "laborer") && <p className="requirements-copy">Building Coin / Laborers: {state.jobs.laborer} assigned, −{Math.round(discount.laborer * 100)}% (cap {BALANCE.laborerDiscountCap * 100}%).{discount.study > 0 && ` Stoneworking: −${Math.round(discount.study * 100)}%; combined −${Math.round((1 - discount.coinMultiplier) * 100)}%.`} Final Coin costs round up. Other costs unchanged.</p>}
+    {jobUnlocked(state, "laborer") && <p className="requirements-copy">Building Coin / Laborers: {state.jobs.laborer} assigned, −{Number((discount.laborer * 100).toFixed(2))}% (cap {BALANCE.laborerDiscountCap * 100}%).{discount.study > 0 && ` Stoneworking: −${Math.round(discount.study * 100)}%; combined −${Number(((1 - discount.coinMultiplier) * 100).toFixed(2))}%.`} Final Coin costs round up. Other costs unchanged.</p>}
     <p className="module-note machine-label">Automatic production is halved during Food shortages.</p>
   </section>;
 }

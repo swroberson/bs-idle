@@ -89,4 +89,25 @@ export const RESEARCH = {
     effect: "Material comparison recorded; production unchanged.", chronicle: "black-metal-study",
     requirements: { buildings: { "antiquities-house": 1 }, expeditions: ["collapsed-gatehouse"] },
   },
+  "provision-stores": {
+    name: "Provision Stores", description: "Measure and wrap the departing parties' food beside the cistern stair. Compare the baskets with the store tally.",
+    text: CHRONICLE["provision-stores"].text, cost: { coin: 20, knowledge: 12 },
+    effect: "Expedition Food costs decrease by 20%. Round the whole party's cost up once; timers and rewards are unchanged.",
+    modifiers: { expeditionFoodMultiplier: .8 }, chronicle: "provision-stores",
+    requirements: { buildings: { "ruined-cistern": 1, "scrivener-house": 1 } },
+  },
+  "apprenticed-hands": {
+    name: "Apprenticed Hands", description: "Pair the workers at the stone bench. Compare the carrying tally with the pieces dressed and laid.",
+    text: CHRONICLE["apprenticed-hands"].text, cost: { coin: 25, knowledge: 20 },
+    effect: "Each Laborer reduces building Coin costs by 7.5%, within the existing 20% cap. Three reach the cap. Stoneworking still multiplies afterward; other costs are unchanged.",
+    modifiers: { laborerDiscountBonus: .025 }, chronicle: "apprenticed-hands",
+    requirements: { buildings: { smithy: 1 }, research: ["stoneworking"] },
+  },
+  "collated-records": {
+    name: "Collated Records", description: "Lay the loose observational leaves beside their copies. Bundle the measurements in a consistent order.",
+    text: CHRONICLE["collated-records"].text, cost: { coin: 20, knowledge: 24 },
+    effect: "Scrivener Knowledge output increases by 25%, to 0.10/s each. Food shortages still halve output.",
+    modifiers: { knowledgeMultiplier: 1.25 }, chronicle: "collated-records",
+    requirements: { buildings: { "antiquities-house": 1 }, research: ["catalog-relics"] },
+  },
 } as const satisfies Record<string, ResearchDefinition>;

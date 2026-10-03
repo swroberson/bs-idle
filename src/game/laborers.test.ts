@@ -74,15 +74,15 @@ describe("construction labor", () => {
   it("migrates existing version-5 saves without altering resources, records or workers", () => {
     const old = JSON.parse(JSON.stringify(workshop()));
     old.version = 5;
-    delete old.jobs.laborer;
+    delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices;
     old.jobs = { forager: 3, lamplighter: 1, scrivener: 1 };
     old.buildings["ruined-cistern"] = 1;
     old.activeExpedition = { destination: "old-cistern", workers: 2, startedAt: 0, returnsAt: 180000 };
     old.readChronicle = ["appointment"];
     old.dismissedIllustrations = ["keeper-office"];
     const migrated = decodeSave(JSON.stringify(old));
-    expect(migrated.version).toBe(6);
-    expect(migrated.jobs).toEqual({ ...old.jobs, laborer: 0 });
+    expect(migrated.version).toBe(7);
+    expect(migrated.jobs).toEqual({ ...old.jobs, laborer: 0, scavenger: 0 });
     expect(migrated.resources).toEqual(old.resources);
     expect(migrated.chronicle).toEqual(old.chronicle);
     expect(migrated.readChronicle).toEqual(old.readChronicle);

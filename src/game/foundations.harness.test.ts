@@ -30,6 +30,7 @@ it("reaches the foundation survey from a fresh save through ordinary actions", (
       }
     }
     if (state.buildings["ruined-cistern"] && !state.completedExpeditions.includes("old-cistern") && !state.activeExpedition && availableWorkers(state) >= 2 && state.resources.food >= 20) {
+      for (let n = 0; n < 2; n++) state = applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, now);
       state = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 2 }, now);
       milestones.departure = second;
     }
@@ -37,7 +38,7 @@ it("reaches the foundation survey from a fresh save through ordinary actions", (
   }
   expect(state.research).toContain("survey-foundations");
   expect(state.completedExpeditions).toContain("old-cistern");
-  expect(state.jobs).toEqual({ forager: 3, lamplighter: 2, scrivener: 1, laborer: 0 });
+  expect(state.jobs).toEqual({ forager: 3, lamplighter: 2, scrivener: 1, laborer: 0, scavenger: 0 });
   expect(availableWorkers(state)).toBe(2);
   expect(decodeSave(encodeSave(state))).toEqual(state);
   expect(milestones["survey-foundations"]).toBeLessThanOrEqual(1200);

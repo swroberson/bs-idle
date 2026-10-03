@@ -22,6 +22,26 @@ export const CHRONICLE = {
     title: "A mended threshold",
     text: "Two more names are entered in the register. The handcart is unloaded beneath the arch. By evening, a chipped stone has been turned and bedded again at the room's entrance. The cooking pot hangs above a small fire inside.",
   },
+  "provision-stores": {
+    title: "Provisions by the stair",
+    text: "Food is measured before it is wrapped. The baskets wait beside the cleared stair, each with its tally tied beneath the handle. Loose handfuls no longer disappear between the stores and the departing party.",
+  },
+  "apprenticed-hands": {
+    title: "Two at the bench",
+    text: "One holds the stone while another dresses its edge. They exchange places before their hands grow numb. At the end of the day, fewer carriers have been called away from the other work.",
+  },
+  "collated-records": {
+    title: "Leaves in order",
+    text: "The scrivener lays the loose leaves beside their copies. Measurements are gathered together; observations remain in the hands that first wrote them. A strip of cloth marks each bundle. Less of the day is spent looking for a line already written.",
+  },
+  "shared-table": {
+    title: "A table between doors",
+    text: "A table is carried beneath the arch. Bowls stand along its uneven edge, with places left for those still at work. The household's request and the provisions issued are entered in the ledger.",
+  },
+  "spare-oil": {
+    title: "Two jars entered",
+    text: "The household's jars are opened beside the press. Their oil is measured into the Ward's vessels, and the exchange is entered beneath the day's ordinary purchases. The empty jars are carried home.",
+  },
   "lamp-complaint": {
     title: "The third lamp",
     text: "Orso has reported a lamp without a reservoir. An examination has been authorized. He asks that the lamp remain where it is. He does not say why.",

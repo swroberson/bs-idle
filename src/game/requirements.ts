@@ -6,7 +6,7 @@ import { RESEARCH } from "../content/research";
 import { EXPEDITIONS } from "../content/expeditions";
 import { RESOURCES } from "../content/resources";
 import { AWAKENING } from "../content/awakening";
-import type { BuildingId, ContentRequirements, Cost, EventId, ExpeditionId, GameState, JobId, ResearchDefinition, ResearchId, ResourceId } from "./types";
+import type { BuildingId, ContentRequirements, Cost, EventDefinition, EventId, ExpeditionId, GameState, JobId, ResearchDefinition, ResearchId, ResourceId } from "./types";
 
 export function availableWorkers(state: GameState): number {
   return state.population - Object.values(state.jobs).reduce((sum, count) => sum + count, 0) - (state.activeExpedition?.workers ?? 0);
@@ -40,12 +40,16 @@ export function prerequisiteRequirements(state: GameState, requirements: Content
 }
 
 export function constructionDiscount(state: GameState) {
-  const laborer = Math.min(BALANCE.laborerDiscountCap, state.jobs.laborer * BALANCE.laborerCoinDiscount);
+  const perLaborer = state.research.reduce((discount, id) => {
+    const study: ResearchDefinition = RESEARCH[id];
+    return discount + (study.modifiers?.laborerDiscountBonus ?? 0);
+  }, BALANCE.laborerCoinDiscount as number);
+  const laborer = Math.min(BALANCE.laborerDiscountCap, state.jobs.laborer * perLaborer);
   const studyMultiplier = state.research.reduce((multiplier, id) => {
     const study: ResearchDefinition = RESEARCH[id];
     return multiplier * (study.modifiers?.constructionCoinMultiplier ?? 1);
   }, 1);
-  return { laborer, study: 1 - studyMultiplier, coinMultiplier: (1 - laborer) * studyMultiplier };
+  return { perLaborer, laborer, study: 1 - studyMultiplier, coinMultiplier: (1 - laborer) * studyMultiplier };
 }
 
 export function buildingCost(state: GameState, id: BuildingId): Cost {
@@ -63,9 +67,16 @@ export function buildingRequirements(state: GameState, id: BuildingId): string[]
   return [...prerequisiteRequirements(state, BUILDINGS[id].requirements), ...costRequirements(state, buildingCost(state, id))];
 }
 
-export function eventRequirements(state: GameState, id: EventId): string[] {
-  const event = EVENTS[id];
-  const requirements = costRequirements(state, event.cost);
+export function eventChoices(id: EventId) {
+  const event: EventDefinition = EVENTS[id];
+  return event.choices ?? [{ id: "accept", label: event.choice, cost: event.cost, rewards: {} }];
+}
+
+export function eventRequirements(state: GameState, id: EventId, choice?: string): string[] {
+  const event: EventDefinition = EVENTS[id];
+  const response = eventChoices(id).find(item => item.id === (choice ?? (event.choices ? "" : "accept")));
+  if (!response) return ["Select a valid response"];
+  const requirements = costRequirements(state, response.cost);
   if (state.resources.food <= 0) requirements.unshift("Restore Food stores first");
   if (state.population + event.population > BALANCE.populationCap) requirements.unshift("Inhabitant register is full");
   return requirements;
@@ -80,16 +91,23 @@ export function jobUnlocked(state: GameState, id: JobId): boolean {
   return prerequisiteRequirements(state, JOBS[id].requirements).length === 0;
 }
 
-export function expeditionCost(id: ExpeditionId, workers: number): Cost {
-  return { food: EXPEDITIONS[id].foodPerWorker * workers };
+export function expeditionCost(state: GameState, id: ExpeditionId, workers: number): Cost {
+  const multiplier = state.research.reduce((value, id) => {
+    const study: ResearchDefinition = RESEARCH[id];
+    return value * (study.modifiers?.expeditionFoodMultiplier ?? 1);
+  }, 1);
+  const cost = EXPEDITIONS[id].foodPerWorker * workers * multiplier;
+  return { food: Math.ceil(cost - Number.EPSILON * cost) };
 }
 
 export function expeditionRequirements(state: GameState, id: ExpeditionId, workers: number): string[] {
   const unmet = prerequisiteRequirements(state, EXPEDITIONS[id].requirements);
   if (!Number.isInteger(workers) || workers < 1 || workers > BALANCE.expeditionMaxWorkers) return [...unmet, "Assign 1–3 inhabitants"];
   if (state.activeExpedition) unmet.push("A party is already away");
-  if (availableWorkers(state) < workers) unmet.push(`Available inhabitants ${availableWorkers(state)} / ${workers}; release workers in Ward`);
-  return [...unmet, ...costRequirements(state, expeditionCost(id, workers))];
+  if (EXPEDITIONS[id].staffing === "scavenger") {
+    if (state.jobs.scavenger < workers) unmet.push(`Assigned Scavengers ${state.jobs.scavenger} / ${workers}; assign workers in Ward`);
+  } else if (availableWorkers(state) < workers) unmet.push(`Available inhabitants ${availableWorkers(state)} / ${workers}; release workers in Ward`);
+  return [...unmet, ...costRequirements(state, expeditionCost(state, id, workers))];
 }
 
 export function resourceVisible(state: GameState, id: ResourceId): boolean {

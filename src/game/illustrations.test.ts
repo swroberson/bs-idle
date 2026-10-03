@@ -20,7 +20,7 @@ function accomplished() {
   for (const building of ["market-stall", "scrivener-house", "ruined-cistern"] as const) {
     state = applyAction(state, { type: "build", building }, 0);
   }
-  return state;
+  return applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, 0);
 }
 
 describe("illustrated accomplishments", () => {
@@ -54,7 +54,8 @@ describe("illustrated accomplishments", () => {
     const returned = reconcile(sent, 180_000).state;
     expect(pendingIllustrations(returned)).toEqual(["keeper-office", "oil-press", "lamp-examination", "cistern-find"]);
     const dismissed = applyAction(returned, { type: "dismiss-illustrations", ids: pendingIllustrations(returned) }, 180_000);
-    const repeat = applyAction(dismissed, { type: "start-expedition", destination: "old-cistern", workers: 1 }, 180_000);
+    const reassigned = applyAction(dismissed, { type: "assign-worker", job: "scavenger", delta: 1 }, 180_000);
+    const repeat = applyAction(reassigned, { type: "start-expedition", destination: "old-cistern", workers: 1 }, 180_000);
     expect(pendingIllustrations(reconcile(repeat, 360_000).state)).toEqual([]);
   });
 
@@ -114,11 +115,11 @@ describe("illustration save migration", () => {
     const state = accomplished();
     const old = JSON.parse(JSON.stringify(state));
     delete old.dismissedIllustrations;
-    delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.resources.current;
+    delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices; delete old.resources.current;
     for (const id of ["lamp-house", "smithy", "subterranean-works", "buried-engine"]) delete old.buildings[id];
     const chronicle = state.chronicle.filter(id => id !== "oil-press-built");
     const migrated = decodeSave(JSON.stringify({ ...old, version: 3, chronicle, readChronicle: ["appointment"] }));
-    expect(migrated.version).toBe(6);
+    expect(migrated.version).toBe(7);
     expect(migrated.resources).toEqual(state.resources);
     expect(migrated.lastSimulatedAt).toBe(state.lastSimulatedAt);
     expect(migrated.chronicle).toEqual([...chronicle, "oil-press-built"]);

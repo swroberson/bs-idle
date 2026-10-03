@@ -20,4 +20,24 @@ export const EVENTS = {
     requirements: { lifetimeAuthority: 80, buildings: { fields: 2 }, research: ["stoneworking"], chronicle: ["household"] },
     provisionedArrival: true, chronicle: "repair-household",
   },
+  "shared-table": {
+    title: "A Table beneath the Arch",
+    text: "A household asks for provisions for a meal beneath the arch. They have borrowed a table and gathered bowls from the neighboring rooms. Those still at work will have a place kept for them.",
+    population: 0,
+    choices: [
+      { id: "full-meal", label: "Issue the full meal", cost: { food: 30 }, rewards: { authority: 10 } },
+      { id: "small-meal", label: "Issue a smaller meal", cost: { food: 10 }, rewards: { authority: 3 } },
+    ],
+    requirements: { research: ["provision-stores"], chronicle: ["household"] }, chronicle: "shared-table",
+  },
+  "spare-oil": {
+    title: "Two Spare Jars",
+    text: "A household brings two sealed jars to the press. They have more lamp oil than they need, and ask whether the Ward will take it in exchange for provisions or Coin. The oil is weighed before the jars are opened.",
+    population: 0,
+    choices: [
+      { id: "provisions", label: "Exchange provisions", cost: { food: 20 }, rewards: { oil: 10 } },
+      { id: "coin", label: "Purchase the oil", cost: { coin: 12 }, rewards: { oil: 10 } },
+    ],
+    requirements: { research: ["apprenticed-hands"], buildings: { "oil-press": 1 }, chronicle: ["household"] }, chronicle: "spare-oil",
+  },
 } as const satisfies Record<string, EventDefinition>;

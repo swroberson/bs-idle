@@ -1,11 +1,11 @@
 import { BALANCE } from "../content/balance";
-import type { BuildingDefinition, GameAction, GameState } from "./types";
+import type { BuildingDefinition, EventDefinition, GameAction, GameState, ResourceId } from "./types";
 import { BUILDINGS } from "../content/buildings";
 import { JOBS } from "../content/jobs";
 import { EVENTS } from "../content/events";
 import { EXPEDITIONS } from "../content/expeditions";
 import { RESEARCH } from "../content/research";
-import { availableWorkers, buildingCost, buildingRequirements, eventRequirements, payCost, researchRequirements, jobUnlocked, expeditionCost, expeditionRequirements } from "./requirements";
+import { availableWorkers, buildingCost, buildingRequirements, eventChoices, eventRequirements, payCost, researchRequirements, jobUnlocked, expeditionCost, expeditionRequirements } from "./requirements";
 import { reconcile } from "./simulation";
 import { queueEvents } from "./progression";
 import { ILLUSTRATIONS } from "../content/illustrations";
@@ -64,16 +64,23 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
       next = { ...payCost(next, buildingCost(next, action.building)), buildings: { ...next.buildings, [action.building]: next.buildings[action.building] + 1 } };
       break;
     case "choose-event": {
-      if (next.pendingEvents[0] !== action.event || eventRequirements(next, action.event).length) return next;
-      const event = EVENTS[action.event];
-      next = { ...payCost(next, event.cost), population: next.population + event.population, pendingEvents: next.pendingEvents.slice(1), chronicle: [...next.chronicle, event.chronicle] };
+      if (next.pendingEvents[0] !== action.event || eventRequirements(next, action.event, action.choice).length) return next;
+      const event: EventDefinition = EVENTS[action.event];
+      const response = eventChoices(action.event).find(item => item.id === (action.choice ?? "accept"))!;
+      next = payCost(next, response.cost);
+      const resources = { ...next.resources };
+      for (const [id, amount] of Object.entries(response.rewards) as [ResourceId, number][]) resources[id] = Math.min(Number.MAX_SAFE_INTEGER, resources[id] + amount);
+      next = { ...next, resources, lifetimeAuthority: Math.min(Number.MAX_SAFE_INTEGER, next.lifetimeAuthority + (response.rewards.authority ?? 0)),
+        eventChoices: event.choices ? { ...next.eventChoices, [action.event]: response.id } : next.eventChoices,
+        population: next.population + event.population, pendingEvents: next.pendingEvents.slice(1), chronicle: [...next.chronicle, event.chronicle] };
       break;
     }
     case "start-expedition": {
       if (expeditionRequirements(next, action.destination, action.workers).length) return next;
       const returnsAt = now + EXPEDITIONS[action.destination].durationMs;
       if (!Number.isSafeInteger(returnsAt)) return next;
-      next = { ...payCost(next, expeditionCost(action.destination, action.workers)),
+      next = { ...payCost(next, expeditionCost(next, action.destination, action.workers)),
+        jobs: EXPEDITIONS[action.destination].staffing === "scavenger" ? { ...next.jobs, scavenger: next.jobs.scavenger - action.workers } : next.jobs,
         activeExpedition: { destination: action.destination, workers: action.workers, startedAt: now, returnsAt } };
       break;
     }
