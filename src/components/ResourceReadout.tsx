@@ -8,6 +8,7 @@ import { economyRates } from "@/game/simulation";
 import { formatCompactNumber } from "./formatNumber";
 
 const glyphs: Record<ResourceId, string> = {
+  current: "M10 2v4M10 18v4M2 12h4M14 12h4M6 5l2 3M12 16l2 3M14 5l-2 3M8 16l-2 3M10 7l4 5-4 5-4-5z",
   food: "M4 17V9l6-5 6 5v8M7 12h6M10 8v9M3 20h14",
   oil: "M6 4h8M8 4v4l-4 5v7h12v-7l-4-5V4M4 15h12",
   coin: "M4 6h12v12H4zM7 9h6v6H7z",
@@ -24,7 +25,7 @@ export function ResourceReadout({ state, onDialogChange }: { state: GameState; o
   return <><section aria-label="Ward stores" className="resource-readout">
     {(Object.keys(RESOURCES) as ResourceId[]).filter(id => resourceVisible(state, id)).map((id) => {
       const exact = state.resources[id].toLocaleString("en-US", { maximumFractionDigits: 20 });
-      return <button key={id} className="resource-cell" title={`${RESOURCES[id].name}: ${exact}`} aria-label={`${RESOURCES[id].name}: ${exact}. View exact amount.`} aria-describedby={`${id}-rate`} aria-haspopup="dialog" aria-controls="resource-details" onClick={() => {
+      return <button key={id} className={`resource-cell ${id === "current" ? "current-instrument" : ""}`} title={`${RESOURCES[id].name}: ${exact}`} aria-label={`${RESOURCES[id].name}: ${exact}. View exact amount.`} aria-describedby={`${id}-rate`} aria-haspopup="dialog" aria-controls="resource-details" onClick={() => {
         setSelected(id);
         amountDialog.current?.showModal();
         onDialogChange?.(true);

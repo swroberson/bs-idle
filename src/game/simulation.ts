@@ -2,6 +2,7 @@ import { BALANCE } from "../content/balance";
 import { JOBS } from "../content/jobs";
 import { BUILDINGS } from "../content/buildings";
 import { RESEARCH } from "../content/research";
+import { AWAKENING } from "../content/awakening";
 import { queueEvents } from "./progression";
 import { completeExpedition } from "./expeditions";
 import type { GameState, Modifiers, ResearchDefinition, ResourceId, ReturnSummary } from "./types";
@@ -11,8 +12,9 @@ export function economyModifiers(state: GameState): Required<Modifiers> {
   return state.research.reduce((modifiers, id) => {
     const research: ResearchDefinition = RESEARCH[id];
     return { foodMultiplier: modifiers.foodMultiplier * (research.modifiers?.foodMultiplier ?? 1),
-      oilDemandMultiplier: modifiers.oilDemandMultiplier * (research.modifiers?.oilDemandMultiplier ?? 1) };
-  }, { foodMultiplier: 1, oilDemandMultiplier: 1 });
+      oilDemandMultiplier: modifiers.oilDemandMultiplier * (research.modifiers?.oilDemandMultiplier ?? 1),
+      oilOutputMultiplier: modifiers.oilOutputMultiplier * (research.modifiers?.oilOutputMultiplier ?? 1) };
+  }, { foodMultiplier: 1, oilDemandMultiplier: 1, oilOutputMultiplier: 1 });
 }
 
 export function economyRates(state: GameState) {
@@ -22,8 +24,8 @@ export function economyRates(state: GameState) {
   // Foragers keep full output, including at zero Food, so recovery never requires clicking.
   const starving = state.resources.food <= 0 && foodNet <= 0;
   const efficiency = starving ? BALANCE.shortageOutputMultiplier : 1;
-  const oilOutput = state.buildings["oil-press"] * BUILDINGS["oil-press"].oilPerSecond * efficiency;
-  const oilDemand = state.jobs.lamplighter * JOBS.lamplighter.oilPerSecond * efficiency * modifiers.oilDemandMultiplier;
+  const oilOutput = state.buildings["oil-press"] * BUILDINGS["oil-press"].oilPerSecond * efficiency * modifiers.oilOutputMultiplier;
+  const oilDemand = state.awakenedAt !== null ? 0 : state.jobs.lamplighter * JOBS.lamplighter.oilPerSecond * efficiency * modifiers.oilDemandMultiplier;
   // At zero stores, lamps consume the available flow instead of oscillating on/off each tick.
   const lampFraction = state.resources.oil <= 0 && oilDemand > 0 ? Math.min(1, oilOutput / oilDemand) : 1;
   return {
@@ -31,10 +33,11 @@ export function economyRates(state: GameState) {
     net: {
       food: state.resources.food <= 0 ? Math.max(0, foodNet) : foodNet,
       oil: oilOutput - oilDemand * lampFraction,
-      authority: state.jobs.lamplighter * JOBS.lamplighter.authorityPerSecond * efficiency * lampFraction,
+      authority: state.jobs.lamplighter * (JOBS.lamplighter.authorityPerSecond + state.buildings["lamp-house"] * BUILDINGS["lamp-house"].authorityPerLamplighter) * efficiency * lampFraction,
       coin: state.buildings["market-stall"] * BUILDINGS["market-stall"].coinPerSecond * efficiency,
       knowledge: state.jobs.scrivener * JOBS.scrivener.knowledgePerSecond * efficiency,
       relics: 0,
+      current: state.awakenedAt !== null ? AWAKENING.currentPerSecond * efficiency : 0,
     },
   };
 }

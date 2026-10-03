@@ -2,7 +2,7 @@
 export const BALANCE = {
   startingPopulation: 5,
   populationCap: 20,
-  startingResources: { food: 30, oil: 20, authority: 0, coin: 0, knowledge: 0, relics: 0 },
+  startingResources: { food: 30, oil: 20, authority: 0, coin: 0, knowledge: 0, relics: 0, current: 0 },
   gatheringFood: 2,
   gatheringCooldownMs: 30_000,
   emergencyOil: 2,

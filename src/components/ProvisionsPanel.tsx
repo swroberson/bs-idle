@@ -19,7 +19,7 @@ export function ProvisionsPanel({ state, wait, active, gather, dispatch }: {
           <p className="telemetry">{ready ? `${BALANCE.gatheringCooldownMs / 1000}s interval` : `${String(seconds).padStart(2, "0")}s / recovery`}</p>
         </div>
         <p className="sr-only" role="status">{!active ? "Gathering unavailable." : ready ? "Ready to gather provisions." : "Manual work is recovering."}</p>
-        {state.resources.oil <= BALANCE.emergencyOil && <div className="fuel-recovery">
+        {state.awakenedAt === null && state.resources.oil <= BALANCE.emergencyOil && <div className="fuel-recovery">
           <p className="machine-label">Emergency / Lamp fuel</p>
           <p className="requirements-copy">Render a little Oil from provisions. Shares the gathering recovery interval.</p>
           <button className="machine-button" disabled={!active || !ready || state.resources.food < BALANCE.emergencyOilFood} aria-describedby="fuel-requirement" onClick={() => dispatch({ type: "render-oil" })}>Render Oil // {BALANCE.emergencyOilFood} Food → {BALANCE.emergencyOil} Oil</button>

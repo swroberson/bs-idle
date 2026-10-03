@@ -12,6 +12,8 @@ import { actionFeedback } from "./actionFeedback";
 import { AttentionBadge } from "./AttentionBadge";
 import { pendingIllustrations } from "@/game/illustrations";
 import { IllustrationReveal } from "./IllustrationReveal";
+import { AwakeningReveal } from "./AwakeningReveal";
+import { AWAKENING } from "@/content/awakening";
 
 function subscribeVisibility(onChange: () => void) {
   document.addEventListener("visibilitychange", onChange);
@@ -29,7 +31,10 @@ export function GameShell() {
   const [resourceDetailsOpen, setResourceDetailsOpen] = useState(false);
   const visible = useSyncExternalStore(subscribeVisibility, pageVisible, serverVisible);
   const reveals = game.state ? pendingIllustrations(game.state) : [];
-  const revealActive = visible && game.status === "active" && !game.error && !game.returnSummary && !resourceDetailsOpen && reveals.length > 0;
+  const endingPending = !!game.state && game.state.awakenedAt !== null && game.state.finaleStep < AWAKENING.passages.length;
+  const canReveal = visible && game.status === "active" && !game.error && !game.returnSummary && !resourceDetailsOpen;
+  const endingActive = endingPending && canReveal;
+  const revealActive = !endingPending && canReveal && reveals.length > 0;
 
   useEffect(() => {
     const clockFrame = window.requestAnimationFrame(() => setNow(Date.now()));
@@ -50,7 +55,7 @@ export function GameShell() {
   const visibleSections = (Object.keys(SECTIONS) as Section[]).filter((id) => (id !== "works" || worksOpen) && (id !== "studies" || studiesOpen) && (id !== "expeditions" || expeditionsOpen));
   const shownSection = game.status === "error" && !game.state ? "settings" : visibleSections.includes(section) ? section : "ward";
   const unread = game.state?.chronicle.filter(id => !game.state?.readChronicle.includes(id)).length ?? 0;
-  const emptyStores = game.state ? Number(game.state.resources.food === 0) + Number(game.state.resources.oil === 0) : 0;
+  const emptyStores = game.state ? Number(game.state.resources.food === 0) + Number(game.state.awakenedAt === null && game.state.resources.oil === 0) : 0;
   const pending = game.state?.pendingEvents.length ?? 0;
   const faults = Number(Boolean(game.error)) + Number(offlineStatus === "failed");
   const returns = game.returnSummary?.completedExpeditions.length ?? 0;
@@ -62,7 +67,9 @@ export function GameShell() {
     settings: { count: faults, label: "record faults", warning: true },
   };
   const dispatch = (action: GameAction) => {
-    if (game.dispatch(action) && action.type !== "read-chronicle" && action.type !== "dismiss-illustrations") setFeedback(actionFeedback(action));
+    if (!game.dispatch(action)) return;
+    if (action.type !== "read-chronicle" && action.type !== "dismiss-illustrations" && action.type !== "advance-awakening") setFeedback(actionFeedback(action));
+    if (action.type === "advance-awakening" && action.step === AWAKENING.passages.length - 1) setSection("ward");
   };
 
   return <div className="terminal-shell">
@@ -81,16 +88,17 @@ export function GameShell() {
         {game.status === "loading" && <p role="status" className="terminal-notice machine-label">Opening the Keeper’s register…</p>}
         {game.status === "waiting" && <div role="status" className="terminal-notice"><p className="machine-label">Access / held by another tab</p><h2>The register is open elsewhere.</h2><p>Close the other Buried Sun tab to continue here. This tab will then load your latest progress.</p></div>}
         {shownSection === "settings" && offlineStatus === "failed" && <p role="alert" className="terminal-alert">Offline shell unavailable. Revisit while online.</p>}
-        <GamePages game={game} section={shownSection} wait={wait} dispatch={dispatch} clearFeedback={() => setFeedback("")} chronicleVisible={reveals.length === 0 && !resourceDetailsOpen} />
+        <GamePages game={game} section={shownSection} wait={wait} dispatch={dispatch} clearFeedback={() => setFeedback("")} chronicleVisible={visible && !endingPending && reveals.length === 0 && !resourceDetailsOpen} />
       </>}
     </main>
     <IllustrationReveal queue={reveals} active={revealActive} dispatch={dispatch} />
+    {game.state && <AwakeningReveal state={game.state} active={endingActive} dispatch={dispatch} />}
     <nav aria-label="Keeper’s records" className="terminal-nav">
       {visibleSections.map((id, index) => <button key={id} aria-current={shownSection === id ? "page" : undefined} aria-controls="main" onClick={() => { setSection(id); setFeedback(""); game.dismissSummary(); }}>
         <span aria-hidden="true" className="nav-index">0{index + 1}</span><span>{SECTIONS[id]}</span><AttentionBadge {...attention[id]} />
       </button>)}
     </nav>
-    <footer className="terminal-footer machine-label"><span role="status">{feedback || `Register // ${game.state ? "Local" : "—"}`}</span><span>{offlineStatus === "ready" ? "Offline shell // ready" : "Outer Ward // I"}</span></footer>
+    <footer className="terminal-footer machine-label"><span role="status">{feedback || `Register // ${game.state ? "Local" : "—"}`}</span><span>{game.state && game.state.awakenedAt !== null ? "Outer Ward // Story complete" : offlineStatus === "ready" ? "Offline shell // ready" : "Outer Ward // I"}</span></footer>
     <p className="sr-only" role="status" aria-atomic="true">{unread ? `Chronicle: ${unread} unread entries.` : ""}{pending ? ` Ward: ${pending} pending reports.` : ""}{emptyStores ? ` Ward: ${emptyStores} empty stores.` : ""}{returns ? ` Expeditions: ${returns} returned parties.` : ""}{faults ? ` Records: ${faults} faults.` : ""}</p>
   </div>;
 }

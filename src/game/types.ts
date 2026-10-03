@@ -18,7 +18,7 @@ export type IllustrationId = keyof typeof ILLUSTRATIONS;
 export type Cost = Partial<Record<ResourceId, number>>;
 
 export interface GameState {
-  version: 4;
+  version: 5;
   resources: Record<ResourceId, number>;
   population: number;
   jobs: Record<JobId, number>;
@@ -35,9 +35,13 @@ export interface GameState {
   expeditionLog: ExpeditionReturn[];
   lastSimulatedAt: number;
   lastGatheredAt: number | null;
+  awakenedAt: number | null;
+  finaleStep: number;
 }
 
 export type GameAction =
+  | { type: "awaken-junction" }
+  | { type: "advance-awakening"; step: number }
   | { type: "dismiss-illustrations"; ids: IllustrationId[] }
   | { type: "read-chronicle"; id: ChronicleId }
   | { type: "gather-food" }
@@ -67,11 +71,13 @@ export interface ContentRequirements {
 export interface Modifiers {
   foodMultiplier?: number;
   oilDemandMultiplier?: number;
+  oilOutputMultiplier?: number;
 }
 export interface BuildingDefinition {
   name: string; description: string; effect?: string; completedEffect?: string; cost: Cost;
   costGrowth: number; maxLevel: number; requirements: ContentRequirements;
   foodPerForager?: number; oilPerSecond?: number; coinPerSecond?: number;
+  authorityPerLamplighter?: number; chronicle?: ChronicleId;
 }
 export interface ResearchDefinition {
   name: string; text: string; description: string; effect: string; cost: Cost;

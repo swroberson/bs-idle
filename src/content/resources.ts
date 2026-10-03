@@ -5,4 +5,5 @@ export const RESOURCES = {
   coin: { name: "Coin", description: "Trade through the Ward's market." },
   knowledge: { name: "Knowledge", description: "Recorded observations and investigation effort." },
   relics: { name: "Relics", description: "Objects recovered from the older Ward." },
+  current: { name: "Current", description: "Output of the restored buried machinery." },
 } as const;

@@ -1,5 +1,5 @@
 import { BALANCE } from "../content/balance";
-import type { GameAction, GameState } from "./types";
+import type { BuildingDefinition, GameAction, GameState } from "./types";
 import { BUILDINGS } from "../content/buildings";
 import { JOBS } from "../content/jobs";
 import { EVENTS } from "../content/events";
@@ -9,6 +9,8 @@ import { availableWorkers, buildingCost, buildingRequirements, eventRequirements
 import { reconcile } from "./simulation";
 import { queueEvents } from "./progression";
 import { ILLUSTRATIONS } from "../content/illustrations";
+import { AWAKENING } from "../content/awakening";
+import { awakeningRequirements } from "./requirements";
 
 export function gatheringWaitMs(state: GameState, now: number): number {
   return state.lastGatheredAt === null ? 0 : Math.max(0, state.lastGatheredAt + BALANCE.gatheringCooldownMs - now);
@@ -16,6 +18,10 @@ export function gatheringWaitMs(state: GameState, now: number): number {
 
 export function applyAction(state: GameState, action: GameAction, now: number): GameState {
   if (!Number.isSafeInteger(now) || now < state.lastSimulatedAt || now < 0) return state;
+  if (action.type === "advance-awakening") {
+    if (state.awakenedAt === null || !Number.isInteger(action.step) || action.step !== state.finaleStep || action.step >= AWAKENING.passages.length) return state;
+    return { ...state, finaleStep: state.finaleStep + 1 };
+  }
   if (action.type === "dismiss-illustrations") {
     if (!Array.isArray(action.ids) || new Set(action.ids).size !== action.ids.length ||
         !action.ids.every(id => typeof id === "string" && Object.hasOwn(ILLUSTRATIONS, id) && state.chronicle.includes(ILLUSTRATIONS[id].chronicle))) return state;
@@ -50,6 +56,8 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
       break;
     case "build":
       if (buildingRequirements(next, action.building).length) return next;
+      const building: BuildingDefinition = BUILDINGS[action.building];
+      if (building.chronicle && next.buildings[action.building] === 0) next = { ...next, chronicle: [...next.chronicle, building.chronicle] };
       if (action.building === "oil-press" && next.buildings["oil-press"] === 0) {
         next = { ...next, chronicle: [...next.chronicle, "oil-press-built"] };
       }
@@ -72,6 +80,10 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
     case "research":
       if (researchRequirements(next, action.research).length) return next;
       next = { ...payCost(next, RESEARCH[action.research].cost), research: [...next.research, action.research], chronicle: [...next.chronicle, RESEARCH[action.research].chronicle] };
+      break;
+    case "awaken-junction":
+      if (awakeningRequirements(next).length) return next;
+      next = { ...next, awakenedAt: now, finaleStep: 0, chronicle: [...next.chronicle, "junction-awakened"] };
       break;
     default: return state;
   }

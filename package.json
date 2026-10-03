@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "simulate:foundations": "vitest run src/game/foundations.harness.test.ts --reporter=verbose --disableConsoleIntercept",
     "simulate:opening": "vitest run src/game/opening.harness.test.ts --reporter=verbose",
+    "simulate:awakening": "vitest run src/game/awakening.harness.test.ts --reporter=verbose --disableConsoleIntercept",
     "check": "npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {

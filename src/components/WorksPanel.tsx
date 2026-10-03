@@ -1,11 +1,16 @@
 import { BUILDINGS } from "@/content/buildings";
+import { useState } from "react";
+import { CatalogPager } from "./CatalogPager";
 import { buildingCost, buildingRequirements, costText, prerequisiteRequirements } from "@/game/requirements";
 import type { BuildingDefinition, BuildingId, GameAction, GameState } from "@/game/types";
 
 export function WorksPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
+  const [page, setPage] = useState(0);
+  const items = (Object.keys(BUILDINGS) as BuildingId[]).filter(id => state.buildings[id] > 0 || prerequisiteRequirements(state, BUILDINGS[id].requirements).length === 0);
+  const index = Math.min(page, Math.max(0, items.length - 1));
   return <section aria-labelledby="works-heading">
     <div className="region-heading"><h2 id="works-heading" className="machine-label">Works / Civic machinery</h2><span className="telemetry">Immediate construction</span></div>
-    {(Object.keys(BUILDINGS) as BuildingId[]).filter((id) => state.buildings[id] > 0 || prerequisiteRequirements(state, BUILDINGS[id].requirements).length === 0).map((id) => {
+    {items.slice(index, index + 1).map((id) => {
       const building: BuildingDefinition = BUILDINGS[id];
       const unmet = buildingRequirements(state, id);
       const level = state.buildings[id];
@@ -20,6 +25,7 @@ export function WorksPanel({ state, active, dispatch }: { state: GameState; acti
         <p id={`build-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Stores sufficient / ready"}</p>
       </article>;
     })}
+    <CatalogPager name="Works" labels={items.map(id => BUILDINGS[id].name)} index={index} select={setPage} />
     <p className="module-note machine-label">Automatic production is halved during Food shortages.</p>
   </section>;
 }

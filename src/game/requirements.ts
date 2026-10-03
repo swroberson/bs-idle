@@ -5,6 +5,7 @@ import { EVENTS } from "../content/events";
 import { RESEARCH } from "../content/research";
 import { EXPEDITIONS } from "../content/expeditions";
 import { RESOURCES } from "../content/resources";
+import { AWAKENING } from "../content/awakening";
 import type { BuildingId, ContentRequirements, Cost, EventId, ExpeditionId, GameState, JobId, ResearchId, ResourceId } from "./types";
 
 export function availableWorkers(state: GameState): number {
@@ -78,6 +79,7 @@ export function expeditionRequirements(state: GameState, id: ExpeditionId, worke
 }
 
 export function resourceVisible(state: GameState, id: ResourceId): boolean {
+  if (id === "current") return state.awakenedAt !== null;
   if (state.resources[id] > 0) return true;
   switch (id) {
     case "coin": return state.research.includes("ledger-keeping");
@@ -85,4 +87,8 @@ export function resourceVisible(state: GameState, id: ResourceId): boolean {
     case "relics": return state.buildings["ruined-cistern"] > 0;
     default: return true;
   }
+}
+
+export function awakeningRequirements(state: GameState): string[] {
+  return state.awakenedAt !== null ? ["Junction already active"] : prerequisiteRequirements(state, AWAKENING.requirements);
 }

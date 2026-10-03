@@ -36,4 +36,29 @@ export const BUILDINGS = {
     cost: { coin: 25, authority: 15 }, costGrowth: 1, maxLevel: 1,
     requirements: { expeditions: ["old-cistern"] },
   },
+  "lamp-house": {
+    name: "Lamp House", description: "Set a bench and measured vessels beside the lamp stores.",
+    effect: "Each level: +0.025 Authority/s per Lamplighter; Oil demand unchanged.",
+    authorityPerLamplighter: .025, chronicle: "lamp-house-built",
+    cost: { coin: 20, authority: 15 }, costGrowth: 1.7, maxLevel: 3,
+    requirements: { buildings: { "oil-press": 1 }, research: ["ledger-keeping"] },
+  },
+  smithy: {
+    name: "Smithy", description: "Clear a hearth and set an anvil for repairing the Ward's tools.",
+    completedEffect: "Repair workspace established.", chronicle: "smithy-built",
+    cost: { coin: 25, food: 15 }, costGrowth: 1, maxLevel: 1,
+    requirements: { buildings: { "market-stall": 1 }, research: ["ledger-keeping"] },
+  },
+  "subterranean-works": {
+    name: "Subterranean Works", description: "Shore the stair beneath the chapel and set lifting tackle beside the older opening. Keep the descent clear for a small party.",
+    completedEffect: "Safe access established.", chronicle: "subterranean-works-built",
+    cost: { coin: 30, food: 30, authority: 20 }, costGrowth: 1, maxLevel: 1,
+    requirements: { research: ["trace-conduits"] },
+  },
+  "buried-engine": {
+    name: "The Buried Engine", description: "Lay a working platform inside the chamber. Support the loose length and place lamps where its exposed surfaces can be examined.",
+    completedEffect: "Inspection platform installed.", chronicle: "engine-works-built",
+    cost: { coin: 25, knowledge: 8 }, costGrowth: 1, maxLevel: 1,
+    requirements: { research: ["open-chamber"] },
+  },
 } as const satisfies Record<string, BuildingDefinition>;
