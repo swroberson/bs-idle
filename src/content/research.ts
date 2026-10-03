@@ -1,5 +1,6 @@
 import type { ResearchDefinition } from "../game/types";
 import { WARD_RECORDS } from "./awakening";
+import { CHRONICLE } from "./chronicle";
 
 export const RESEARCH = {
   "examine-old-lamps": {
@@ -68,6 +69,13 @@ export const RESEARCH = {
     text: WARD_RECORDS["iron-tools"].text, cost: { coin: 15, knowledge: 12 },
     effect: "All Forager Food output increases by 20%, multiplying with Crop Rotation.",
     modifiers: { foodMultiplier: 1.2 }, chronicle: "iron-tools", requirements: { buildings: { smithy: 1 } },
+  },
+  stoneworking: {
+    name: "Stoneworking", description: "Sort the salvaged masonry at the Smithy. Dress the chipped edges and measure what can be laid again.",
+    text: CHRONICLE.stoneworking.text, cost: { coin: 20, knowledge: 16 },
+    effect: "Building Coin costs decrease by 10%, multiplying with the capped Laborer discount. Other costs are unchanged; final Coin costs round up.",
+    modifiers: { constructionCoinMultiplier: 0.9 }, chronicle: "stoneworking",
+    requirements: { buildings: { smithy: 1, "scrivener-house": 1 } },
   },
   "improved-presses": {
     name: "Improved Presses", description: "Refit the press bearings and measure a full turn under load.",

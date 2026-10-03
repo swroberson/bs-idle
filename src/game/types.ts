@@ -18,7 +18,7 @@ export type IllustrationId = keyof typeof ILLUSTRATIONS;
 export type Cost = Partial<Record<ResourceId, number>>;
 
 export interface GameState {
-  version: 5;
+  version: 6;
   resources: Record<ResourceId, number>;
   population: number;
   jobs: Record<JobId, number>;
@@ -69,6 +69,7 @@ export interface ContentRequirements {
   lifetimeAuthority?: number;
 }
 export interface Modifiers {
+  constructionCoinMultiplier?: number;
   foodMultiplier?: number;
   oilDemandMultiplier?: number;
   oilOutputMultiplier?: number;
@@ -82,6 +83,11 @@ export interface BuildingDefinition {
 export interface ResearchDefinition {
   name: string; text: string; description: string; effect: string; cost: Cost;
   chronicle: ChronicleId; requirements: ContentRequirements; modifiers?: Modifiers;
+}
+export interface EventDefinition {
+  title: string; text: string; choice: string; cost: Cost; population: number;
+  chronicle: ChronicleId; requirements: ContentRequirements;
+  provisionedArrival?: boolean;
 }
 export interface ExpeditionDefinition {
   name: string; description: string; durationMs: number; foodPerWorker: number;

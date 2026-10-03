@@ -16,10 +16,10 @@ describe("scholarship and save compatibility", () => {
   it("migrates a version-2 discovery without changing stores, jobs or elapsed time", () => {
     const old = openingSave();
     const migrated = decodeSave(JSON.stringify(old), 999000);
-    expect(migrated.version).toBe(5);
+    expect(migrated.version).toBe(6);
     expect(migrated.lastSimulatedAt).toBe(old.lastSimulatedAt);
     expect(migrated.resources).toEqual({ ...createInitialState(0).resources, ...old.resources });
-    expect(migrated.jobs).toEqual({ ...old.jobs, scrivener: 0 });
+    expect(migrated.jobs).toEqual({ ...old.jobs, scrivener: 0, laborer: 0 });
     expect(migrated.activeExpedition).toBeNull();
     expect(decodeSave(encodeSave(migrated))).toEqual(migrated);
   });

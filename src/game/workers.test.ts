@@ -10,7 +10,7 @@ import type { GameAction } from "./types";
 describe("inhabitant allocation", () => {
   it("starts with all inhabitants available", () => {
     const state = createInitialState(1000);
-    expect(state.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0 });
+    expect(state.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0, laborer: 0 });
     expect(assignedWorkers(state)).toBe(0);
     expect(availableWorkers(state)).toBe(5);
   });
@@ -20,11 +20,11 @@ describe("inhabitant allocation", () => {
     const forager = applyAction(initial, { type: "assign-worker", job: "forager", delta: 1 }, 1000);
     const lamp = applyAction(forager, { type: "assign-worker", job: "lamplighter", delta: 1 }, 1000);
     const released = applyAction(lamp, { type: "assign-worker", job: "forager", delta: -1 }, 1000);
-    expect(released.jobs).toEqual({ forager: 0, lamplighter: 1, scrivener: 0 });
+    expect(released.jobs).toEqual({ forager: 0, lamplighter: 1, scrivener: 0, laborer: 0 });
     expect(availableWorkers(released)).toBe(4);
     expect(released.population).toBe(5);
     expect(released.resources).toEqual(initial.resources);
-    expect(initial.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0 });
+    expect(initial.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0, laborer: 0 });
   });
 
   it("prevents repeated actions from over-assigning the shared pool", () => {
@@ -60,14 +60,14 @@ describe("inhabitant allocation", () => {
 describe("allocation saves", () => {
   it("round-trips assignments", () => {
     const state = applyAction(createInitialState(1000), { type: "assign-worker", job: "forager", delta: 1 }, 1000);
-    expect(decodeSave(encodeSave(state)).jobs).toEqual({ forager: 1, lamplighter: 0, scrivener: 0 });
+    expect(decodeSave(encodeSave(state)).jobs).toEqual({ forager: 1, lamplighter: 0, scrivener: 0, laborer: 0 });
   });
 
   it("preserves older saves with all inhabitants available", () => {
     const legacy = JSON.parse(encodeSave(createInitialState(1000)));
     delete legacy.readChronicle;
     const decoded = decodeSave(JSON.stringify(legacy));
-    expect(decoded.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0 });
+    expect(decoded.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0, laborer: 0 });
     expect(decoded.resources).toEqual(legacy.resources);
   });
 

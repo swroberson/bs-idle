@@ -1,9 +1,11 @@
 import { JOBS } from "@/content/jobs";
-import { availableWorkers, jobUnlocked } from "@/game/requirements";
+import { BALANCE } from "@/content/balance";
+import { availableWorkers, constructionDiscount, jobUnlocked } from "@/game/requirements";
 import type { GameAction, GameState, JobId } from "@/game/types";
 
 export function WorkerPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
   const available = availableWorkers(state);
+  const discount = constructionDiscount(state);
   return <aside aria-labelledby="inhabitants-heading" className="inhabitants-region">
     <div className="region-heading"><h2 id="inhabitants-heading" className="machine-label">02 / Inhabitants</h2><span className="machine-label">Register</span></div>
     <div className="population-register">
@@ -17,12 +19,13 @@ export function WorkerPanel({ state, active, dispatch }: { state: GameState; act
     </div>
     <div className="worker-allocations">
       {(Object.keys(JOBS) as JobId[]).filter(id => jobUnlocked(state, id)).map((id) => <div className="worker-allocation" key={id}>
-        <div className="worker-role"><p id={`job-${id}`}>{JOBS[id].name}</p><p className="machine-label">{id === "forager" ? "Gardens" : id === "lamplighter" ? "Ward lamps" : "Scriptorium"}</p></div>
+        <div className="worker-role"><p id={`job-${id}`}>{JOBS[id].name}</p><p className="machine-label">{id === "forager" ? "Gardens" : id === "lamplighter" ? "Ward lamps" : id === "laborer" ? `Coin −${Math.round(discount.laborer * 100)}% / cap ${BALANCE.laborerDiscountCap * 100}%` : "Scriptorium"}</p></div>
         <button className="worker-step" disabled={!active || state.jobs[id] === 0} aria-label={`Release one ${JOBS[id].name}`} onClick={() => dispatch({ type: "assign-worker", job: id, delta: -1 })}>−</button>
         <span className="worker-count" aria-label={`${state.jobs[id]} assigned ${JOBS[id].name}s`}>{String(state.jobs[id]).padStart(2, "0")}</span>
         <button className="worker-step" disabled={!active || available === 0} aria-label={`Assign one ${JOBS[id].name}`} onClick={() => dispatch({ type: "assign-worker", job: id, delta: 1 })}>+</button>
       </div>)}
     </div>
+    {jobUnlocked(state, "laborer") && <p className="allocation-note machine-label">Building Coin: −{BALANCE.laborerCoinDiscount * 100}% per Laborer. Other costs unchanged.</p>}
     <p className="allocation-note machine-label">All inhabitants consume Food.</p>
   </aside>;
 }

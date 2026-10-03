@@ -37,7 +37,7 @@ it("reaches the foundation survey from a fresh save through ordinary actions", (
   }
   expect(state.research).toContain("survey-foundations");
   expect(state.completedExpeditions).toContain("old-cistern");
-  expect(state.jobs).toEqual({ forager: 3, lamplighter: 2, scrivener: 1 });
+  expect(state.jobs).toEqual({ forager: 3, lamplighter: 2, scrivener: 1, laborer: 0 });
   expect(availableWorkers(state)).toBe(2);
   expect(decodeSave(encodeSave(state))).toEqual(state);
   expect(milestones["survey-foundations"]).toBeLessThanOrEqual(1200);

@@ -24,7 +24,7 @@ button, a, input, textarea { outline-offset: -3px; }
 
 /* One viewport-sized instrument, with an accessible overflow fallback for
    large text, landscape screens, the software keyboard and lengthy records. */
-.terminal-shell { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto auto; height: 100dvh; max-width: 72rem; margin: 0 auto; background: var(--color-ward); border-inline: 1px solid var(--color-line); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+.terminal-shell { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(8rem, 1fr) auto auto; height: 100dvh; max-width: 72rem; margin: 0 auto; background: var(--color-ward); border-inline: 1px solid var(--color-line); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
 .machine-label, .telemetry, .resource-value, .resource-rate, .worker-readout dd { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .machine-label { font-size: .625rem; line-height: 1.6; letter-spacing: .08em; text-transform: uppercase; color: var(--color-muted); }
 .telemetry { font-size: .75rem; color: var(--color-muted); }
@@ -92,6 +92,7 @@ button, a, input, textarea { outline-offset: -3px; }
 .worker-allocations { border-top: 1px solid var(--color-line); padding-inline: 1rem; }
 .worker-allocation { display: grid; grid-template-columns: minmax(0, 1fr) 2.75rem 1.75rem 2.75rem; gap: .5rem; align-items: center; min-height: 3.5rem; padding-block: .375rem; border-bottom: 1px solid var(--color-line); }
 .worker-allocation:last-child { border-bottom: 0; }
+.ward-with-labor .worker-allocation { min-height: 3rem; padding-block: .125rem; }
 .worker-role > p:first-child { font-size: .8125rem; }
 .worker-role .machine-label { font-size: .5625rem; }
 .worker-step { min-height: 2.75rem; width: 2.75rem; border: 1px solid #626858; background: #23291f; font-family: var(--font-mono); font-size: 1.125rem; }
@@ -174,6 +175,9 @@ button, a, input, textarea { outline-offset: -3px; }
   .population-marks span { width: .5rem; height: 1.25rem; border: 1px solid #7c826e; background: #353c2e; }
   .worker-readout > div { padding-block: .75rem; border-top: 1px solid var(--color-line); }
   .worker-readout dt, .worker-readout dd { font-size: .75rem; }
+  .ward-with-labor .population-register { padding: .75rem 1rem; }
+  .ward-with-labor .population-marks { margin-block: .75rem; }
+  .ward-with-labor .worker-readout > div { padding-block: .375rem; }
   .terminal-nav { grid-template-columns: repeat(3, 1fr); }
   .terminal-nav button { min-height: 3rem; }
   .terminal-footer { padding-inline: 1.5rem; }
@@ -187,6 +191,9 @@ button, a, input, textarea { outline-offset: -3px; }
   .terminal-nav button { gap: .375rem; font-size: .6875rem; }
 }
 @media (max-width: 767px) {
+  .ward-with-labor .ward-scene, .ward-with-labor .gathering-copy { display: none; }
+  .ward-with-labor .gathering-station .region-heading { display: none; }
+  .ward-with-labor .gathering-station { padding-top: .5rem; }
   .ward-inscription, .scene-caption { display: none; }
   .ward-scene { padding: .75rem 1rem; }
   .population-register { padding-block: .375rem; }

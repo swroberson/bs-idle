@@ -1,6 +1,6 @@
 # Buried Sun: Narrative Bible
 
-**Edition:** 1.2 — October 2, 2026
+**Edition:** 1.3 — October 2, 2026
 
 **Audience:** authors and agents; contains end-of-story spoilers  
 **Status:** approved story foundations, provisional chapter outline, and an audit of existing content
@@ -51,8 +51,8 @@ story's destination is approved.
 ### Source map and implementation boundary
 
 - [Chronicle](../src/content/chronicle.ts): opening and persistent narrative records.
-- [Events](../src/content/events.ts): household arrival and lamp complaint.
-- [Research](../src/content/research.ts): thirteen implemented investigations/improvements; several repeat Chronicle text.
+- [Events](../src/content/events.ts): household arrivals and lamp complaint.
+- [Research](../src/content/research.ts): fourteen implemented investigations/improvements; several repeat Chronicle text.
 - [Expeditions](../src/content/expeditions.ts): six destinations and their record references.
 - [Buildings](../src/content/buildings.ts), [jobs](../src/content/jobs.ts), and [resources](../src/content/resources.ts): descriptions and local terminology.
 - [Ward scene](../src/components/WardPanel.tsx): the road toward the Citadel; [app metadata](../src/app/layout.tsx): public premise.
@@ -61,8 +61,8 @@ story's destination is approved.
 **EXISTING:** the playable Outer Ward now reaches the deliberate
 `awaken-junction` action, recorded as `junction-awakened`. Current and Oil-free
 restored lamp tending follow activation, while management continues. There are
-currently ten buildings, thirteen research entries, two queued-choice events,
-six expedition destinations, and twenty-eight Chronicle entries. The remaining
+currently ten buildings, fourteen research entries, three queued-choice events,
+six expedition destinations, and thirty Chronicle entries. The remaining
 Phase 1 content-count targets, playtesting, and real-device checks are separate
 from this implemented story endpoint.
 
@@ -335,6 +335,31 @@ Do not write either as depending on the other. Research discovery text is
 duplicated in Chronicle entries; a future approved wording revision must update
 both representations consistently.
 
+### Ordinary construction and another household — October 2, 2026
+
+The user requested Laborers and Stoneworking, followed by another household
+before further catalog expansion. These are optional civic developments in
+Chapter 1, independent of the archaeological spine.
+
+- `laborer` becomes assignable after the Smithy. Its work is preparing stone
+  and carrying materials; the capped Coin discount is a game rule, not evidence
+  of an unfamiliar system. No new building or special worker ancestry is added.
+- `stoneworking` requires the Smithy and Scrivener's House. Its matching study
+  and Chronicle text records dressing chipped stone and setting reusable pieces
+  aside. It does not interpret inherited materials or anomalous architecture.
+- Event/Chronicle `repair-household` follows completed Stoneworking, expanded
+  Fields and the first household record, with standing, provisions and register
+  capacity gates. Two unnamed people arrive with bedding, a cooking pot and
+  worn tools, asking for a room and permission to repair its threshold. Admission
+  adds two idle inhabitants; the record describes ordinary masonry and a fire.
+  Their previous home, relationships, ages and histories are unspecified. The
+  event does not depend on an expedition or introduce a revelation.
+
+These incidental details elaborate established Ward life. They do not change
+clue meanings, the retained story chronology, author-level truths or reveal
+limits. The first household still precedes Orso's complaint; the later household
+may precede or follow optional expeditions and is unnecessary for the awakening.
+
 ### Implemented continuation — approved October 2, 2026
 
 The user explicitly approved the [survey-to-awakening draft](PHASE_1_AWAKENING_DRAFT.md)
@@ -392,6 +417,7 @@ footprint or comprehensive Ward geography is approved by this work.
 | Two children | EXISTING: arrive with Nera and account for two of the three new names. | Ages, genders, work, adulthood, and future Keeper roles are open. Population arithmetic is not characterization. |
 | The scrivener | EXISTING: an unnamed woman in ledger/catalog prose; `scrivener` is also an assignable job. | Name, history, and whether every reference denotes one continuous individual are open. Do not infer secret biological knowledge from her word choice. |
 | Initial five inhabitants | CANON opening count; individual identities are not enumerated. | Do not claim a roster or decide whether the player is included in that count. Worker accounting does not settle narrative identity. |
+| The later household | EXISTING: two unnamed people, a handcart, bedding, cooking pot and worn tools; `repair-household`. | No prior home, family relationship, ages, trade specialization or consequential backstory is established. |
 | Later Keepers | CANON succession across generations. | No names, bloodline, dates, number, or complete character arcs are approved. |
 
 ### Places and physical continuity
@@ -602,3 +628,4 @@ narrative automatically.
 | 2026-10-02 | User requested removal of messages forecasting what studies, expeditions, and other actions unlock, preserving suspense while accumulating their costs. | Study effects appear after completion; construction no longer previews new roles or systems; the lamp-report choice does not name its unlock; expedition rewards and findings appear after return. Existing findings, progression, costs, timers, and ordinary production rates are preserved. No new lore or revelations added. |
 | 2026-10-02 | User approved the narrative audit's three consistency fixes: the reservoir wording, Knowledge terminology, and Chronicle inventory. | Event `lamp-complaint` now says "attempted to fill," matching the brief and repairing CL03; the Knowledge description no longer places observations in the household register; the inventory now counts twelve Chronicle entries. No triggers, chronology, clues, reveal limits, or unresolved environmental symptoms changed. |
 | 2026-10-02 | Edition 1.2: user replied “approved!” to the completed survey-to-awakening draft and its implementation approval question. Accepts local access/repair evidence, removable oil fittings in older civic lamps, the optional Barrow relic, and staged awakening wording. | Implemented ten buildings, thirteen studies, six destinations, and the deliberate awakening with Current, Oil-free restored lamp tending, version-5 persistence and independent presentation acknowledgements. Costs tuned provisionally through the full harness. No vessel/stellar/ancestral reveal, new major history, or explanations of enduring mysteries. |
+| 2026-10-02 | Edition 1.3: user requested Laborers + Stoneworking followed by another household event, grounded in Ward life and preserving the larger mysteries. | Implemented the capped construction job, optional stone reuse study and two-person household choice/record. Adds incidental ordinary work and belongings only; no major history, character backstory, system purpose, revelation, ending or clue interpretation changed. Fourteen studies, three events and thirty Chronicle records. |

@@ -3,12 +3,12 @@ import { JOBS } from "../content/jobs";
 import { BUILDINGS } from "../content/buildings";
 import { RESEARCH } from "../content/research";
 import { AWAKENING } from "../content/awakening";
-import { queueEvents } from "./progression";
+import { queueEvents, secondsUntilEvent } from "./progression";
 import { completeExpedition } from "./expeditions";
 import type { GameState, Modifiers, ResearchDefinition, ResourceId, ReturnSummary } from "./types";
 
 // Production bonuses multiply after the base worker + building output is added.
-export function economyModifiers(state: GameState): Required<Modifiers> {
+export function economyModifiers(state: GameState): Required<Pick<Modifiers, "foodMultiplier" | "oilDemandMultiplier" | "oilOutputMultiplier">> {
   return state.research.reduce((modifiers, id) => {
     const research: ResearchDefinition = RESEARCH[id];
     return { foodMultiplier: modifiers.foodMultiplier * (research.modifiers?.foodMultiplier ?? 1),
@@ -46,7 +46,7 @@ export function reconcile(state: GameState, now: number): { state: GameState; su
   const valid = Number.isSafeInteger(now) && now >= 0;
   const elapsedMs = valid ? Math.max(0, now - state.lastSimulatedAt) : 0;
   const productionMs = Math.min(elapsedMs, BALANCE.offlineProductionCapMs);
-  let next = state;
+  let next = queueEvents(state);
   let cursor = state.lastSimulatedAt;
   const productionEnd = cursor + productionMs;
   const completedExpeditions: ReturnSummary["completedExpeditions"] = [];
@@ -59,7 +59,7 @@ export function reconcile(state: GameState, now: number): { state: GameState; su
   if (elapsedMs > 0) finishParty(cursor);
   while (cursor < productionEnd) {
     const { net } = economyRates(next);
-    let seconds = (productionEnd - cursor) / 1000;
+    let seconds = Math.min((productionEnd - cursor) / 1000, secondsUntilEvent(next, net));
     if (next.activeExpedition) seconds = Math.min(seconds, (next.activeExpedition.returnsAt - cursor) / 1000);
     for (const id of ["food", "oil"] as const) {
       if (net[id] < 0 && next.resources[id] > 0) seconds = Math.min(seconds, next.resources[id] / -net[id]);
@@ -75,6 +75,7 @@ export function reconcile(state: GameState, now: number): { state: GameState; su
     next = { ...next, resources, lifetimeAuthority: Math.min(Number.MAX_SAFE_INTEGER, next.lifetimeAuthority + net.authority * seconds) };
     cursor = Math.min(productionEnd, cursor + seconds * 1000);
     finishParty(cursor);
+    next = queueEvents(next);
   }
   if (elapsedMs > 0) {
     finishParty(now); // Timers continue even after production reaches its cap.

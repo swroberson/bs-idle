@@ -6,7 +6,7 @@ import { RESEARCH } from "../content/research";
 import { EXPEDITIONS } from "../content/expeditions";
 import { RESOURCES } from "../content/resources";
 import { AWAKENING } from "../content/awakening";
-import type { BuildingId, ContentRequirements, Cost, EventId, ExpeditionId, GameState, JobId, ResearchId, ResourceId } from "./types";
+import type { BuildingId, ContentRequirements, Cost, EventId, ExpeditionId, GameState, JobId, ResearchDefinition, ResearchId, ResourceId } from "./types";
 
 export function availableWorkers(state: GameState): number {
   return state.population - Object.values(state.jobs).reduce((sum, count) => sum + count, 0) - (state.activeExpedition?.workers ?? 0);
@@ -39,9 +39,23 @@ export function prerequisiteRequirements(state: GameState, requirements: Content
   return unmet;
 }
 
+export function constructionDiscount(state: GameState) {
+  const laborer = Math.min(BALANCE.laborerDiscountCap, state.jobs.laborer * BALANCE.laborerCoinDiscount);
+  const studyMultiplier = state.research.reduce((multiplier, id) => {
+    const study: ResearchDefinition = RESEARCH[id];
+    return multiplier * (study.modifiers?.constructionCoinMultiplier ?? 1);
+  }, 1);
+  return { laborer, study: 1 - studyMultiplier, coinMultiplier: (1 - laborer) * studyMultiplier };
+}
+
 export function buildingCost(state: GameState, id: BuildingId): Cost {
   const building = BUILDINGS[id];
-  return Object.fromEntries(Object.entries(building.cost).map(([resource, amount]) => [resource, Math.ceil(amount * building.costGrowth ** state.buildings[id])])) as Cost;
+  const { coinMultiplier } = constructionDiscount(state);
+  return Object.fromEntries(Object.entries(building.cost).map(([resource, amount]) => {
+    const cost = amount * building.costGrowth ** state.buildings[id] * (resource === "coin" ? coinMultiplier : 1);
+    // Remove floating-point dust at whole Coin boundaries before rounding upward.
+    return [resource, Math.ceil(cost - Number.EPSILON * cost)];
+  })) as Cost;
 }
 
 export function buildingRequirements(state: GameState, id: BuildingId): string[] {

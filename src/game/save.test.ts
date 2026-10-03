@@ -14,17 +14,17 @@ describe("save validation", () => {
   it("migrates a scaffold save without charging for time before the economy existed", () => {
     const old = { version: 1, resources: { food: 30, oil: 20, authority: 0 }, population: 5, chronicle: ["appointment"], lastSimulatedAt: 1000, lastGatheredAt: null };
     const migrated = decodeSave(JSON.stringify(old), 500_000);
-    expect(migrated.version).toBe(5);
+    expect(migrated.version).toBe(6);
     expect(migrated.lastSimulatedAt).toBe(500_000);
-    expect(migrated.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0 });
+    expect(migrated.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0, laborer: 0 });
     expect(migrated.resources).toEqual({ ...createInitialState(0).resources, ...old.resources });
     expect(decodeSave(encodeSave(migrated))).toEqual(migrated);
   });
 
   it.each([
-    { jobs: { forager: 6, lamplighter: 0, scrivener: 0 } },
-    { jobs: { forager: -1, lamplighter: 0, scrivener: 0 } },
-    { jobs: { forager: 1.5, lamplighter: 0, scrivener: 0 } },
+    { jobs: { forager: 6, lamplighter: 0, scrivener: 0, laborer: 0 } },
+    { jobs: { forager: -1, lamplighter: 0, scrivener: 0, laborer: 0 } },
+    { jobs: { forager: 1.5, lamplighter: 0, scrivener: 0, laborer: 0 } },
     { buildings: { ...createInitialState(0).buildings, fields: 4 } },
     { pendingEvents: ["household"] },
     { triggeredEvents: ["household", "household"] },
@@ -106,7 +106,7 @@ describe("UI scaffold migration", () => {
     lastSimulatedAt: 1000, lastGatheredAt: null };
   it("preserves allocations, exact stores and read entries when enabling the economy", () => {
     const migrated = decodeSave(JSON.stringify(old), 500_000);
-    expect(migrated.jobs).toEqual({ forager: 3, lamplighter: 2, scrivener: 0 });
+    expect(migrated.jobs).toEqual({ forager: 3, lamplighter: 2, scrivener: 0, laborer: 0 });
     expect(migrated.readChronicle).toEqual(["appointment"]);
     expect(migrated.resources.food).toBe(2165);
     expect(migrated.lastSimulatedAt).toBe(500_000);

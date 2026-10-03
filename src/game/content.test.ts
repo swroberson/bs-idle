@@ -4,11 +4,12 @@ import { RESEARCH } from "../content/research";
 import { EXPEDITIONS } from "../content/expeditions";
 import { JOBS } from "../content/jobs";
 import { CHRONICLE } from "../content/chronicle";
+import { EVENTS } from "../content/events";
 import type { ContentRequirements } from "./types";
 
 it("resolves all content prerequisites and uses distinct one-time Chronicle records", () => {
   const records: string[] = [];
-  for (const content of [...Object.values(JOBS), ...Object.values(BUILDINGS), ...Object.values(RESEARCH), ...Object.values(EXPEDITIONS)]) {
+  for (const content of [...Object.values(JOBS), ...Object.values(BUILDINGS), ...Object.values(RESEARCH), ...Object.values(EXPEDITIONS), ...Object.values(EVENTS)]) {
     const requirements: ContentRequirements = content.requirements;
     for (const id of Object.keys(requirements.buildings ?? {})) expect(Object.hasOwn(BUILDINGS, id)).toBe(true);
     for (const id of requirements.research ?? []) expect(Object.hasOwn(RESEARCH, id)).toBe(true);

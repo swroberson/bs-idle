@@ -6,7 +6,7 @@ import { JOBS } from "../content/jobs";
 import { BUILDINGS } from "../content/buildings";
 import { EVENTS } from "../content/events";
 import { EXPEDITIONS } from "../content/expeditions";
-import { prerequisiteRequirements } from "./requirements";
+import { jobUnlocked, prerequisiteRequirements } from "./requirements";
 import { RESEARCH } from "../content/research";
 import { createInitialState } from "./state";
 import { ILLUSTRATIONS } from "../content/illustrations";
@@ -18,6 +18,7 @@ const OLD_BUILDINGS = ["fields", "oil-press", "market-stall", "scrivener-house",
 const OLD_RESEARCH = ["examine-old-lamps", "ledger-keeping", "crop-rotation", "better-wicks", "catalog-relics", "survey-foundations"];
 const OLD_EXPEDITIONS = ["old-cistern", "abandoned-farmstead"];
 const OLD_CHRONICLE = Object.fromEntries(Object.keys(CHRONICLE).filter(id => !Object.hasOwn(WARD_RECORDS, id)).map(id => [id, true]));
+const PRE_LABOR_CHRONICLE = Object.fromEntries(Object.keys(CHRONICLE).filter(id => id !== "stoneworking" && id !== "repair-household").map(id => [id, true]));
 
 function oldIds(value: unknown, allowed: readonly string[]): boolean {
   return Array.isArray(value) && value.every(id => allowed.includes(id));
@@ -25,7 +26,7 @@ function oldIds(value: unknown, allowed: readonly string[]): boolean {
 
 function migrateIllustrations(state: GameState): GameState {
   const backfill = state.buildings["oil-press"] > 0 && !state.chronicle.includes("oil-press-built");
-  const next: GameState = { ...state, version: 5, dismissedIllustrations: [],
+  const next: GameState = { ...state, version: 6, dismissedIllustrations: [],
     chronicle: backfill ? [...state.chronicle, "oil-press-built"] : state.chronicle,
     readChronicle: backfill ? [...state.readChronicle, "oil-press-built"] : state.readChronicle };
   return { ...next, dismissedIllustrations: pendingIllustrations(next) };
@@ -61,7 +62,7 @@ function migrateWard(value: Record<string, unknown>): Record<string, unknown> {
       !Array.isArray(value.expeditionLog) || !value.expeditionLog.every(entry => record(entry) && OLD_EXPEDITIONS.includes(entry.destination as string))) {
     throw new Error("Invalid legacy save: unsupported buildings or findings.");
   }
-  return { ...value, version: 5, resources: { current: 0, ...value.resources as object },
+  return { ...value, version: 6, resources: { current: 0, ...value.resources as object },
     buildings: { ...createInitialState(0).buildings, ...value.buildings }, awakenedAt: null, finaleStep: 0 };
 }
 
@@ -88,7 +89,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   try { value = JSON.parse(text); }
   catch { throw new Error("This is not valid JSON. Choose a Buried Sun save or paste its complete text."); }
   if (!record(value)) throw new Error("The save must contain a game object.");
-  if (![1, 2, 3, 4, 5].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–5.");
+  if (![1, 2, 3, 4, 5, 6].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–6.");
   const originalVersion = value.version as number;
   const legacyIllustrations = originalVersion < 4;
   const chronicle = value.chronicle;
@@ -108,7 +109,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   const extraKeys = ["jobs", "buildings", "lifetimeAuthority", "triggeredEvents", "pendingEvents", "research"];
   const expeditionKeys = ["activeExpedition", "completedExpeditions", "expeditionLog"];
   if (originalVersion >= 4) expeditionKeys.push("dismissedIllustrations");
-  if (originalVersion === 5) expeditionKeys.push("awakenedAt", "finaleStep");
+  if (originalVersion >= 5) expeditionKeys.push("awakenedAt", "finaleStep");
   if (Object.hasOwn(value, "readChronicle")) baseKeys.push("readChronicle");
   if (hasWorkers) baseKeys.push("workers");
   const legacy = value.version === 1 || value.version === 2;
@@ -123,6 +124,11 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   }
   if (originalVersion < 5 && (!ids(value.chronicle, OLD_CHRONICLE) || !ids(readChronicle, OLD_CHRONICLE))) {
     throw new Error("Invalid legacy save: unsupported discovery records.");
+  }
+  if (originalVersion < 6 && (!ids(value.chronicle, PRE_LABOR_CHRONICLE) || !ids(readChronicle, PRE_LABOR_CHRONICLE) ||
+      (originalVersion > 1 && (!oldIds(value.triggeredEvents, ["household", "lamp-complaint"]) ||
+        !oldIds(value.pendingEvents, ["household", "lamp-complaint"]) || !oldIds(value.research, Object.keys(RESEARCH).filter(id => id !== "stoneworking")))))) {
+    throw new Error("Invalid legacy save: unsupported household or study records.");
   }
   if (value.version === 1) {
     if (value.chronicle.length !== 1) throw new Error("Invalid scaffold chronicle.");
@@ -141,12 +147,19 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
       throw new Error("Invalid opening save data.");
     }
     const defaults = createInitialState(0);
-    value = { ...value, version: 5, resources: { ...defaults.resources, ...value.resources as object },
+    value = { ...value, version: 6, resources: { ...defaults.resources, ...value.resources as object },
       jobs: { ...defaults.jobs, ...value.jobs }, buildings: { ...defaults.buildings, ...value.buildings },
       activeExpedition: null, completedExpeditions: [], expeditionLog: [], awakenedAt: null, finaleStep: 0 };
   }
   if (!record(value)) throw new Error("Invalid migrated save.");
   if (originalVersion === 3 || originalVersion === 4) value = migrateWard(value);
+  if (!record(value)) throw new Error("Invalid migrated save.");
+  if (originalVersion >= 3 && originalVersion <= 5) {
+    if (!record(value.jobs) || !exactKeys(value.jobs, ["forager", "lamplighter", "scrivener"])) {
+      throw new Error("Invalid legacy save: worker assignments are malformed.");
+    }
+    value = { ...value, version: 6, jobs: { ...value.jobs, laborer: 0 } };
+  }
   if (!record(value)) throw new Error("Invalid migrated save.");
   if (!record(value.resources) || !ids(value.chronicle, CHRONICLE) ||
       !record(value.jobs) || !exactKeys(value.jobs, Object.keys(JOBS)) || !Object.values(value.jobs).every(timestamp) ||
@@ -168,9 +181,12 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   }
   if (value.triggeredEvents.includes("lamp-complaint") && !value.chronicle.includes("household")) throw new Error("Invalid save: the household record is missing.");
   const state = value as unknown as GameState;
+  if (state.triggeredEvents.includes("repair-household") && prerequisiteRequirements(state, EVENTS["repair-household"].requirements).length) {
+    throw new Error("Invalid save: household arrival prerequisites are missing.");
+  }
   validateRestoration(state);
   if (!ids(value.completedExpeditions, EXPEDITIONS) || !Array.isArray(value.expeditionLog) || value.expeditionLog.length > BALANCE.expeditionLogLimit ||
-      (state.jobs.scrivener > 0 && state.buildings["scrivener-house"] === 0)) throw new Error("Invalid expedition or scholarship records.");
+      (Object.keys(JOBS) as (keyof typeof JOBS)[]).some(id => state.jobs[id] > 0 && !jobUnlocked(state, id))) throw new Error("Invalid expedition or worker records.");
   for (const id of Object.keys(EXPEDITIONS) as (keyof typeof EXPEDITIONS)[]) {
     if (state.completedExpeditions.includes(id) !== state.chronicle.includes(EXPEDITIONS[id].chronicle) ||
         (state.completedExpeditions.includes(id) && prerequisiteRequirements(state, EXPEDITIONS[id].requirements).length)) throw new Error("Invalid save: expedition discoveries disagree.");

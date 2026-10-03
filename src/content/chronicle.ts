@@ -14,6 +14,14 @@ export const CHRONICLE = {
     title: "Three more names",
     text: "The woman gives her name as Nera. She places a little bag of seeds beside the register before asking where she should work. Three names are entered beneath the five.",
   },
+  stoneworking: {
+    title: "Stone set aside",
+    text: "At the Smithy, the chipped edges are dressed before the stone is carried out. Pieces that once went to the waste heap are set aside for the next wall. The tally of purchased stone grows shorter.",
+  },
+  "repair-household": {
+    title: "A mended threshold",
+    text: "Two more names are entered in the register. The handcart is unloaded beneath the arch. By evening, a chipped stone has been turned and bedded again at the room's entrance. The cooking pot hangs above a small fire inside.",
+  },
   "lamp-complaint": {
     title: "The third lamp",
     text: "Orso has reported a lamp without a reservoir. An examination has been authorized. He asks that the lamp remain where it is. He does not say why.",

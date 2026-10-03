@@ -8,7 +8,7 @@ export function WardPanel({ state, wait, active, gather, dispatch }: {
   state: GameState; wait: number; active: boolean; gather: () => void; dispatch: (action: GameAction) => void;
 }) {
   const rates = economyRates(state);
-  return <div className="ward-layout">
+  return <div className={`ward-layout${state.buildings.smithy > 0 ? " ward-with-labor" : ""}`}>
     <section aria-labelledby="ward-heading" className="ward-operations">
       <div className="region-heading"><h2 id="ward-heading" className="machine-label">01 / Keeper’s station</h2><span className="machine-label">Outer Ward</span></div>
       {state.pendingEvents.length > 0 ? <EventPanel state={state} active={active} dispatch={dispatch} /> : <div className="ward-scene">
