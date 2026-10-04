@@ -89,6 +89,17 @@ describe("illustrated accomplishments", () => {
     expect(pendingIllustrations(later)).toEqual(["keeper-office"]);
   });
 
+  it("reveals the Smithy only after its first construction and persists dismissal", () => {
+    const before = accomplished();
+    expect(pendingIllustrations(before)).not.toContain("smithy");
+    const built = applyAction(before, { type: "build", building: "smithy" }, 0);
+    expect(pendingIllustrations(built)).toContain("smithy");
+    const dismissed = applyAction(built, { type: "dismiss-illustrations", ids: ["smithy"] }, 0);
+    expect(pendingIllustrations(decodeSave(encodeSave(dismissed)))).not.toContain("smithy");
+    expect(applyAction(dismissed, { type: "build", building: "smithy" }, 0)).toBe(dismissed);
+    expect(dismissed.chronicle.filter(id => id === "smithy-built")).toHaveLength(1);
+  });
+
   it.each([["unknown"], [null], [{}], ["__proto__"], ["oil-press"], ["keeper-office", "keeper-office"], null, "keeper-office"])(
     "rejects invalid or unearned dismissal actions: %j", ids => {
       const state = createInitialState(0);

@@ -16,7 +16,7 @@ export const ILLUSTRATIONS = {
   },
   "oil-press": {
     chronicle: "oil-press-built", src: "/art/oil-press.webp",
-    alt: "A worker tends a worn screw press beside oil containers in a dim stone workshop.",
+    alt: "A worn timber screw press with a turning bar mounted on its spindle, beside oil containers in an unoccupied stone workshop.",
     width: 1200, height: 900,
   },
   "lamp-examination": {
@@ -27,6 +27,21 @@ export const ILLUSTRATIONS = {
   "cistern-find": {
     chronicle: "cistern-find", src: "/art/cistern-find.webp",
     alt: "Pale recovered fragments on cloth beside an exposed cistern stair that descends into darkness.",
+    width: 1200, height: 900,
+  },
+  smithy: {
+    chronicle: "smithy-built", src: "/art/smithy.webp",
+    alt: "A garden blade rests across an anvil beside a lit hearth, patched bellows and worn tools in an unoccupied Smithy.",
+    width: 1200, height: 900,
+  },
+  "sealed-chamber": {
+    chronicle: "chamber-opened", src: "/art/sealed-chamber.webp",
+    alt: "Lifting tackle holds a displaced slab at a dark chamber entrance; lamplight reaches only the nearest cleared floor.",
+    width: 1200, height: 900,
+  },
+  "junction-awakened": {
+    chronicle: "junction-awakened", src: "/art/junction-awakened.webp",
+    alt: "White flameless wall lamps illuminate an empty stone passage, with empty oil vessels and removed wick holders beside the wall.",
     width: 1200, height: 900,
   },
 } as const satisfies Record<string, IllustrationDefinition>;

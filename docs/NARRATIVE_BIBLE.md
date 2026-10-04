@@ -1,6 +1,6 @@
 # Buried Sun: Narrative Bible
 
-**Edition:** 1.4 — October 3, 2026
+**Edition:** 1.7 — October 4, 2026
 
 **Audience:** authors and agents; contains end-of-story spoilers  
 **Status:** approved story foundations, provisional chapter outline, and an audit of existing content
@@ -620,8 +620,13 @@ Before delivering a narrative change:
    promises a solution the story does not intend to provide.
 5. Keep duplicated research/Chronicle prose consistent, preserve one-time
    discoveries, and retain readable records of completed findings.
-6. Use the existing Dark Chronicle art direction: intimate human viewpoints,
-   tactile ordinary work, localized illumination, and cropped fragments.
+6. Use the approved Dark Chronicle pixel art direction: detailed pixel clusters,
+   realistic proportions, intimate human viewpoints, tactile ordinary work,
+   localized illumination, and cropped fragments. The dark-doorway Keeper's
+   Office is the style reference; see `docs/ART.md` for the October 4 change.
+   Illustrations show workstations, tools and discoveries without people,
+   hands, other body parts or silhouettes. Unoccupied framing adds atmosphere
+   without establishing a disappearance or changing the inhabitants' presence.
    Author knowledge of the vessel never licenses recognizable spacecraft art,
    omniscient establishing shots, cutaways, or contemporary sci-fi equipment.
    Later visual changes require explicit direction; chapter advancement alone
@@ -663,3 +668,6 @@ narrative automatically.
 | 2026-10-02 | Edition 1.2: user replied “approved!” to the completed survey-to-awakening draft and its implementation approval question. Accepts local access/repair evidence, removable oil fittings in older civic lamps, the optional Barrow relic, and staged awakening wording. | Implemented ten buildings, thirteen studies, six destinations, and the deliberate awakening with Current, Oil-free restored lamp tending, version-5 persistence and independent presentation acknowledgements. Costs tuned provisionally through the full harness. No vessel/stellar/ancestral reveal, new major history, or explanations of enduring mysteries. |
 | 2026-10-02 | Edition 1.3: user requested Laborers + Stoneworking followed by another household event, grounded in Ward life and preserving the larger mysteries. | Implemented the capped construction job, optional stone reuse study and two-person household choice/record. Adds incidental ordinary work and belongings only; no major history, character backstory, system purpose, revelation, ending or clue interpretation changed. Fourteen studies, three events and thirty Chronicle records. |
 | 2026-10-03 | Edition 1.4: user requested Scavenger implementation and the first civic studies/events batch, deferring human playtesting/tuning. | Implemented archaeological staffing, Provision Stores, Apprenticed Hands, Collated Records, shared-table and spare-oil choices, and version-7 persistence. Incidental food packing, paired stonework, copied leaves, a shared meal and ordinary oil exchange only; no new major history, backstory, system purpose, revelation or clue explanation. Seventeen studies, five events and thirty-five Chronicle records. |
+| 2026-10-04 | Edition 1.5: user approved the detailed pixel Keeper's Office, requested darkness outside its doorway, then directed applying that style to the other illustrations and correcting the Oil Press handle connection. | Replaced all four illustration assets with detailed pixel art retaining realistic proportions, rich amber lighting, enclosed viewpoints and established contents. Press turning bar now connects to the screw hub beneath the fixed beam. Updated AGENTS.md and docs/ART.md. Captions, chronology, clues, mysteries, reveal limits, gameplay and saves unchanged. |
+| 2026-10-04 | Edition 1.6: user approved the proposed Smithy, Sealed Chamber and Awakening art batch, then requested no people in the pictures, only workstations and discoveries. | Added three illustrations bound to existing accomplished Chronicle records; removed the Oil Press worker and cistern hand. All seven images omit figures and body parts. The finale uses neutral white light; its art follows the existing staged passages. Existing captions, local lamp relationship, clue chronology, mysteries, mechanical rewards and saves are preserved. Unoccupied compositions imply no disappearance or change to the settlement's population. |
+| 2026-10-04 | Edition 1.7: user requested a Sealed Chamber picture revision after comparing its odd closure with the discovery text. | Revised the fitted slab's profile and surround, simplified ordinary tackle to a rope sling, quieted the ancient black material and reduced the bench-like interior shape. No exposed pivot mechanism, people, new explanation or later platform. Caption, access sequence, clues, mysteries, reveal limits and gameplay unchanged. Exact edit prompts in docs/ART_CHAMBER_REVISION.md. |

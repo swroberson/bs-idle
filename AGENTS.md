@@ -204,7 +204,7 @@ It should **not** feel:
 - Like a Tailwind component library demo
 - Like a mobile banking app
 - Like a conventional admin dashboard
-- Excessively retro, pixel-art, or faux-CRT
+- Excessively retro or faux-CRT interface styling (the illustrations use pixel art)
 
 The goal is not to imitate an old computer terminal. It is to create a fictional industrial interface that happens to be rendered with modern web technology.
 
@@ -564,9 +564,36 @@ The player is not browsing information about an excavation.
 
 Illustrations should feel valuable because they are uncommon. Do not add decorative art merely to fill space.
 
-### Core visual identity: Dark Chronicle
+### Core visual identity: Dark Chronicle pixel art
 
-The visual style is **Dark Chronicle**: grounded historical realism presented with heavy chiaroscuro, deep shadow, restrained color, and an atmosphere of age, enclosure, neglect, and imperfect understanding.
+The illustration style is **Dark Chronicle pixel art**, approved October 4,
+2026: detailed pixel rendering with realistic human and object proportions,
+believable perspective, heavy chiaroscuro, deep shadow, restrained color, and
+an atmosphere of age, enclosure, neglect, and imperfect understanding. The
+accepted Keeper's Office with the dark doorway is the style anchor in
+`public/art/keeper-office.webp`. Preserve its rich amber lamplight, dirty browns
+and charcoal shadows. This replaces the earlier realistic/painterly rendering
+medium; the material culture, composition rules and narrative limits remain.
+
+Illustrations depict workstations, tools, architecture and discoveries by
+themselves. Do not depict people, hands, other body parts, portraits or human
+silhouettes. Imply ordinary life through useful tools, arranged materials and
+traces of work. Unoccupied compositions are an atmospheric choice, not a new
+claim that the Ward has no inhabitants.
+
+Render every part of an illustration with deliberate visible square pixel
+clusters, stepped edges and discrete shading ramps. Keep substantial detail
+in objects and functional tool connections without uniform texture noise. Avoid chibi or
+toy proportions, generic low-detail sprites, smooth photographic patches,
+blur, painterly strokes and a mere mosaic filter over realistic artwork.
+Pixel art applies to world illustrations; do not turn the readable terminal
+interface into an 8-bit game or faux-CRT display.
+
+Ordinary tools and machines must work visibly: grips are reachable and handles
+connect to the parts they drive. On the Oil Press, the turning bar enters a hub
+on the vertical screw below the stationary upper beam; it does not attach to
+the fixed frame. Preserve ordinary labor's clarity without explaining ancient
+systems.
 
 The world should feel:
 
@@ -699,17 +726,16 @@ A wooden shelf might be attached to an impossibly smooth ancient wall. A stone w
 
 Do not make every scene strange. Ordinary life must be convincing enough that anomalies matter.
 
-### People
+### Human presence through workstations
 
-Avoid conventional RPG character portraits and heroic poses.
-
-When illustrating a worker type, show the person **performing their role in an environment**.
-
-A Smith should be working at an anvil rather than posing with a hammer. A Lamplighter should be tending a lamp. A Scrivener should be hunched over records. A Scavenger should be examining or recovering something.
-
-People should generally appear small relative to their environment. Clothing should be practical, worn, layered, and grounded in the material culture of the Ward.
-
-Characters are inhabitants, laborers, clerks, craftspeople, and custodians, not fantasy heroes.
+Do not depict people, portraits, silhouettes, hands or other body parts. Show
+roles through their workstations and tools: a garden blade on an anvil, measured
+oil vessels beside a lamp bench, observational leaves on a scrivener's desk,
+or recovered fragments on cloth beside scavenging tools. Held objects must be
+set naturally on a supporting surface when a person is removed. Keep tools
+functional and familiar; the absence of a depicted operator does not excuse
+incorrect mechanical connections. Do not turn unoccupied scenes into new
+stories of disappearance or abandonment.
 
 ### Buildings and locations
 
@@ -754,7 +780,7 @@ Use these general approaches:
 
 **Buildings:** intimate environmental views showing the building in use.
 
-**Workers:** environmental portraits showing the worker performing their job.
+**Workers:** unoccupied workstations with the tools and materials of their role.
 
 **Research and discoveries:** close observational compositions emphasizing the object, fragment, document, excavation, or anomaly being studied.
 
@@ -771,19 +797,19 @@ surface-rendering guidance before generating or editing illustrations.
 
 When prompting an image model, explicitly reinforce the following concepts where relevant:
 
-> dark historical realism, heavy chiaroscuro, localized oil-lamp or fire illumination, deep surrounding darkness, weathered tactile materials, cramped or enclosed composition, restrained desaturated palette, ancient inhabited environment, human-scale viewpoint, subtle unexplained architectural anomalies, monumental structures disappearing beyond the frame, grounded clothing and tools, no overt fantasy spectacle, no recognizable science-fiction technology, no panoramic establishing view
+> detailed pixel art with realistic object proportions and perspective, deliberate square pixel clusters and stepped shading, heavy chiaroscuro, localized oil-lamp or fire illumination, deep surrounding darkness, material-specific selective wear, cramped or enclosed composition, restrained earthy palette, ancient inhabited environment, human-scale viewpoint, subtle unexplained architectural anomalies, monumental structures disappearing beyond the frame, functional ordinary tools, no people or body parts, no overt fantasy spectacle, no recognizable science-fiction technology, no panoramic establishing view
 
 Do not rely on the phrase "dark fantasy" alone. Image models frequently interpret it as conventional fantasy art and introduce castles, armor, magical symbols, dramatic skylines, or other inappropriate imagery. Describe the physical scene and lighting explicitly.
 
-Keep material wear irregular and specific to each material. Preserve the
-accepted original color grade and lighting. Stone pits and pores should vary
-in size, depth, density and spacing, with clustered erosion alternating with
-less pitted areas. Timber grain follows the wood; wear gathers around edges
-and use. Avoid repeated stippling, embossed curls, uniform procedural bump
-patterns, canvas texture, impasto and oversharpening. Do not substitute global
-smoothing, blur, polished or plastic surfaces, recoloring or relighting. Use
-the accepted current artwork as a reference; superseded smoothing trials are
-not style anchors.
+Keep material wear irregular and specific to each material, expressed through
+selective pixel clusters rather than realistic microtexture. Preserve the
+accepted color grade and localized lighting. Stone marks vary in scale and
+spacing, with quieter faces between worn patches. Timber grain follows the
+wood; wear gathers around edges and use. Avoid repeated stippling, embossed
+curls, uniform procedural noise, canvas texture, impasto and oversharpening.
+Do not substitute global smoothing, blur, polished or plastic surfaces,
+recoloring or relighting. Use the approved pixel office as a reference;
+superseded realistic images and smoothing trials are not style anchors.
 
 ### Final test
 
@@ -797,6 +823,8 @@ Before accepting an illustration, ask:
 6. Does anything look generically high-fantasy or conventionally science-fictional?
 7. If something strange appears, is it subtle enough that an inhabitant might accept it as part of the world?
 8. Does the image reveal something while leaving a larger question unanswered?
-9. At full resolution and phone size, do pits, pores and wear vary naturally rather than repeat a uniform pattern, while preserving the accepted colors and lighting?
+9. At full resolution and phone size, are pixel clusters deliberate and consistent, proportions realistic, wear selective, and the accepted colors and lighting preserved?
+10. Can a worker actually operate the depicted ordinary tool or machine through its visible connections and reachable grips?
+11. Are people, hands, other body parts, portraits and human silhouettes entirely absent, with life implied through the workstations instead?
 
 If an image fails these tests, revise it before adding it to the game.

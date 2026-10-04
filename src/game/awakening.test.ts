@@ -33,6 +33,19 @@ function restoredWard(): GameState {
 }
 
 describe("deliberate local awakening", () => {
+  it("earns chamber artwork through opening and finale artwork only through deliberate awakening", () => {
+    expect(pendingIllustrations(createInitialState(0))).not.toContain("sealed-chamber");
+    const ready = restoredWard();
+    expect(pendingIllustrations(ready)).toContain("sealed-chamber");
+    expect(pendingIllustrations(ready)).not.toContain("junction-awakened");
+    const awake = applyAction(ready, { type: "awaken-junction" }, ready.lastSimulatedAt);
+    expect(pendingIllustrations(awake)).toContain("junction-awakened");
+    const dismissed = applyAction(awake, { type: "dismiss-illustrations", ids: pendingIllustrations(awake) }, awake.lastSimulatedAt);
+    expect(pendingIllustrations(decodeSave(encodeSave(dismissed)))).toEqual([]);
+    expect(applyAction(dismissed, { type: "awaken-junction" }, dismissed.lastSimulatedAt)).toBe(dismissed);
+    expect(dismissed.resources).toEqual(awake.resources);
+  });
+
   it("requires the full repair, never awakens offline, and preserves ordinary stores", () => {
     const initial = createInitialState(0);
     expect(applyAction(initial, { type: "awaken-junction" }, 0)).toBe(initial);
