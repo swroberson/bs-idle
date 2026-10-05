@@ -15,7 +15,7 @@ function OpeningPage({ section, state, active, dispatch, wait, chronicleVisible,
   onDialogChange: (open: boolean) => void;
 }) {
   switch (section) {
-    case "works": return <WorksPanel state={state} active={active} dispatch={dispatch} />;
+    case "works": return <WorksPanel state={state} active={active} dispatch={dispatch} onDialogChange={onDialogChange} />;
     case "expeditions": return <ExpeditionPanel state={state} active={active} dispatch={dispatch} onDialogChange={onDialogChange} />;
     case "studies": return <StudiesPanel state={state} active={active} dispatch={dispatch} />;
     case "chronicle": return <ChroniclePanel state={state} active={active && chronicleVisible} dispatch={dispatch} />;

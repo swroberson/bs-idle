@@ -54,7 +54,6 @@ export function GameShell() {
   const expeditionsOpen = !!game.state && game.state.buildings["ruined-cistern"] > 0;
   const visibleSections = (Object.keys(SECTIONS) as Section[]).filter((id) => (id !== "works" || worksOpen) && (id !== "studies" || studiesOpen) && (id !== "expeditions" || expeditionsOpen));
   const shownSection = game.status === "error" && !game.state ? "settings" : visibleSections.includes(section) ? section : "ward";
-  const unread = game.state?.chronicle.filter(id => !game.state?.readChronicle.includes(id)).length ?? 0;
   const emptyStores = game.state ? Number(game.state.resources.food === 0) + Number(game.state.awakenedAt === null && game.state.resources.oil === 0) : 0;
   const pending = game.state?.pendingEvents.length ?? 0;
   const faults = Number(Boolean(game.error)) + Number(offlineStatus === "failed");
@@ -63,7 +62,7 @@ export function GameShell() {
     ward: { count: pending + emptyStores, label: "reports or empty stores", warning: emptyStores > 0 },
     works: { count: 0, label: "reports" }, studies: { count: 0, label: "reports" },
     expeditions: { count: returns, label: "returned parties" },
-    chronicle: { count: unread, label: unread === 1 ? "unread entry" : "unread entries" },
+    chronicle: { count: 0, label: "entries" },
     settings: { count: faults, label: "record faults", warning: true },
   };
   const dispatch = (action: GameAction) => {
@@ -99,6 +98,6 @@ export function GameShell() {
       </button>)}
     </nav>
     <footer className="terminal-footer machine-label"><span role="status">{feedback || `Register // ${game.state ? "Local" : "—"}`}</span><span>{game.state && game.state.awakenedAt !== null ? "Outer Ward // Story complete" : offlineStatus === "ready" ? "Offline shell // ready" : "Outer Ward // I"}</span></footer>
-    <p className="sr-only" role="status" aria-atomic="true">{unread ? `Chronicle: ${unread} unread entries.` : ""}{pending ? ` Ward: ${pending} pending reports.` : ""}{emptyStores ? ` Ward: ${emptyStores} empty stores.` : ""}{returns ? ` Expeditions: ${returns} returned parties.` : ""}{faults ? ` Records: ${faults} faults.` : ""}</p>
+    <p className="sr-only" role="status" aria-atomic="true">{pending ? `Ward: ${pending} pending reports.` : ""}{emptyStores ? ` Ward: ${emptyStores} empty stores.` : ""}{returns ? ` Expeditions: ${returns} returned parties.` : ""}{faults ? ` Records: ${faults} faults.` : ""}</p>
   </div>;
 }

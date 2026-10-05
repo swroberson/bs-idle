@@ -6,25 +6,30 @@ import { buildingCost, buildingRequirements, constructionDiscount, prerequisiteR
 import { ResourceAmounts } from "./ResourceAmounts";
 import { constructionSpeed, constructionWork } from "@/game/construction";
 import { ConstructionPanel } from "./ConstructionPanel";
+import { WorkerReassignment } from "./WorkerReassignment";
 import type { BuildingDefinition, BuildingId, GameAction, GameState, ResourceId } from "@/game/types";
 
-export function WorksPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
+export function WorksPanel({ state, active, dispatch, onDialogChange }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void; onDialogChange: (open: boolean) => void }) {
   const [page, setPage] = useState(0);
   const items = (Object.keys(BUILDINGS) as BuildingId[]).filter(id => state.buildings[id] > 0 || prerequisiteRequirements(state, BUILDINGS[id].requirements).length === 0);
   const index = Math.min(page, Math.max(0, items.length - 1));
   const discount = constructionDiscount(state);
+  const crew = <>
+    <ConstructionPanel state={state} active={active} dispatch={dispatch} />
+    <WorkerReassignment state={state} active={active} dispatch={dispatch} onDialogChange={onDialogChange} />
+  </>;
   if (state.activeConstruction) {
     const project = state.activeConstruction;
     return <section aria-labelledby="works-heading">
       <div className="region-heading"><h2 id="works-heading" className="machine-label">Works / Civic machinery</h2><span className="machine-label">One project</span></div>
-      <ConstructionPanel state={state} active={active} dispatch={dispatch} />
+      {crew}
       <p className="narrative construction-description">{project.kind === "building" ? BUILDINGS[project.id].description : RESEARCH[project.id].description}</p>
       <p className="module-note machine-label">Construction and automatic production are halved during Food shortages.</p>
     </section>;
   }
   return <section aria-labelledby="works-heading">
     <div className="region-heading"><h2 id="works-heading" className="machine-label">Works / Civic machinery</h2><span className="machine-label">One project</span></div>
-    <ConstructionPanel state={state} active={active} dispatch={dispatch} />
+    {crew}
     {items.slice(index, index + 1).map((id) => {
       const building: BuildingDefinition = BUILDINGS[id];
       const unmet = buildingRequirements(state, id);

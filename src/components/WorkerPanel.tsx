@@ -6,8 +6,8 @@ import { availableWorkers, jobUnlocked } from "@/game/requirements";
 import { constructionSpeed } from "@/game/construction";
 import type { GameAction, GameState, JobId } from "@/game/types";
 
-export function WorkerPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
-  const [selected, setSelected] = useState("daily");
+export function WorkerPanel({ state, active, dispatch, initialGroup = "daily" }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void; initialGroup?: "daily" | "field" | "study" }) {
+  const [selected, setSelected] = useState<string>(initialGroup);
   const available = availableWorkers(state);
   const groups = [
     { id: "daily", label: "Daily work", roles: ["forager", "lamplighter"] },

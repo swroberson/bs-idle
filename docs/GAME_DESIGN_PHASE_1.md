@@ -243,13 +243,13 @@ Keep these facts easy to find:
 
 - Current resources and net production rates.
 - Population, assigned workers, expedition workers, and available workers.
-- Unread records and unresolved situations, signaled on the relevant navigation tab.
+- New-record popups and unresolved situations, with attention badges on the relevant tabs other than Chronicle.
 - Purchase costs and the concrete effects of buildings or research.
 - Expedition timers, pending events, and recent discoveries.
 
 Avoid dense desktop tables, hover-only explanations, or tiny assignment buttons. Support keyboard navigation, readable contrast, reduced motion, and status cues that do not depend on color alone. Illustration is optional; no art pipeline is required for the first build.
 
-The terminal should fit within the viewport during ordinary play, keeping stores and navigation visible. Prefer focused views and pagination to growing lists. Preserve scrolling as an accessibility fallback for enlarged text, short landscape screens, and unusually long content. Chronicle badges count unread entries and persist across reloads; viewing an entry acknowledges only that entry. Other sections use the same badge language for situations needing attention, such as unresolved choices or empty stores. Do not flag every affordable purchase or suggest the next action. Mechanical costs, effects and unavailable requirements remain explicit; players discover the path themselves.
+The terminal should fit within the viewport during ordinary play, keeping stores and navigation visible. Prefer focused views and pagination to growing lists. Preserve scrolling as an accessibility fallback for enlarged text, short landscape screens, and unusually long content. Chronicle has no new-entry badge; popups notify the player of new records. Viewing an entry acknowledges only that entry and persists its acknowledgement. Other sections use the same badge language for situations needing attention, such as unresolved choices or empty stores. Do not flag every affordable purchase or suggest the next action. Mechanical costs, effects and unavailable requirements remain explicit; players discover the path themselves.
 
 ## 11. Technical architecture
 

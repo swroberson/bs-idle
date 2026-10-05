@@ -478,10 +478,11 @@ content; never clip essential controls to enforce a no-scroll layout.
 
 Chronicle always opens to the latest entry, with older entries available through
 pagination, regardless of which entries are unread.
-Chronicle tabs display a count of unread entries. Persist acknowledgement in
-the save and clear only the entry actually viewed in a visible, active tab.
+Chronicle tabs do not display a new-entry badge; new-entry popups provide the
+notification. Persist acknowledgement in the save and acknowledge only the
+entry actually viewed in a visible, active tab.
 Use the same badge convention wherever attention is required: pending choices,
-new records, empty stores, or record faults. Do not badge ordinary affordable
+empty stores, or record faults. Do not badge ordinary affordable
 purchases or routine cooldown completion as recommended next actions.
 
 Do not show objectives, next-step hints, recommended actions, or tutorial
