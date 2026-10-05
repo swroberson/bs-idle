@@ -1,6 +1,5 @@
 import { BUILDINGS } from "@/content/buildings";
 import { RESEARCH } from "@/content/research";
-import { useState } from "react";
 import { CatalogPager } from "./CatalogPager";
 import { buildingCost, buildingRequirements, constructionDiscount, prerequisiteRequirements, resourceVisible } from "@/game/requirements";
 import { ResourceAmounts } from "./ResourceAmounts";
@@ -9,10 +8,12 @@ import { ConstructionPanel } from "./ConstructionPanel";
 import { WorkerReassignment } from "./WorkerReassignment";
 import type { BuildingDefinition, BuildingId, GameAction, GameState, ResourceId } from "@/game/types";
 
-export function WorksPanel({ state, active, dispatch, onDialogChange }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void; onDialogChange: (open: boolean) => void }) {
-  const [page, setPage] = useState(0);
+export function WorksPanel({ state, active, dispatch, onDialogChange, selected, select }: {
+  state: GameState; active: boolean; dispatch: (action: GameAction) => void; onDialogChange: (open: boolean) => void;
+  selected: BuildingId | null; select: (id: BuildingId) => void;
+}) {
   const items = (Object.keys(BUILDINGS) as BuildingId[]).filter(id => state.buildings[id] > 0 || prerequisiteRequirements(state, BUILDINGS[id].requirements).length === 0);
-  const index = Math.min(page, Math.max(0, items.length - 1));
+  const index = Math.max(0, items.findIndex(id => id === selected));
   const discount = constructionDiscount(state);
   const crew = <>
     <ConstructionPanel state={state} active={active} dispatch={dispatch} />
@@ -49,7 +50,7 @@ export function WorksPanel({ state, active, dispatch, onDialogChange }: { state:
         <p id={`build-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Stores and crew sufficient / ready"}</p>
       </article>;
     })}
-    <CatalogPager name="Works" labels={items.map(id => BUILDINGS[id].name)} index={index} select={setPage} />
+    <CatalogPager name="Works" labels={items.map(id => BUILDINGS[id].name)} index={index} select={page => select(items[page])} />
     {discount.study > 0 && <p className="requirements-copy">Stoneworking / building Coin −{Math.round(discount.study * 100)}%. Final Coin costs round up; other costs unchanged.</p>}
     <p className="module-note machine-label">Construction and automatic production are halved during Food shortages.</p>
   </section>;

@@ -6,7 +6,7 @@ import { ResourceReadout } from "./ResourceReadout";
 import { useLocalGame } from "./useLocalGame";
 import { BALANCE } from "@/content/balance";
 import { ReturnPanel } from "./ReturnPanel";
-import type { GameAction } from "@/game/types";
+import type { BuildingId, GameAction, ResearchId } from "@/game/types";
 import { GamePages, SECTIONS, type Section } from "./GamePages";
 import { actionFeedback } from "./actionFeedback";
 import { AttentionBadge } from "./AttentionBadge";
@@ -25,6 +25,8 @@ const serverVisible = () => false;
 export function GameShell() {
   const game = useLocalGame();
   const [section, setSection] = useState<Section>("ward");
+  const [selectedWork, selectWork] = useState<BuildingId | null>(null);
+  const [selectedStudy, selectStudy] = useState<ResearchId | null>(null);
   const [now, setNow] = useState(0);
   const [offlineStatus, setOfflineStatus] = useState<"pending" | "ready" | "failed">("pending");
   const [feedback, setFeedback] = useState("");
@@ -87,7 +89,7 @@ export function GameShell() {
         {game.status === "loading" && <p role="status" className="terminal-notice machine-label">Opening the Keeper’s register…</p>}
         {game.status === "waiting" && <div role="status" className="terminal-notice"><p className="machine-label">Access / held by another tab</p><h2>The register is open elsewhere.</h2><p>Close the other Buried Sun tab to continue here. This tab will then load your latest progress.</p></div>}
         {shownSection === "settings" && offlineStatus === "failed" && <p role="alert" className="terminal-alert">Offline shell unavailable. Revisit while online.</p>}
-        <GamePages game={game} section={shownSection} wait={wait} dispatch={dispatch} clearFeedback={() => setFeedback("")} chronicleVisible={visible && !endingPending && reveals.length === 0 && !detailsOpen} onDialogChange={setDetailsOpen} />
+        <GamePages game={game} section={shownSection} wait={wait} dispatch={dispatch} clearFeedback={() => setFeedback("")} chronicleVisible={visible && !endingPending && reveals.length === 0 && !detailsOpen} onDialogChange={setDetailsOpen} selectedWork={selectedWork} selectWork={selectWork} selectedStudy={selectedStudy} selectStudy={selectStudy} />
       </>}
     </main>
     <IllustrationReveal queue={reveals} active={revealActive} dispatch={dispatch} />

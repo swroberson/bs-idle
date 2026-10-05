@@ -1,5 +1,4 @@
 import { RESEARCH } from "@/content/research";
-import { useState } from "react";
 import { AWAKENING } from "@/content/awakening";
 import { awakeningRequirements } from "@/game/requirements";
 import { CatalogPager } from "./CatalogPager";
@@ -9,10 +8,12 @@ import { researchRequirements, prerequisiteRequirements } from "@/game/requireme
 import { ResourceAmounts } from "./ResourceAmounts";
 import type { GameAction, GameState, ResearchDefinition, ResearchId } from "@/game/types";
 
-export function StudiesPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
-  const [page, setPage] = useState(0);
+export function StudiesPanel({ state, active, dispatch, selected, select }: {
+  state: GameState; active: boolean; dispatch: (action: GameAction) => void;
+  selected: ResearchId | null; select: (id: ResearchId) => void;
+}) {
   const items = (Object.keys(RESEARCH) as ResearchId[]).filter(id => state.research.includes(id) || prerequisiteRequirements(state, RESEARCH[id].requirements).length === 0);
-  const index = Math.min(page, Math.max(0, items.length - 1));
+  const index = Math.max(0, items.findIndex(id => id === selected));
   const awakeningReady = state.research.includes("restore-conduit") && state.awakenedAt === null;
   const unmetAwakening = awakeningRequirements(state);
   return <section aria-labelledby="studies-heading">
@@ -40,6 +41,6 @@ export function StudiesPanel({ state, active, dispatch }: { state: GameState; ac
         {complete && <p className="requirements-copy">Investigation complete / discovery preserved in the Chronicle.</p>}
       </article>;
     })}
-    <CatalogPager name="Studies" labels={items.map(id => RESEARCH[id].name)} index={index} select={setPage} />
+    <CatalogPager name="Studies" labels={items.map(id => RESEARCH[id].name)} index={index} select={page => select(items[page])} />
   </section>;
 }
