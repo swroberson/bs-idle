@@ -1,9 +1,11 @@
 import { BALANCE } from "../content/balance";
 import type { GameState } from "./types";
+import { initialLamps } from "./lamps";
 
 export function createInitialState(now: number): GameState {
   return {
-    version: 9,
+    version: 10,
+    lamps: initialLamps(),
     resources: { ...BALANCE.startingResources },
     population: BALANCE.startingPopulation,
     jobs: { forager: 0, lamplighter: 0, laborer: 0, scavenger: 0, scrivener: 0 },

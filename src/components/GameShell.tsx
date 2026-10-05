@@ -16,6 +16,8 @@ import { AwakeningReveal } from "./AwakeningReveal";
 import { AWAKENING } from "@/content/awakening";
 import { availableStudies, availableWorks } from "@/game/catalogs";
 import { WorkerReassignment } from "./WorkerReassignment";
+import { LampReadout } from "./LampReadout";
+import { LAMPS } from "@/content/lamps";
 
 function subscribeVisibility(onChange: () => void) {
   document.addEventListener("visibilitychange", onChange);
@@ -59,6 +61,7 @@ export function GameShell() {
   const visibleSections = (Object.keys(SECTIONS) as Section[]).filter((id) => (id !== "works" || worksOpen) && (id !== "studies" || studiesOpen) && (id !== "expeditions" || expeditionsOpen));
   const shownSection = game.status === "error" && !game.state ? "settings" : visibleSections.includes(section) ? section : "ward";
   const emptyStores = game.state ? Number(game.state.resources.food === 0) + Number(game.state.awakenedAt === null && game.state.resources.oil === 0) : 0;
+  const darkLamps = !!game.state && game.state.lamps.lit < LAMPS.count;
   const pending = game.state?.pendingEvents.length ?? 0;
   const faults = Number(Boolean(game.error)) + Number(offlineStatus === "failed");
   const returns = game.returnSummary?.completedExpeditions.length ?? 0;
@@ -81,7 +84,7 @@ export function GameShell() {
   }, [catalogVisible, game, shownSection, workId, studyId]);
 
   const attention = {
-    ward: { count: pending + emptyStores, label: "reports or empty stores", warning: emptyStores > 0 },
+    ward: { count: pending + emptyStores + Number(darkLamps), label: "reports, empty stores or unlit lamps", warning: emptyStores > 0 || darkLamps },
     works: { count: newWorks, label: "new entries" }, studies: { count: newStudies, label: "new entries" },
     expeditions: { count: returns, label: "returned parties" },
     chronicle: { count: 0, label: "entries" },
@@ -105,7 +108,7 @@ export function GameShell() {
         {game.state && <WorkerReassignment state={game.state} active={game.status === "active" && !game.error && !game.returnSummary && !endingPending && reveals.length === 0} dispatch={dispatch} onDialogChange={setDetailsOpen} initialGroup={shownSection === "studies" ? "study" : shownSection === "works" || shownSection === "expeditions" ? "field" : "daily"} />}
       </div>
     </header>
-    <div className="terminal-instruments">{game.state && <ResourceReadout state={game.state} onDialogChange={setDetailsOpen} />}</div>
+    <div className="terminal-instruments">{game.state && <><ResourceReadout state={game.state} onDialogChange={setDetailsOpen} /><LampReadout state={game.state} onDialogChange={setDetailsOpen} /></>}</div>
     <main id="main" tabIndex={-1} aria-label={SECTIONS[shownSection]}>
       {game.returnSummary ? <ReturnPanel summary={game.returnSummary} dismiss={game.dismissSummary} /> : <>
         {game.error && <div role="alert" className="terminal-alert"><p className="machine-label">Record fault</p><p>{game.error}</p></div>}
@@ -123,6 +126,6 @@ export function GameShell() {
       </button>)}
     </nav>
     <footer className="terminal-footer machine-label"><span role="status">{feedback || `Register // ${game.state ? "Local" : "—"}`}</span><span>{game.state && game.state.awakenedAt !== null ? "Outer Ward // Story complete" : offlineStatus === "ready" ? "Offline shell // ready" : "Outer Ward // I"}</span></footer>
-    <p className="sr-only" role="status" aria-atomic="true">{pending ? `Ward: ${pending} pending reports.` : ""}{emptyStores ? ` Ward: ${emptyStores} empty stores.` : ""}{newWorks ? ` Works: ${newWorks} new entries.` : ""}{newStudies ? ` Studies: ${newStudies} new entries.` : ""}{returns ? ` Expeditions: ${returns} returned parties.` : ""}{faults ? ` Records: ${faults} faults.` : ""}</p>
+    <p className="sr-only" role="status" aria-atomic="true">{pending ? `Ward: ${pending} pending reports.` : ""}{emptyStores ? ` Ward: ${emptyStores} empty stores.` : ""}{darkLamps ? ` Ward: ${game.state!.lamps.lit} of ${LAMPS.count} lamps lit.` : ""}{newWorks ? ` Works: ${newWorks} new entries.` : ""}{newStudies ? ` Studies: ${newStudies} new entries.` : ""}{returns ? ` Expeditions: ${returns} returned parties.` : ""}{faults ? ` Records: ${faults} faults.` : ""}</p>
   </div>;
 }

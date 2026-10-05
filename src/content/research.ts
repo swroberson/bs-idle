@@ -25,7 +25,7 @@ export const RESEARCH = {
   "better-wicks": {
     name: "Better Wicks", description: "Try a tighter weave in the ordinary lamps. The third lamp must remain untouched.",
     text: "The new wicks draw less oil. Orso enters the saving in the ledger and leaves the third lamp's column blank.",
-    cost: { coin: 15, knowledge: 12 }, effect: "Reduces ordinary Lamplighter Oil consumption by 25%. Authority output is unchanged.",
+    cost: { coin: 15, knowledge: 12 }, effect: "Reduces Oil consumption per ordinary burning lamp by 25%. Authority output is unchanged.",
     modifiers: { oilDemandMultiplier: 0.75 }, chronicle: "better-wicks", requirements: { buildings: { "scrivener-house": 1 } },
   },
   "catalog-relics": {

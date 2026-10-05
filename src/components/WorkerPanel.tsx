@@ -41,6 +41,7 @@ export function WorkerPanel({ state, active, dispatch, initialGroup = "daily" }:
     </div>
     {group.roles.includes("laborer") && <p className="allocation-note machine-label">{constructionSpeed(state)} work/s per Laborer. Food shortages halve work. With no crew, project progress is retained.</p>}
     {group.roles.includes("scavenger") && <p className="allocation-note machine-label">Archaeological parties draw from Scavengers. Return idle.</p>}
+    {group.roles.includes("lamplighter") && <p className="allocation-note machine-label">One Lamplighter tends three lamps. {state.awakenedAt !== null ? "Restored fixtures burn without Oil." : "Burning lamps consume Oil independently of the crew."}</p>}
     <p className="allocation-note machine-label">All inhabitants consume Food.</p>
   </aside>;
 }

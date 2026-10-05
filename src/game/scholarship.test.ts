@@ -17,7 +17,7 @@ describe("scholarship and save compatibility", () => {
   it("migrates a version-2 discovery without changing stores, jobs or elapsed time", () => {
     const old = openingSave();
     const migrated = decodeSave(JSON.stringify(old), 999000);
-    expect(migrated.version).toBe(9);
+    expect(migrated.version).toBe(10);
     expect(migrated.lastSimulatedAt).toBe(old.lastSimulatedAt);
     expect(migrated.resources).toEqual({ ...createInitialState(0).resources, ...old.resources });
     expect(migrated.jobs).toEqual({ ...old.jobs, scrivener: 0, laborer: 0, scavenger: 0 });
@@ -49,7 +49,7 @@ describe("scholarship and save compatibility", () => {
     state = applyAction(state, { type: "research", research: "crop-rotation" }, state.lastSimulatedAt);
     expect(economyRates(state).net.food + state.population * .025).toBeCloseTo((before.food + state.population * .025) * 1.25);
     state = applyAction(state, { type: "research", research: "better-wicks" }, state.lastSimulatedAt);
-    expect(economyRates(state).net.oil).toBeCloseTo(.1 - .15 * .75);
+    expect(economyRates(state).net.oil).toBeCloseTo(.03 - .075 * .75);
     expect(applyAction(state, { type: "research", research: "better-wicks" }, state.lastSimulatedAt)).toBe(state);
     expect(decodeSave(encodeSave(state))).toEqual(state);
     state.resources.food = 0;

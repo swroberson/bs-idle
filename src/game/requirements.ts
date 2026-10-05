@@ -6,6 +6,7 @@ import { RESEARCH } from "../content/research";
 import { EXPEDITIONS } from "../content/expeditions";
 import { RESOURCES } from "../content/resources";
 import { AWAKENING } from "../content/awakening";
+import { LAMPS } from "../content/lamps";
 import type { BuildingId, ContentRequirements, Cost, EventDefinition, EventId, ExpeditionId, GameState, JobId, ResearchDefinition, ResearchId, ResourceId } from "./types";
 
 export function availableWorkers(state: GameState): number {
@@ -76,6 +77,7 @@ export function eventRequirements(state: GameState, id: EventId, choice?: string
   const response = eventChoices(id).find(item => item.id === (choice ?? (event.choices ? "" : "accept")));
   if (!response) return ["Select a valid response"];
   const requirements = costRequirements(state, response.cost);
+  if (event.population > 0 && state.lamps.lit < LAMPS.count) requirements.unshift(`Ordinary lamps ${state.lamps.lit} / ${LAMPS.count} lit`);
   if (state.resources.food <= 0) requirements.unshift("Restore Food stores first");
   if (state.population + event.population > BALANCE.populationCap) requirements.unshift("Inhabitant register is full");
   return requirements;

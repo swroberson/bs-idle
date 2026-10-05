@@ -11,11 +11,12 @@ import { startBuilding, finishConstruction } from "./construction.test-support";
 describe("bounded stores", () => {
   it("banks a few purchases after two hours instead of unlimited production", () => {
     const state = createInitialState(0);
-    state.jobs = { ...state.jobs, forager: 2, scrivener: 1, lamplighter: 1 };
+    state.jobs = { ...state.jobs, forager: 2, scrivener: 1, lamplighter: 2 };
     state.buildings.fields = 1;
-    state.buildings["oil-press"] = 1;
+    state.buildings["oil-press"] = 3;
     state.buildings["market-stall"] = 1;
     state.buildings["scrivener-house"] = 1;
+    state.resources.oil = 160;
     const result = reconcile(state, 7_200_000);
     for (const id of ["food", "oil", "coin", "knowledge", "authority"] as const) {
       expect(result.state.resources[id]).toBe(resourceCapacity(state, id));
@@ -24,7 +25,7 @@ describe("bounded stores", () => {
     expect(result.state.resources.coin).toBeLessThanOrEqual(80);
     expect(result.state.resources.knowledge).toBeLessThanOrEqual(60);
     expect(result.summary.changes.coin).toBe(result.state.resources.coin);
-    expect(result.state.lifetimeAuthority).toBeCloseTo(720);
+    expect(result.state.lifetimeAuthority).toBeCloseTo(1440);
     expect(reconcile(result.state, 7_200_000).state).toBe(result.state);
   });
 
@@ -93,7 +94,7 @@ describe("bounded stores", () => {
 
   it("resumes production after spending from full stores", () => {
     const state = createInitialState(0);
-    state.jobs = { ...state.jobs, forager: 2, lamplighter: 1 };
+    state.jobs = { ...state.jobs, forager: 2, lamplighter: 2 };
     state.resources.food = resourceCapacity(state, "food");
     state.resources.authority = resourceCapacity(state, "authority");
     state.lifetimeAuthority = state.resources.authority;
@@ -102,6 +103,7 @@ describe("bounded stores", () => {
     const spent = applyAction(state, { type: "choose-event", event: "household" }, 0);
     expect(economyRates(spent).net.food).toBeGreaterThan(0);
     expect(economyRates(spent).net.authority).toBeGreaterThan(0);
+    spent.buildings["oil-press"] = 3;
     const refilled = reconcile(spent, 7_200_000).state;
     expect(refilled.resources.food).toBe(resourceCapacity(refilled, "food"));
     expect(refilled.resources.authority).toBe(resourceCapacity(refilled, "authority"));

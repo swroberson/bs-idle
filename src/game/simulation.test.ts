@@ -39,7 +39,7 @@ describe("elapsed-time economy", () => {
     for (const id of ["food", "oil", "authority"] as const) expect(foreground.resources[id]).toBeCloseTo(away.resources[id], 7);
     expect(away.resources.food).toBe(0);
     expect(away.resources.oil).toBe(0);
-    expect(away.resources.authority).toBeCloseTo(4);
+    expect(away.resources.authority).toBeCloseTo(2.45);
   });
 
   it("uses Oil as it is pressed at zero stores, independent of tick frequency", () => {
@@ -49,7 +49,7 @@ describe("elapsed-time economy", () => {
     state.resources.oil = 0;
     const result = reconcile(state, 60_000).state;
     expect(result.resources.oil).toBe(0);
-    expect(result.resources.authority).toBeCloseTo(8);
+    expect(result.resources.authority).toBeCloseTo(4.8);
     let stepped = state;
     for (let time = 1000; time <= 60_000; time += 1000) stepped = reconcile(stepped, time).state;
     expect(stepped.resources.authority).toBeCloseTo(result.resources.authority);
@@ -70,7 +70,7 @@ describe("elapsed-time economy", () => {
   it("caps an absence and consumes the whole timestamp so reload cannot earn it twice", () => {
     const state = createInitialState(0);
     state.jobs = { ...state.jobs, forager: 2, lamplighter: 2 };
-    state.buildings["oil-press"] = 2;
+    state.buildings["oil-press"] = 3;
     const now = 12 * 60 * 60 * 1000;
     const result = reconcile(state, now);
     expect(result.summary.elapsedMs).toBe(now);

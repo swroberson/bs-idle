@@ -18,7 +18,7 @@ export function WardPanel({ state, wait, active, gather, dispatch }: {
         <p className="machine-label scene-caption">A register beneath the dark</p>
       </div>}
       {rates.starving && <p className="shortage-warning" role="status">Food exhausted // Other output halved</p>}
-      {rates.lampsLimited && <p className="shortage-warning" role="status">Oil supply limited // Lamps use available flow</p>}
+
       <ProvisionsPanel state={state} wait={wait} active={active} gather={gather} dispatch={dispatch} />
     </section>
     <WorkerPanel state={state} active={active} dispatch={dispatch} />

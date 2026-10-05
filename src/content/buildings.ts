@@ -9,9 +9,9 @@ export const BUILDINGS = {
   },
   "oil-press": {
     name: "Oil Press", description: "The screw turns easily once cleaned. No one remembers who cut its thread.",
-    effect: "Each level: +0.10 Oil/s automatically; half output during Food shortages.",
+    effect: "Each level: +0.03 Oil/s automatically; half output during Food shortages.",
     cost: { food: 25, authority: 10 }, workSeconds: 45, costGrowth: 1.7, maxLevel: 3,
-    oilPerSecond: 0.1, storagePerLevel: { oil: 40 }, requirements: { buildings: { fields: 1 }, lifetimeAuthority: 3 },
+    oilPerSecond: 0.03, storagePerLevel: { oil: 40 }, requirements: { buildings: { fields: 1 }, lifetimeAuthority: 3 },
   },
   "market-stall": {
     name: "Market Stall", description: "A counter is set beneath the arch. The first coins bear a face worn entirely smooth.",
@@ -40,7 +40,7 @@ export const BUILDINGS = {
   },
   "lamp-house": {
     name: "Lamp House", description: "Set a bench and measured vessels beside the lamp stores.",
-    effect: "Each level: +0.025 Authority/s per Lamplighter; Oil demand unchanged.",
+    effect: "Each level: +0.025 Authority/s per three tended lamps; Oil demand unchanged.",
     authorityPerLamplighter: .025, chronicle: "lamp-house-built",
     storagePerLevel: { authority: 20 },
     cost: { coin: 20, authority: 15 }, workSeconds: 45, costGrowth: 1.7, maxLevel: 3,

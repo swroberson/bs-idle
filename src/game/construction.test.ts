@@ -51,7 +51,7 @@ describe("assigned construction crews", () => {
     let started = applyAction(state, { type: "build", building: "oil-press" }, 0);
     const offline = reconcile(started, 90_000);
     expect(offline.state.buildings["oil-press"]).toBe(1);
-    expect(offline.state.resources.oil).toBeCloseTo(24.5);
+    expect(offline.state.resources.oil).toBeCloseTo(15.725);
     for (let n = 1; n <= 90; n++) started = reconcile(started, n * 1000).state;
     for (const id of Object.keys(started.resources) as (keyof typeof started.resources)[]) expect(started.resources[id]).toBeCloseTo(offline.state.resources[id], 7);
     expect(offline.state.chronicle.filter(id => id === "oil-press-built")).toHaveLength(1);
@@ -75,11 +75,11 @@ describe("assigned construction crews", () => {
 
   it("migrates version-7 progress without rebuilding completed structures or changing allocations", () => {
     const old = JSON.parse(JSON.stringify(ready()));
-    old.version = 7;
+    old.version = 7; delete old.lamps;
     delete old.activeConstruction;
     delete old.seenWorks; delete old.seenStudies;
     const migrated = decodeSave(JSON.stringify(old));
-    expect(migrated.version).toBe(9);
+    expect(migrated.version).toBe(10);
     expect(migrated.activeConstruction).toBeNull();
     expect(migrated.resources).toEqual(old.resources);
     expect(migrated.jobs).toEqual(old.jobs);
@@ -148,7 +148,7 @@ describe("assigned construction crews", () => {
     delete value.activeConstruction;
     delete value.seenWorks; delete value.seenStudies;
     expect(() => decodeSave(JSON.stringify(value))).toThrow();
-    value.version = 7;
+    value.version = 7; delete value.lamps;
     value.activeConstruction = null;
     expect(() => decodeSave(JSON.stringify(value))).toThrow();
   });

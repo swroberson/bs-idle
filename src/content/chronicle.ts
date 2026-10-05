@@ -6,6 +6,10 @@ export const CHRONICLE = {
     title: "The office of Keeper",
     text: "The register is placed before you. Five names remain beneath the heading ‘Outer Ward.’ Beside it lies a ring of keys, most of them without a known lock. Your first duty is written in a newer hand: keep the lamps burning.",
   },
+  "lamp-outage": {
+    title: "An unlit stretch",
+    text: "An ordinary lamp has gone out. Between the neighboring pools of light, a stretch of the Way is dark. The omission is entered beneath the Keeper's name.",
+  },
   "oil-press-built": {
     title: "Oil Press",
     text: "The screw turns easily once cleaned. Oil collects in the vessels beneath it. No one remembers who cut its thread.",

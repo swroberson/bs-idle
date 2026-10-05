@@ -22,13 +22,13 @@ export function buildCompleted(state: GameState, building: BuildingId): GameStat
   return finishConstruction(applyAction(state, { type: "build", building }, state.lastSimulatedAt));
 }
 
-// Reachability strategy: move one Forager to construction only when supplies are ready.
+// Reachability strategy: use idle crew first; borrow a Forager only when supplies are ready.
 export function startBuilding(state: GameState, building: BuildingId): GameState {
   if (state.activeConstruction || state.buildings[building] >= BUILDINGS[building].maxLevel ||
       prerequisiteRequirements(state, BUILDINGS[building].requirements).length ||
       costRequirements(state, buildingCost(state, building)).length || !jobUnlocked(state, "laborer")) return state;
   if (!state.jobs.laborer) {
-    if (state.jobs.forager > 1 || !availableWorkers(state)) state = applyAction(state, { type: "assign-worker", job: "forager", delta: -1 }, state.lastSimulatedAt);
+    if (!availableWorkers(state)) state = applyAction(state, { type: "assign-worker", job: "forager", delta: -1 }, state.lastSimulatedAt);
     state = applyAction(state, { type: "assign-worker", job: "laborer", delta: 1 }, state.lastSimulatedAt);
   }
   return buildingRequirements(state, building).length ? state : applyAction(state, { type: "build", building }, state.lastSimulatedAt);
@@ -36,6 +36,7 @@ export function startBuilding(state: GameState, building: BuildingId): GameState
 
 export function releaseIdleCrew(state: GameState): GameState {
   if (state.activeConstruction || !state.jobs.laborer) return state;
-  return applyAction(applyAction(state, { type: "assign-worker", job: "laborer", delta: -1 }, state.lastSimulatedAt),
-    { type: "assign-worker", job: "forager", delta: 1 }, state.lastSimulatedAt);
+  const released = applyAction(state, { type: "assign-worker", job: "laborer", delta: -1 }, state.lastSimulatedAt);
+  const foragers = state.research.includes("survey-foundations") ? 2 : 3;
+  return released.jobs.forager < foragers ? applyAction(released, { type: "assign-worker", job: "forager", delta: 1 }, state.lastSimulatedAt) : released;
 }

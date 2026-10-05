@@ -1,6 +1,6 @@
 # Buried Sun: Narrative Bible
 
-**Edition:** 1.8 — October 4, 2026
+**Edition:** 1.9 — October 5, 2026
 
 **Audience:** authors and agents; contains end-of-story spoilers  
 **Status:** approved story foundations, provisional chapter outline, and an audit of existing content
@@ -62,7 +62,7 @@ story's destination is approved.
 `awaken-junction` action, recorded as `junction-awakened`. Current and Oil-free
 restored lamp tending follow activation, while management continues. There are
 currently ten buildings, seventeen research entries, five queued-choice events,
-six expedition destinations, and thirty-five Chronicle entries. The remaining
+six expedition destinations, and thirty-six Chronicle entries. The remaining
 Phase 1 content-count targets, playtesting, and real-device checks are separate
 from this implemented story endpoint.
 
@@ -406,7 +406,7 @@ interpretations remain open. Provisional numerical balance is not canon.
 | Engine installation / `buried-engine` → `engine-works-built` | Open chamber, then install an inspection platform and supports. | Buried Engine is a local ledger heading. The machinery already exists; building purchases working access, not a newly manufactured engine. |
 | Study / `study-engine` → `engine-study` | Chamber open + inspection platform; compare a loose joining piece and test a movable stone. | Local fit and repeatable movement constraint. Orso compares inner lamp surfaces without secret expertise. |
 | Restore / `restore-conduit` → `conduit-restored` | Completed study + engine installation; seat and support the joining piece. | Repaired local connection. Ordinary oil fittings remain in place until deliberate awakening; no early Current. |
-| Awaken / `awaken-junction` → `junction-awakened` | Completed restoration + study + engine installation; explicit action. | Remove marked fixtures' oil fittings, then draw the tested stone to its stop. Local response and white lamps without flame; Current appears and Lamplighter Oil demand becomes zero. |
+| Awaken / `awaken-junction` → `junction-awakened` | Completed restoration + study + engine installation; explicit action. | Remove marked fixtures' oil fittings, then draw the tested stone to its stop. Local response and white lamps without flame; Current appears and monitored civic fixture Oil demand becomes zero. |
 | Retain the ending | Completion and ending record committed once; three presentation passages acknowledged independently. | Continued management; rereading and reload never repeat effects. No later chapter, vessel, voyage, or stellar diagnosis. |
 
 **Accepted lamp relationship (Q08):** marked civic fixtures along the
@@ -434,6 +434,35 @@ remain optional. None of their records is required by the main sequence. The
 Buried Engine is not identified with the titular Buried Sun or propulsion.
 The Processional Way supplies only a local inhabited passage; no vessel
 footprint or comprehensive Ward geography is approved by this work.
+
+### Ordinary lamp responsibility — approved October 5, 2026
+
+The user approved the proposed Oil-economy revision and requested implementation
+following phone playtesting. The monitored duty now covers **six ordinary civic
+lamps**, a local maintained subset rather than the total lamps of the Ward or
+ancient network. The anomalous third lamp remains outside this ordinary fuel
+model; its observations, absence of fittings, prior light and Orso's caution are
+unchanged. Do not read the telemetry denominator as a comprehensive census,
+network boundary, numerology, or explanation of the third lamp.
+
+Burning fixtures consume ordinary Oil independently of staffing. Lamplighters
+tend a finite portion of this lighting, which supports civic standing. Shortages
+or inadequate tending gradually extinguish lamps; sustained incomplete lighting
+reduces stored standing and prevents new household settlement until lighting is
+restored. These are reversible civic consequences, not supernatural danger,
+population loss, structural damage, or new ancient-system purposes. Rates,
+capacities and delays are provisional balance in `src/content/lamps.ts`.
+
+The first outage adds `lamp-outage` / **An unlit stretch**, an incidental record
+of a dark stretch of the existing Way and the Keeper's recorded omission. It may
+occur before or after other opening records and is not a narrative prerequisite.
+Repeated outages add no repeat discovery. Restoration automatically relights
+ordinary fixtures; deliberate awakening makes all six monitored fixtures burn
+without Oil and ends ordinary outage penalties. Tending still earns Authority.
+
+No change to the required clue chain, household-before-complaint order, third
+lamp handling, marked civic fixture relationship, Current reveal boundary, or
+larger geography is introduced. Handheld/workshop lamps remain ordinary.
 
 ## 5. Continuity reference
 
@@ -669,3 +698,5 @@ narrative automatically.
 | 2026-10-04 | Edition 1.6: user approved the proposed Smithy, Sealed Chamber and Awakening art batch, then requested no people in the pictures, only workstations and discoveries. | Added three illustrations bound to existing accomplished Chronicle records; removed the Oil Press worker and cistern hand. All seven images omit figures and body parts. The finale uses neutral white light; its art follows the existing staged passages. Existing captions, local lamp relationship, clue chronology, mysteries, mechanical rewards and saves are preserved. Unoccupied compositions imply no disappearance or change to the settlement's population. |
 | 2026-10-04 | Edition 1.7: user requested a Sealed Chamber picture revision after comparing its odd closure with the discovery text. | Revised the fitted slab's profile and surround, simplified ordinary tackle to a rope sling, quieted the ancient black material and reduced the bench-like interior shape. No exposed pivot mechanism, people, new explanation or later platform. Caption, access sequence, clues, mysteries, reveal limits and gameplay unchanged. Exact edit prompts in docs/ART_CHAMBER_REVISION.md. |
 | 2026-10-04 | Edition 1.8: user approved trying assigned construction crews and introducing Laborers alongside the initial construction mechanic. | Replaced the instantaneous worker discount with one adjustable, pausable construction project, early Laborer availability, crew-based conduit restoration and version-8 persistence. Existing supplies, discoveries and illustrations are committed at their appropriate start/completion boundaries; awakening remains deliberate. Existing prose, household chronology, clues and reveal limits are preserved. Apprenticed Hands changes work speed; Stoneworking retains its Coin saving. No major lore or new interpretation. |
+
+| 2026-10-05 | Edition 1.9: user approved the six-lamp responsibility proposal and requested implementation after observing early Oil surplus on a phone. | Implemented 70% lower press output, fuel demand per burning fixture, finite tending coverage, gradual outages/relighting, recoverable stored-standing loss and lit-lamp household gates; version-10 saves, persistent readouts and return reporting. Adds the one-time incidental `lamp-outage` record. Six monitored ordinary fixtures are a local subset, not a total network census; the anomalous third lamp stays outside the fuel model. Awakening restores monitored light without Oil and ends darkness penalties. No clue interpretation, consequential history, larger geography, reveal boundary, or ending changed. |

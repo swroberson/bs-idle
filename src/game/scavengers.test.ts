@@ -57,14 +57,14 @@ describe("Scavenger dispatch", () => {
 
   it("migrates a version-6 archaeological party and returns it once without assigning Scavengers", () => {
     const old = JSON.parse(JSON.stringify(cistern()));
-    old.version = 6;
+    old.version = 6; delete old.lamps;
     delete old.jobs.scavenger;
     delete old.eventChoices;
     delete old.activeConstruction;
     delete old.seenWorks; delete old.seenStudies;
     old.activeExpedition = { destination: "old-cistern", workers: 2, startedAt: 0, returnsAt: 180000 };
     const state = decodeSave(JSON.stringify(old));
-    expect(state.version).toBe(9);
+    expect(state.version).toBe(10);
     expect(state.jobs.scavenger).toBe(0);
     expect(state.resources).toEqual(old.resources);
     expect(state.activeExpedition).toEqual(old.activeExpedition);

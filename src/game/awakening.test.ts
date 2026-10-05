@@ -15,6 +15,7 @@ function restoredWard(): GameState {
   state.resources = { ...state.resources, food: 20000, oil: 20000, authority: 1000, coin: 1000, knowledge: 1000, relics: 20 };
   state.lifetimeAuthority = 1000;
   state.jobs.laborer = 1;
+  state.jobs.lamplighter = 2;
   const build = (building: BuildingId) => { state = buildCompleted(state, building); };
   const study = (research: ResearchId) => { state = applyAction(state, { type: "research", research }, state.lastSimulatedAt); if (state.activeConstruction) state = finishConstruction(state); };
   const travel = (destination: ExpeditionId, duration: number) => {
@@ -101,6 +102,21 @@ describe("deliberate local awakening", () => {
     expect(economyRates(awake).net.current).toBeCloseTo(.01);
   });
 
+  it("restores extinguished fixtures and ends darkness penalties permanently at awakening", () => {
+    const ready = restoredWard();
+    ready.jobs.lamplighter = 0;
+    const dark = reconcile(ready, ready.lastSimulatedAt + 180_000).state;
+    expect(dark.lamps.lit).toBe(0);
+    const awake = applyAction(dark, { type: "awaken-junction" }, dark.lastSimulatedAt);
+    awake.resources.oil = 0;
+    expect(awake.lamps.lit).toBe(6);
+    const returnReport = reconcile(awake, awake.lastSimulatedAt + 43_200_000);
+    expect(returnReport.state.lamps.lit).toBe(6);
+    expect(returnReport.summary.lamps.extinguished).toBe(0);
+    expect(returnReport.summary.lamps.authorityLost).toBe(0);
+    expect(decodeSave(encodeSave(returnReport.state))).toEqual(returnReport.state);
+  });
+
   it("persists each passage independently of Chronicle reading and never repeats rewards", () => {
     let state = restoredWard();
     expect(applyAction(state, { type: "advance-awakening", step: 0 }, state.lastSimulatedAt)).toBe(state);
@@ -153,7 +169,7 @@ describe("deliberate local awakening", () => {
     old.research = ["examine-old-lamps", "ledger-keeping", "catalog-relics", "survey-foundations"];
     old.completedExpeditions = ["old-cistern"];
     old.expeditionLog = old.expeditionLog.filter((entry: { destination: string }) => entry.destination === "old-cistern");
-    old.version = 4; delete old.resources.current; delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices;
+    old.version = 4; delete old.lamps; delete old.resources.current; delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices;
     delete old.activeConstruction;
     delete old.seenWorks; delete old.seenStudies;
     for (const id of ["lamp-house", "smithy", "subterranean-works", "buried-engine"]) delete old.buildings[id];
@@ -161,7 +177,7 @@ describe("deliberate local awakening", () => {
     old.dismissedIllustrations = ["keeper-office"];
     old.activeExpedition = { destination: "abandoned-farmstead", workers: 2, startedAt: old.lastSimulatedAt, returnsAt: old.lastSimulatedAt + 240000 };
     state = decodeSave(JSON.stringify(old));
-    expect(state.version).toBe(9);
+    expect(state.version).toBe(10);
     expect(state.resources).toEqual({ ...old.resources, current: 0 });
     expect(state.activeExpedition).toEqual(old.activeExpedition);
     expect(state.lastSimulatedAt).toBe(old.lastSimulatedAt);
@@ -177,7 +193,7 @@ describe("deliberate local awakening", () => {
 
   it("supports optional civic modifiers without requiring their findings for the ending", () => {
     let state = restoredWard();
-    state.jobs.forager = 3; state.jobs.lamplighter = 1;
+    state.jobs.forager = 3; state.jobs.lamplighter = 2;
     state.resources.food = 30;
     const base = economyRates(state).net;
     for (const building of ["lamp-house", "smithy"] as const) state = buildCompleted(state, building);
@@ -185,8 +201,8 @@ describe("deliberate local awakening", () => {
     state.resources.food = 30; state.resources.oil = 20; state.resources.authority = 0;
     const rates = economyRates(state).net;
     expect(rates.food + state.population * .025).toBeCloseTo((base.food + state.population * .025) * 1.25 * 1.2);
-    expect(rates.oil).toBeCloseTo(.1 * 1.25 - .075 * .75);
-    expect(rates.authority).toBeCloseTo(.125);
+    expect(rates.oil).toBeCloseTo(.03 * 1.25 - .075 * .75);
+    expect(rates.authority).toBeCloseTo(.25);
     expect(decodeSave(encodeSave(state))).toEqual(state);
   });
 

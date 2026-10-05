@@ -18,7 +18,8 @@ export type IllustrationId = keyof typeof ILLUSTRATIONS;
 export type Cost = Partial<Record<ResourceId, number>>;
 
 export interface GameState {
-  version: 9;
+  version: 10;
+  lamps: LampState;
   resources: Record<ResourceId, number>;
   population: number;
   jobs: Record<JobId, number>;
@@ -59,6 +60,7 @@ export type GameAction =
   | { type: "start-expedition"; destination: ExpeditionId; workers: number };
 
 export interface ReturnSummary {
+  lamps: { before: number; after: number; extinguished: number; relit: number; authorityLost: number; darknessMs: number };
   elapsedMs: number;
   productionMs: number;
   changes: Record<ResourceId, number>;
@@ -66,6 +68,13 @@ export interface ReturnSummary {
   completedExpeditions: ExpeditionId[];
   completedConstruction: ConstructionProject[];
   fullStores: ResourceId[];
+}
+
+export interface LampState {
+  lit: number;
+  transition: "out" | "relight" | null;
+  transitionSeconds: number;
+  darknessSeconds: number;
 }
 
 export type ConstructionProject =

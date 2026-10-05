@@ -7,12 +7,13 @@ import { EVENTS } from "../content/events";
 import { EXPEDITIONS } from "../content/expeditions";
 import { RESEARCH } from "../content/research";
 import { availableWorkers, buildingCost, buildingRequirements, eventChoices, eventRequirements, payCost, researchRequirements, jobUnlocked, expeditionCost, expeditionRequirements } from "./requirements";
-import { reconcile } from "./simulation";
+import { reconcile, economyRates } from "./simulation";
 import { queueEvents } from "./progression";
 import { ILLUSTRATIONS } from "../content/illustrations";
 import { AWAKENING } from "../content/awakening";
 import { awakeningRequirements } from "./requirements";
 import { availableStudies, availableWorks } from "./catalogs";
+import { initialLamps, prepareLamps } from "./lamps";
 
 export function gatheringWaitMs(state: GameState, now: number): number {
   return state.lastGatheredAt === null ? 0 : Math.max(0, state.lastGatheredAt + BALANCE.gatheringCooldownMs - now);
@@ -102,9 +103,9 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
       break;
     case "awaken-junction":
       if (awakeningRequirements(next).length) return next;
-      next = { ...next, awakenedAt: now, finaleStep: 0, chronicle: [...next.chronicle, "junction-awakened"] };
+      next = { ...next, awakenedAt: now, lamps: initialLamps(), finaleStep: 0, chronicle: [...next.chronicle, "junction-awakened"] };
       break;
     default: return state;
   }
-  return queueEvents(next);
+  return queueEvents(prepareLamps(next, economyRates(next).lamps));
 }

@@ -14,6 +14,7 @@ function civicWard() {
   state.resources = { ...state.resources, food: 1000, oil: 1000, coin: 1000, knowledge: 1000, authority: 1000 };
   state.lifetimeAuthority = 1000;
   state.jobs.laborer = 1;
+  state.jobs.lamplighter = 2;
   for (const building of ["fields", "oil-press"] as const) state = buildCompleted(state, building);
   for (const event of ["household", "lamp-complaint"] as const) state = applyAction(state, { type: "choose-event", event }, state.lastSimulatedAt);
   for (const research of ["examine-old-lamps", "ledger-keeping"] as const) state = applyAction(state, { type: "research", research }, state.lastSimulatedAt);
@@ -133,12 +134,12 @@ describe("deliberate civic responses", () => {
     const missing = { ...pending, research: pending.research.filter(id => id !== "provision-stores"), chronicle: pending.chronicle.filter(id => id !== "provision-stores") };
     expect(() => decodeSave(JSON.stringify(missing))).toThrow();
     const old = JSON.parse(JSON.stringify(pending));
-    old.version = 6; delete old.jobs.scavenger; delete old.eventChoices;
+    old.version = 6; delete old.lamps; delete old.jobs.scavenger; delete old.eventChoices;
     delete old.activeConstruction;
     delete old.seenWorks; delete old.seenStudies;
     expect(() => decodeSave(JSON.stringify(old))).toThrow();
     const valid = JSON.parse(JSON.stringify(civicWard()));
-    valid.version = 6; delete valid.jobs.scavenger; delete valid.eventChoices;
+    valid.version = 6; delete valid.lamps; delete valid.jobs.scavenger; delete valid.eventChoices;
     delete valid.activeConstruction;
     delete valid.seenWorks; delete valid.seenStudies;
     expect(decodeSave(JSON.stringify(valid)).eventChoices).toEqual({});

@@ -98,7 +98,7 @@ Population is a count of inhabitants, not a consumable currency. Workers assigne
 | Job | Function |
 |---|---|
 | Forager | Produces Food; later benefits from Fields |
-| Lamplighter | Consumes Oil and produces Authority |
+| Lamplighter | Tends up to three ordinary civic lamps; maintained lighting produces Authority |
 | Laborer | Performs work on the active construction or restoration project |
 | Scavenger | Becomes eligible for expeditions that recover Relics |
 | Scrivener | Produces Knowledge once scholarship is unlocked |
@@ -112,12 +112,31 @@ New population arrives through one-time narrative household events, gated by suf
 ### Shortages and recovery
 
 - Never allow resources to fall below zero.
-- Oil shortages stop ordinary lamp output and explain why Authority production has paused.
+- Six ordinary civic lamps under the Keeper's care consume Oil independently of
+  the tending crew. Each burns 0.0125 Oil/s; Better Wicks reduces this by 25%.
+  The anomalous third lamp is recorded separately and is never assigned Oil demand.
+- Each Lamplighter tends up to three lamps. Authority reflects maintained lighting,
+  capped at six lamps; extra workers do not increase output. Oil shortages limit
+  Authority to the available fuel flow while lamps gradually go out.
+- Inadequate Oil or tending extinguishes one lamp every 30 seconds. Automatic
+  relighting takes 10 seconds per lamp, with a 1-Oil reserve or sustainable flow
+  for the additional lamp. Burning lamps keep drawing Oil during either interval.
+- After two minutes of incomplete lighting, each unlit lamp costs 0.005 stored
+  Authority/s. Earnings and this loss produce the displayed net rate. No debt,
+  lost lifetime milestones, deaths, departing workers, or damaged buildings.
+  Full lighting clears the darkness delay. Household eligibility and admission
+  require all six lamps lit; already pending reports remain pending.
+- Oil Press output is 0.03 Oil/s per level, a 70% reduction from the prior balance.
+  Press production halves during Food shortages; lamp fuel demand does not.
+  Improved Presses still increases output by 25%.
 - Food shortages pause household arrivals and reduce productive output; do not kill inhabitants or create an unrecoverable spiral in Phase 1.
 - Keep food gathering available during shortages so recovery is always possible.
 - Display net rates after consumption, not just gross output.
 
-These rules must apply equally during foreground and offline simulation.
+These rules must apply equally during foreground and offline simulation. Lamp
+conditions, relighting and standing loss share the eight-hour economy cap.
+The first outage creates one Chronicle entry; return reports record outages,
+relighting, time in incomplete lighting and actual Authority lost.
 
 ## 5. Buildings
 
@@ -227,7 +246,9 @@ At this point:
 
 - Reveal Current in the resource display.
 - Enable a modest Current output from the Buried Engine.
-- Remove Oil consumption from restored lamp tending while preserving Authority output.
+- Restore all six monitored fixtures to light and remove their Oil consumption
+  and darkness penalties. They remain lit without a tending crew; Lamplighters
+  still earn Authority by tending them, subject to Food-shortage penalties.
 - Record Phase 1 completion and preserve the event for rereading.
 - Allow continued management, with a clear indication that the available story has ended.
 

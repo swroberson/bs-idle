@@ -80,10 +80,10 @@ describe("catalog attention", () => {
   it("migrates version 8 without retroactive alerts or changing progress", () => {
     const state = openedWard();
     const legacy = JSON.parse(JSON.stringify(state));
-    legacy.version = 8;
+    legacy.version = 8; delete legacy.lamps;
     delete legacy.seenWorks; delete legacy.seenStudies;
     const migrated = decodeSave(JSON.stringify(legacy));
-    expect(migrated.version).toBe(9);
+    expect(migrated.version).toBe(10);
     expect(migrated.seenWorks).toEqual(availableWorks(state));
     expect(migrated.seenStudies).toEqual(availableStudies(state));
     expect(migrated.resources).toEqual(state.resources);
@@ -95,7 +95,7 @@ describe("catalog attention", () => {
 
   it("keeps entries unlocked during offline reconciliation new after migration", () => {
     const legacy = JSON.parse(JSON.stringify(createInitialState(1000)));
-    legacy.version = 8;
+    legacy.version = 8; delete legacy.lamps;
     delete legacy.seenWorks; delete legacy.seenStudies;
     legacy.lifetimeAuthority = 2.9;
     legacy.jobs.lamplighter = 1;

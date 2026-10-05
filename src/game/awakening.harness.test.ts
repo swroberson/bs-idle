@@ -3,11 +3,14 @@ import { expect, it } from "vitest";
 import { createInitialState } from "./state";
 import { applyAction } from "./actions";
 import { reconcile } from "./simulation";
-import { availableWorkers, eventRequirements, researchRequirements, expeditionRequirements } from "./requirements";
+import { availableWorkers, eventRequirements, researchRequirements, expeditionRequirements, costRequirements } from "./requirements";
 import { releaseIdleCrew, startBuilding } from "./construction.test-support";
 import { decodeSave, encodeSave } from "./save";
 import type { BuildingId, ResearchId, ExpeditionId } from "./types";
 import { writeFileSync } from "node:fs";
+import { RESEARCH } from "../content/research";
+import { LAMPS } from "../content/lamps";
+import { BUILDINGS } from "../content/buildings";
 import { resourceCapacity } from "./storage";
 
 it.each([[1, false, false, "none"], [3, false, false, "none"], [3, true, false, "none"], [3, true, true, "none"],
@@ -41,6 +44,10 @@ it.each([[1, false, false, "none"], [3, false, false, "none"], [3, true, false, 
     if (process.env.BS_CAPTURE_SAVES && event === "repair-household") writeFileSync("/tmp/buried-sun-household.json", encodeSave(state));
     const choice = event === "shared-table" ? "full-meal" : event === "spare-oil" ? "coin" : undefined;
     if (event && !eventRequirements(state, event, choice).length) state = applyAction(state, { type: "choose-event", event, choice }, now);
+    // Keep lighting sustainable, including after an early return to an underpowered press.
+    if (state.buildings["oil-press"] > 0 && state.buildings["oil-press"] < 3 && state.buildings["oil-press"] * BUILDINGS["oil-press"].oilPerSecond < LAMPS.count * LAMPS.oilPerLampSecond) {
+      state = startBuilding(state, "oil-press");
+    }
     for (const building of ["fields", "oil-press", "market-stall", "scrivener-house", "ruined-cistern", "antiquities-house", "subterranean-works", "buried-engine"] as BuildingId[]) {
       if (!state.buildings[building]) {
         state = startBuilding(state, building);
@@ -57,8 +64,8 @@ it.each([[1, false, false, "none"], [3, false, false, "none"], [3, true, false, 
       }
     }
     if (state.research.includes("survey-foundations")) {
-      if (state.jobs.lamplighter === 2) {
-        state = applyAction(state, { type: "assign-worker", job: "lamplighter", delta: -1 }, now);
+      if (state.jobs.scrivener === 1) {
+        if (state.jobs.forager > 2) state = applyAction(state, { type: "assign-worker", job: "forager", delta: -1 }, now);
         state = applyAction(state, { type: "assign-worker", job: "scrivener", delta: 1 }, now);
       }
       if (state.buildings["market-stall"] < marketLevel) {
@@ -72,8 +79,9 @@ it.each([[1, false, false, "none"], [3, false, false, "none"], [3, true, false, 
         }
       }
     }
-    if (state.research.includes("study-engine") && !state.research.includes("restore-conduit") && !state.jobs.laborer && !state.activeConstruction) {
-      state = applyAction(applyAction(state, { type: "assign-worker", job: "forager", delta: -1 }, now), { type: "assign-worker", job: "laborer", delta: 1 }, now);
+    if (state.research.includes("study-engine") && !state.research.includes("restore-conduit") && !state.jobs.laborer && !state.activeConstruction && !costRequirements(state, RESEARCH["restore-conduit"].cost).length) {
+      if (!availableWorkers(state)) state = applyAction(state, { type: "assign-worker", job: "forager", delta: -1 }, now);
+      state = applyAction(state, { type: "assign-worker", job: "laborer", delta: 1 }, now);
     }
     for (const research of ["examine-old-lamps", "ledger-keeping", "catalog-relics", "survey-foundations", "trace-conduits", "open-chamber", "study-engine", "restore-conduit"] as ResearchId[]) {
       if (!state.research.includes(research) && !researchRequirements(state, research).length) {

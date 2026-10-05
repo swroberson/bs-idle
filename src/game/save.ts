@@ -14,6 +14,8 @@ import { pendingIllustrations } from "./illustrations";
 import { AWAKENING, WARD_RECORDS } from "../content/awakening";
 import { constructionWork } from "./construction";
 import { knownStudies, knownWorks } from "./catalogs";
+import { initialLamps } from "./lamps";
+import { LAMPS } from "../content/lamps";
 
 const OLD_RESOURCES = ["food", "oil", "authority", "coin", "knowledge", "relics"];
 const OLD_BUILDINGS = ["fields", "oil-press", "market-stall", "scrivener-house", "ruined-cistern", "antiquities-house"];
@@ -33,7 +35,7 @@ function oldIds(value: unknown, allowed: readonly string[]): boolean {
 
 function migrateIllustrations(state: GameState): GameState {
   const backfill = state.buildings["oil-press"] > 0 && !state.chronicle.includes("oil-press-built");
-  const next: GameState = { ...state, version: 9, dismissedIllustrations: [],
+  const next: GameState = { ...state, version: 10, dismissedIllustrations: [],
     chronicle: backfill ? [...state.chronicle, "oil-press-built"] : state.chronicle,
     readChronicle: backfill ? [...state.readChronicle, "oil-press-built"] : state.readChronicle };
   return { ...next, dismissedIllustrations: pendingIllustrations(next) };
@@ -96,7 +98,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   try { value = JSON.parse(text); }
   catch { throw new Error("This is not valid JSON. Choose a Buried Sun save or paste its complete text."); }
   if (!record(value)) throw new Error("The save must contain a game object.");
-  if (![1, 2, 3, 4, 5, 6, 7, 8, 9].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–9.");
+  if (![1, 2, 3, 4, 5, 6, 7, 8, 9, 10].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–10.");
   const originalVersion = value.version as number;
   const legacyIllustrations = originalVersion < 4;
   const chronicle = value.chronicle;
@@ -120,6 +122,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   if (originalVersion >= 7) expeditionKeys.push("eventChoices");
   if (originalVersion >= 8) expeditionKeys.push("activeConstruction");
   if (originalVersion >= 9) expeditionKeys.push("seenWorks", "seenStudies");
+  if (originalVersion >= 10) expeditionKeys.push("lamps");
   if (Object.hasOwn(value, "readChronicle")) baseKeys.push("readChronicle");
   if (hasWorkers) baseKeys.push("workers");
   const legacy = value.version === 1 || value.version === 2;
@@ -135,6 +138,25 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   if (originalVersion < 5 && (!ids(value.chronicle, OLD_CHRONICLE) || !ids(readChronicle, OLD_CHRONICLE))) {
     throw new Error("Invalid legacy save: unsupported discovery records.");
   }
+  if (originalVersion < 10 && value.chronicle.includes("lamp-outage")) throw new Error("Invalid legacy save: unsupported lamp record.");
+  if (originalVersion >= 10) {
+    const lamps = value.lamps;
+    if (!record(lamps) || !exactKeys(lamps, ["lit", "transition", "transitionSeconds", "darknessSeconds"]) ||
+        !timestamp(lamps.lit) || lamps.lit > LAMPS.count ||
+        ![null, "out", "relight"].includes(lamps.transition as string | null) ||
+        !finiteNonnegative(lamps.transitionSeconds) || lamps.transitionSeconds >= (lamps.transition === "out" ? LAMPS.outageSeconds : LAMPS.relightSeconds) ||
+        (lamps.transition === null && lamps.transitionSeconds !== 0) ||
+        (lamps.transition === "out" && lamps.lit === 0) || (lamps.transition === "relight" && lamps.lit === LAMPS.count) ||
+        !finiteNonnegative(lamps.darknessSeconds) || lamps.darknessSeconds > LAMPS.darknessGraceSeconds ||
+        (lamps.lit === LAMPS.count && lamps.darknessSeconds !== 0) ||
+        (lamps.lit < LAMPS.count && !value.chronicle.includes("lamp-outage")) ||
+        (value.awakenedAt !== null && (lamps.lit !== LAMPS.count || lamps.transition !== null))) {
+      throw new Error("Invalid save: lamp counts, timers or outage record disagree.");
+    }
+  } else {
+    value = { ...value, lamps: initialLamps() };
+  }
+  if (!record(value) || !record(value.resources) || !ids(value.chronicle, CHRONICLE)) throw new Error("Invalid migrated save.");
   if (originalVersion < 6 && (!ids(value.chronicle, PRE_LABOR_CHRONICLE) || !ids(readChronicle, PRE_LABOR_CHRONICLE) ||
       (originalVersion > 1 && (!oldIds(value.triggeredEvents, ["household", "lamp-complaint"]) ||
         !oldIds(value.pendingEvents, ["household", "lamp-complaint"]) || !oldIds(value.research, PRE_CIVIC_RESEARCH.filter(id => id !== "stoneworking")))))) {
@@ -275,7 +297,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
     throw new Error("Invalid save data: catalog acknowledgements are malformed or unearned.");
   }
   // Validation above covers every field. Return a fresh JSON object, not user references.
-  return { ...result, version: 9, seenWorks: originalVersion < 9 ? works : result.seenWorks, seenStudies: originalVersion < 9 ? studies : result.seenStudies };
+  return { ...result, version: 10, seenWorks: originalVersion < 9 ? works : result.seenWorks, seenStudies: originalVersion < 9 ? studies : result.seenStudies };
 }
 
 export function encodeSave(state: GameState): string {

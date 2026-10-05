@@ -14,7 +14,7 @@ describe("save validation", () => {
   it("migrates a scaffold save without charging for time before the economy existed", () => {
     const old = { version: 1, resources: { food: 30, oil: 20, authority: 0 }, population: 5, chronicle: ["appointment"], lastSimulatedAt: 1000, lastGatheredAt: null };
     const migrated = decodeSave(JSON.stringify(old), 500_000);
-    expect(migrated.version).toBe(9);
+    expect(migrated.version).toBe(10);
     expect(migrated.lastSimulatedAt).toBe(500_000);
     expect(migrated.jobs).toEqual({ forager: 0, lamplighter: 0, scrivener: 0, laborer: 0, scavenger: 0 });
     expect(migrated.resources).toEqual({ ...createInitialState(0).resources, ...old.resources });

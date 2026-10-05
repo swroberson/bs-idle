@@ -40,6 +40,17 @@ button, a, input, textarea { outline-offset: -3px; }
 .status-light { width: .375rem; height: .375rem; background: var(--color-muted); }
 .status-light.is-active { background: #909c78; animation: register-pulse 4s ease-in-out infinite; }
 .terminal-instruments { background: #171b16; }
+.lamp-strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .25rem .75rem; width: 100%; min-height: 2.75rem; padding: .375rem .75rem; border-bottom: 1px solid var(--color-line); text-align: left; }
+.lamp-strip strong { margin-left: .5rem; color: var(--color-ink); font-weight: 400; white-space: nowrap; }
+.lamp-strip:hover { background: var(--color-panel); }
+.lamp-marks { display: flex; gap: .25rem; }
+.lamp-mark { width: .625rem; height: 1rem; color: #59614f; }
+.lamp-mark.is-lit { color: var(--color-ink); }
+.lamp-strip-warning .lamp-condition { color: var(--color-warning); }
+.lamp-strip-restored .lamp-mark.is-lit { color: var(--color-lamp); }
+.lamp-details-readout { margin-block: 1rem; }
+.lamp-details-readout > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem .75rem; padding-block: .375rem; border-bottom: 1px solid var(--color-line); }
+@media (max-width: 359px) { .lamp-strip { gap: .25rem .5rem; padding-inline: .375rem; } .lamp-marks { gap: .125rem; } .lamp-strip .machine-label { font-size: .5625rem; } }
 .resource-readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, max(6rem, 33.333%)), 1fr)); border-bottom: 1px solid var(--color-line); }
 .resource-cell { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: .125rem .375rem; min-width: 0; padding: .5rem .75rem; border-right: 1px solid var(--color-line); text-align: left; }
 .resource-cell:last-child { border-right: 0; }

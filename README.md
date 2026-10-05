@@ -48,15 +48,15 @@ The application needs no API, server actions, database, authentication or server
 
 Implemented: Forager/Lamplighter assignments, elapsed-time Food consumption and Oil/Authority production, Fields and Oil Press construction, a one-time household arrival, the lamplighter’s report, and a deliberate lamp examination. Works and Studies appear as they unlock. Costs, unmet requirements, net rates, and completed discoveries are visible in the terminal interface. New inhabitants arrive idle.
 
-Foragers retain full output during Food shortages; other productive output falls to 50%. At zero Oil, lamp output follows the available Oil Press flow. Manual provisions gathering and emergency rendering (5 Food → 2 Oil) share a 30-second recovery interval, so poor allocations or spending cannot permanently strand the opening without fuel.
+Foragers retain full output during Food shortages; other productive output falls to 50%. Burning civic lamps consume Oil independently of staffing, with fuel demand unchanged during Food shortages. At zero Oil, Authority output follows available press flow while lamps gradually go out. Manual provisions gathering and emergency rendering (5 Food → 2 Oil) share a 30-second recovery interval, so poor allocations or spending cannot permanently strand the opening without fuel.
 
-The pure engine splits intervals at depletion and event-eligibility boundaries and uses the same rules in foreground and away play. Hidden tabs stop production callbacks; launch/resume reconciles elapsed time, caps a single absence at eight hours, consumes the whole timestamp, and reports net changes. Eligible narrative reports await the player. Saves now use version 9, including Works/Studies viewing acknowledgements, a nullable active construction project, Scavenger/Laborer assignments, selected civic responses, the awakening and presentation acknowledgement. Versions 1–8 migrate; existing workers, stores, timers and acknowledgements are preserved, with new roles unassigned and empty civic-response records. Existing version-1 records migrate without charging Food for time before the economy existed. Version-2 opening records preserve their economy timestamp and migrate new stores, buildings, jobs, and expedition records with empty defaults.
+The pure engine splits intervals at depletion and event-eligibility boundaries and uses the same rules in foreground and away play. Hidden tabs stop production callbacks; launch/resume reconciles elapsed time, caps a single absence at eight hours, consumes the whole timestamp, and reports net changes. Eligible narrative reports await the player. Saves now use version 10, including persisted lamp conditions, Works/Studies viewing acknowledgements, a nullable active construction project, Scavenger/Laborer assignments, selected civic responses, the awakening and presentation acknowledgement. Versions 1–9 migrate; existing workers, stores, timers and acknowledgements are preserved, with new roles unassigned and empty civic-response records. Existing version-1 records migrate without charging Food for time before the economy existed. Version-2 opening records preserve their economy timestamp and migrate new stores, buildings, jobs, and expedition records with empty defaults.
 
 Scholarship and expeditions extend play through **Survey the Foundations**. Ledger Keeping unlocks automatic Coin production at the Market Stall and Knowledge production by assigned Scriveners. The Ruined Cistern opens two destinations: Old Cistern (three minutes, Relics) and Abandoned Farmstead (four minutes, Food/Coin). Send 1–3 assigned Scavengers to the cistern; supply trips use idle inhabitants. Each initially costs 10 Food. Party size scales ordinary rewards. One party may be away at a time; all inhabitants continue consuming Food. Workers return idle and rewards arrive automatically in foreground and away play, with a guaranteed first finding recorded once.
 
 Build the House of Antiquities after the first cistern return, Catalog the Relics, and Survey the Foundations. Crop Rotation (+25% Food output) and Better Wicks (−25% Oil consumption) offer optional improvements. Modifiers multiply after base worker/building output is added. Completed investigations remain readable; the expedition log retains the latest 20 returns while discoveries remain permanent. Resource instruments and destinations appear as their systems unlock.
 
-The approved continuation now reaches **Awaken the Junction**: an aqueduct return supplies measurements for tracing; Subterranean Works and a chapel expedition permit chamber opening; an inspection platform supports engine study; and deliberate repair precedes activation. The catalog now contains ten buildings, seventeen studies, six destinations, five queued-choice events, and thirty-five Chronicle records. Lamp House, Smithy, tool/press improvements, Gatehouse salvage, and Barrow Field are optional. Ordinary buildings stop at three levels; story installations are unique.
+The approved continuation now reaches **Awaken the Junction**: an aqueduct return supplies measurements for tracing; Subterranean Works and a chapel expedition permit chamber opening; an inspection platform supports engine study; and deliberate repair precedes activation. The catalog now contains ten buildings, seventeen studies, six destinations, five queued-choice events, and thirty-six Chronicle records. Lamp House, Smithy, tool/press improvements, Gatehouse salvage, and Barrow Field are optional. Ordinary buildings stop at three levels; story installations are unique.
 
 Laborers become assignable alongside Works at 3 lifetime Authority. Construction requires one assigned Laborer to start; one project may be active at a time. Supplies are paid upfront, and the installation takes effect only after its crew finishes. Each Laborer performs 1 work/s, halved during Food shortages. Removing the crew pauses work without losing progress; adding workers accelerates it. Laborers remain assigned after completion and do no productive work between projects. Fields require 30 work initially, other ordinary installations 45–60, and late access works 90. Expansion work grows by 25% per completed level, rounded up. The Works readout shows crew, progress, rate and remaining time, with staffing controls available directly there.
 
@@ -247,6 +247,64 @@ and the production browser console is clear. A full human
 playthrough and real iPhone Safari/home-screen PWA checks remain outstanding.
 This balance pass is local and has not been deployed.
 
+## Lamp responsibility — October 5, 2026
+
+The current lamp economy supersedes the earlier production values and harness
+measurements above. The Keeper monitors six ordinary civic lamps, independently
+of the anomalous third lamp and any wider network. The persistent readout shows
+lit fixtures in every view; its keyboard/touch dialog explains exact fuel,
+tending, transition and standing rules without objectives or future discoveries.
+
+- Each burning fixture consumes 0.0125 Oil/s (0.75/min), independently of crew.
+  Better Wicks cuts this by 25%; Food shortages do not reduce fuel demand.
+- Each Lamplighter tends three lamps. Maintained, fueled lighting earns Authority;
+  output stops increasing beyond full coverage. Lamp Houses increase its value.
+- Each Oil Press level produces 0.03 Oil/s (1.8/min), **70% less** than before.
+  Improved Presses retains its 25% increase; Food shortages halve press output.
+- Insufficient tending or fuel puts one lamp out every 30 seconds. Automatic
+  relighting takes 10 seconds per lamp, starting with 1 Oil in reserve or enough
+  continuous flow for the additional fixture. Work already begun may finish
+  while that reserve is consumed; zero fuel cancels it. This avoids flickering
+  on fractional trickles while permitting passive recovery.
+- After two minutes of incomplete lighting, each dark lamp costs 0.005 stored
+  Authority/s (0.3/min). Net earnings include the loss; Authority stops at zero.
+  Full lighting clears the delay. Lifetime standing and discoveries remain.
+  New household eligibility/admission requires all six lamps lit.
+- Outages and relighting split elapsed intervals, use the same foreground/offline
+  rules and share the eight-hour economy cap. Return reports include transitions,
+  incomplete-lighting duration and actual stored standing lost. The first outage
+  adds one Chronicle record. Already pending choices remain unresolved.
+- Awakening lights all six monitored fixtures without Oil and ends ordinary outage
+  penalties. Lamplighters still earn Authority by tending the restored fixtures.
+
+Version-10 saves validate and persist lamp counts and both timers. Versions 1–9
+migrate with initially lit monitored fixtures and fresh grace periods, preserving
+stores, workers, discoveries, acknowledgements and projects. Legacy Oil surplus
+is retained; use a fresh save for balance assessment. Earlier releases cannot
+read version-10 saves, so subsequent releases must retain forward compatibility.
+
+The no-grant/no-gathering harness uses idle construction crew where available,
+maintains two Lamplighters, expands press capacity, and borrows Foragers only when
+needed. It waits for restoration supplies before allocating a crew. Four active
+strategies reach the ending at **3,544 / 2,940 / 3,248 / 3,390 seconds** (49–59
+minutes). Two-hour absences at opening, scholarship and engine installation leave
+**2,722 / 2,535 / 2,570 seconds** of simulated time outside that absence. These
+are automated strategies, not a human enjoyment measurement. The restoration
+costs are unchanged; Lamp Houses, Smithy and wick/press studies remain optional.
+
+Validation: lint, TypeScript, **245 tests**, all seven progression strategies,
+static production export, and the generated 45-URL offline shell pass. An isolated
+Chromium preview completed the fresh 390px opening through Fields at normal speed,
+then verified outages, standing loss, automatic relighting, malformed-import
+preservation, save reloads, exact improved-wick rates, pre/post-discovery text,
+and the Oil-free finale. Layouts fit 320, 390, 768, 1024 and 1440px widths, with
+44px navigation targets; 320×400 with doubled text retained reachable controls
+and no horizontal overflow. Native lamp dialogs support Escape and focus return.
+Cached reopening with networking disabled passes; the game console is clear.
+
+This revision is local and has not been deployed. A full human playthrough,
+real iPhone Safari and home-screen PWA checks remain necessary before release.
+
 ## Vercel
 
 `next.config.ts` uses `output: "export"`; `npm run build` writes the site into `out/`. `vercel.json` selects Vercel’s **Other** hosting preset (`framework: null`), specifies `npm ci`, `npm run build`, `out` as the output directory, and a no-cache header for the service worker. The app still builds with Next.js; Vercel publishes its static export without a runtime server. Using the Next.js hosting preset with an `out` override failed in the cloud because that adapter expected server build manifests there. The Other preset serves the exported files directly. See [Vercel static configuration](https://vercel.com/docs/project-configuration/vercel-json) and [Next.js static export guidance](https://nextjs.org/docs/app/guides/static-exports).
@@ -274,4 +332,4 @@ npx --yes vercel@62.1.0 inspect https://bs-idle.vercel.app --scope swrobersons-p
 
 Verified on production: anonymous HTTP 200 for the app and service worker; `Cache-Control: no-cache` for `sw.js`; working worker assignments, gathering, Food/Oil/Authority progression, and reload persistence; offline-shell readiness; a 390px phone layout without horizontal overflow; and no game-origin console warnings or errors. The manifest was checked on the successful preview. Real iPhone Safari, home-screen installation, offline reopening, and background/resume behavior still require device verification.
 
-If a later release breaks the game, use Vercel's production rollback only to a verified deployment that supports the player's save version, then check the public URL again. Keep the saved record intact. Earlier releases cannot read new version-9 saves; use a compatible forward fix rather than rolling those players back to it. Export a backup before any intentional save migration. Saves belong to their origin, so localhost and preview progress do not transfer to the production URL automatically.
+If a later release breaks the game, use Vercel's production rollback only to a verified deployment that supports the player's save version, then check the public URL again. Keep the saved record intact. Earlier releases cannot read new version-10 saves; use a compatible forward fix rather than rolling those players back to it. Export a backup before any intentional save migration. Saves belong to their origin, so localhost and preview progress do not transfer to the production URL automatically.
