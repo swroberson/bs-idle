@@ -6,20 +6,16 @@ import { availableWorks } from "@/game/catalogs";
 import { ResourceAmounts } from "./ResourceAmounts";
 import { constructionSpeed, constructionWork } from "@/game/construction";
 import { ConstructionPanel } from "./ConstructionPanel";
-import { WorkerReassignment } from "./WorkerReassignment";
 import type { BuildingDefinition, BuildingId, GameAction, GameState, ResourceId } from "@/game/types";
 
-export function WorksPanel({ state, active, dispatch, onDialogChange, selected, select }: {
-  state: GameState; active: boolean; dispatch: (action: GameAction) => void; onDialogChange: (open: boolean) => void;
+export function WorksPanel({ state, active, dispatch, selected, select }: {
+  state: GameState; active: boolean; dispatch: (action: GameAction) => void;
   selected: BuildingId | null; select: (id: BuildingId) => void;
 }) {
   const items = availableWorks(state);
   const index = Math.max(0, items.findIndex(id => id === selected));
   const discount = constructionDiscount(state);
-  const crew = <>
-    <ConstructionPanel state={state} active={active} dispatch={dispatch} />
-    <WorkerReassignment state={state} active={active} dispatch={dispatch} onDialogChange={onDialogChange} />
-  </>;
+  const crew = <ConstructionPanel state={state} active={active} dispatch={dispatch} />;
   if (state.activeConstruction) {
     const project = state.activeConstruction;
     return <section aria-labelledby="works-heading">

@@ -15,6 +15,7 @@ import { IllustrationReveal } from "./IllustrationReveal";
 import { AwakeningReveal } from "./AwakeningReveal";
 import { AWAKENING } from "@/content/awakening";
 import { availableStudies, availableWorks } from "@/game/catalogs";
+import { WorkerReassignment } from "./WorkerReassignment";
 
 function subscribeVisibility(onChange: () => void) {
   document.addEventListener("visibilitychange", onChange);
@@ -99,7 +100,10 @@ export function GameShell() {
         <svg viewBox="0 0 32 40" aria-hidden="true" className="ward-glyph" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M4 4h24v24L16 36 4 28zM10 12h12M10 18h12M16 8v20M10 26h12" /></svg>
         <div><p className="machine-label">The Outer Ward</p><h1>Buried Sun</h1></div>
       </div>
-      <p className="connection-status machine-label"><span className={`status-light ${game.status === "active" ? "is-active" : ""}`} aria-hidden="true" /><span>{status}</span></p>
+      <div className="terminal-header-controls">
+        <p className="connection-status machine-label"><span className={`status-light ${game.status === "active" ? "is-active" : ""}`} aria-hidden="true" /><span>{status}</span></p>
+        {game.state && <WorkerReassignment state={game.state} active={game.status === "active" && !game.error && !game.returnSummary && !endingPending && reveals.length === 0} dispatch={dispatch} onDialogChange={setDetailsOpen} initialGroup={shownSection === "studies" ? "study" : shownSection === "works" || shownSection === "expeditions" ? "field" : "daily"} />}
+      </div>
     </header>
     <div className="terminal-instruments">{game.state && <ResourceReadout state={game.state} onDialogChange={setDetailsOpen} />}</div>
     <main id="main" tabIndex={-1} aria-label={SECTIONS[shownSection]}>

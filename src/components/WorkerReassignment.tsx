@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import type { GameAction, GameState } from "@/game/types";
 import { WorkerPanel } from "./WorkerPanel";
 
-export function WorkerReassignment({ state, active, dispatch, onDialogChange }: {
+export function WorkerReassignment({ state, active, dispatch, onDialogChange, initialGroup }: {
   state: GameState; active: boolean; dispatch: (action: GameAction) => void;
   onDialogChange: (open: boolean) => void;
+  initialGroup: "daily" | "field" | "study";
 }) {
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -30,12 +31,10 @@ export function WorkerReassignment({ state, active, dispatch, onDialogChange }: 
   }, [active]);
 
   return <>
-    <div className="crew-controls">
-      <button ref={triggerRef} className="machine-button" disabled={!active} aria-haspopup="dialog" aria-controls="worker-reassignment" onClick={() => setOpen(true)}>Reassign workers</button>
-    </div>
+    <button ref={triggerRef} className="machine-button" disabled={!active} aria-haspopup="dialog" aria-controls="worker-reassignment" onClick={() => setOpen(true)}>Reassign workers</button>
     <dialog ref={dialogRef} id="worker-reassignment" className="worker-reassignment" aria-label="Reassign workers" onClose={() => setOpen(false)}>
-      <div className="region-heading"><span className="machine-label">Works / Crew register</span><button className="machine-button" autoFocus onClick={() => dialogRef.current?.close()}>Close</button></div>
-      {open && <WorkerPanel state={state} active={active} dispatch={dispatch} initialGroup="field" />}
+      <div className="region-heading"><span className="machine-label">Workforce / Crew register</span><button className="machine-button" autoFocus onClick={() => dialogRef.current?.close()}>Close</button></div>
+      {open && <WorkerPanel state={state} active={active} dispatch={dispatch} initialGroup={initialGroup} />}
     </dialog>
   </>;
 }
