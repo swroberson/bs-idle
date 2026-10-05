@@ -5,6 +5,8 @@ import { reconcile, economyRates } from "./simulation";
 import { availableWorkers } from "./requirements";
 import { decodeSave, encodeSave } from "./save";
 import { EXPEDITIONS } from "../content/expeditions";
+import { resourceCapacity } from "./storage";
+import { completeExpedition } from "./expeditions";
 
 function prepared() {
   const state = createInitialState(0);
@@ -20,6 +22,32 @@ function prepared() {
 }
 
 describe("expedition lifecycle", () => {
+  it.each([15.1, 59.7])("round-trips return receipts with fractional stores (%s Coin)", coin => {
+    const state = prepared();
+    state.completedExpeditions = ["old-cistern"];
+    state.chronicle.push("cistern-find");
+    state.resources.coin = coin;
+    const sent = applyAction(state, { type: "start-expedition", destination: "abandoned-farmstead", workers: 1 }, 0);
+    const returned = completeExpedition(sent, sent.activeExpedition!.returnsAt);
+    returned.lastSimulatedAt = sent.activeExpedition!.returnsAt;
+    expect(returned.expeditionLog[0].rewards.coin).toBeLessThanOrEqual(12);
+    expect(decodeSave(encodeSave(returned))).toEqual(returned);
+  });
+  it("saves capacity-limited rewards and discoveries without repeating a return", () => {
+    const state = prepared();
+    state.jobs = { ...state.jobs, scavenger: 0 };
+    state.completedExpeditions = ["old-cistern"];
+    state.chronicle.push("cistern-find");
+    state.resources.food = resourceCapacity(state, "food");
+    state.resources.coin = resourceCapacity(state, "coin");
+    const sent = applyAction(state, { type: "start-expedition", destination: "abandoned-farmstead", workers: 2 }, 0);
+    const returned = reconcile(sent, sent.activeExpedition!.returnsAt).state;
+    expect(returned.resources.food).toBe(resourceCapacity(returned, "food"));
+    expect(returned.expeditionLog[0].rewards).toEqual({ food: 0, coin: 0 });
+    expect(returned.completedExpeditions).toContain("abandoned-farmstead");
+    expect(decodeSave(encodeSave(returned))).toEqual(returned);
+    expect(reconcile(returned, returned.lastSimulatedAt).state).toBe(returned);
+  });
   it("transfers assigned Scavengers, pays provisions, and permits only one expedition", () => {
     const state = prepared();
     const sent = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 2 }, 0);

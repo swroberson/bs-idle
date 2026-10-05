@@ -6,14 +6,15 @@ import { EXPEDITIONS } from "@/content/expeditions";
 import { costText, expeditionCost, expeditionRequirements, prerequisiteRequirements } from "@/game/requirements";
 import type { ExpeditionId, GameAction, GameState } from "@/game/types";
 import { CatalogPager } from "./CatalogPager";
+import { ExpeditionDispatchDialog } from "./ExpeditionDispatchDialog";
 
 function duration(ms: number) {
   const seconds = Math.ceil(ms / 1000);
   return `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, "0")}s`;
 }
 
-export function ExpeditionPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
-  const [workers, setWorkers] = useState(2);
+export function ExpeditionPanel({ state, active, dispatch, onDialogChange }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void; onDialogChange: (open: boolean) => void }) {
+  const [destinationToDispatch, setDestinationToDispatch] = useState<ExpeditionId | null>(null);
   const [page, setPage] = useState(0);
   const [view, setView] = useState<"destinations" | "returns">("destinations");
   const items = (Object.keys(EXPEDITIONS) as ExpeditionId[]).filter(id => prerequisiteRequirements(state, EXPEDITIONS[id].requirements).length === 0);
@@ -32,22 +33,17 @@ export function ExpeditionPanel({ state, active, dispatch }: { state: GameState;
       <progress className="expedition-progress" aria-label="Expedition progress" max={party.returnsAt - party.startedAt} value={Math.max(0, state.lastSimulatedAt - party.startedAt)} />
       <p className="requirements-copy">Automatic return, including while away. Returned workers remain idle. Rewards and findings appear in the return log.</p>
     </div>}
-    {view === "destinations" && <><div className="expedition-allocation">
-      <label htmlFor="expedition-workers" className="machine-label">Party size // 1–3 inhabitants</label>
-      <select id="expedition-workers" value={workers} disabled={!active || !!party} onChange={event => setWorkers(Number(event.target.value))}>
-        {Array.from({ length: BALANCE.expeditionMaxWorkers }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1} {i === 0 ? "inhabitant" : "inhabitants"}</option>)}
-      </select>
-    </div>
+    {view === "destinations" && <>
     {items.slice(index, index + 1).map(id => {
       const destination = EXPEDITIONS[id];
-      const unmet = expeditionRequirements(state, id, workers);
+      const unmet = expeditionRequirements(state, id, 1);
       const staffing = destination.staffing === "scavenger" ? "assigned Scavengers" : "idle inhabitants";
       return <article key={id} className="operation-row">
         <div className="operation-heading"><h3>{destination.name}</h3><span className="machine-label">{state.completedExpeditions.includes(id) ? "Surveyed" : "Unvisited"}</span></div>
         <p className="narrative">{destination.description}</p>
-        <p className="effect-readout">Duration // {duration(destination.durationMs)}<br />{workers} {staffing} reserved until return</p>
-        <button className="machine-button" disabled={!active || unmet.length > 0} aria-describedby={`expedition-${id}-requirements`} onClick={() => dispatch({ type: "start-expedition", destination: id, workers })}>Dispatch // {costText(expeditionCost(state, id, workers))}</button>
-        <p id={`expedition-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || `${workers} ${staffing} ready / provisions sufficient`}</p>
+        <p className="effect-readout">Duration // {duration(destination.durationMs)}<br />1–3 {staffing} reserved until return<br />Provisions for 1 inhabitant // {costText(expeditionCost(state, id, 1))}</p>
+        <button className="machine-button" disabled={!active || unmet.length > 0} aria-haspopup="dialog" aria-describedby={`expedition-${id}-requirements`} onClick={() => setDestinationToDispatch(id)}>Dispatch expedition</button>
+        <p id={`expedition-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Party available / provisions sufficient"}</p>
       </article>;
     })}
     <CatalogPager name="Destinations" labels={items.map(id => EXPEDITIONS[id].name)} index={index} select={setPage} /></>}
@@ -60,5 +56,6 @@ export function ExpeditionPanel({ state, active, dispatch }: { state: GameState;
     </div>)}
     <CatalogPager name="Returns" labels={entries.map((entry, i) => `${entries.length - i} / ${EXPEDITIONS[entry.destination].name}`)} index={index} select={setPage} />
     </>}
+    {destinationToDispatch && <ExpeditionDispatchDialog destination={destinationToDispatch} state={state} active={active} dispatch={dispatch} onClose={() => setDestinationToDispatch(null)} onDialogChange={onDialogChange} />}
   </section>;
 }

@@ -1,6 +1,7 @@
 import { EVENTS } from "@/content/events";
-import { costText, eventChoices, eventRequirements } from "@/game/requirements";
-import type { GameAction, GameState } from "@/game/types";
+import { costText, eventChoices, eventRequirements, payCost } from "@/game/requirements";
+import { resourceCapacity } from "@/game/storage";
+import type { GameAction, GameState, ResourceId } from "@/game/types";
 
 export function EventPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
   const id = state.pendingEvents[0];
@@ -13,8 +14,11 @@ export function EventPanel({ state, active, dispatch }: { state: GameState; acti
     {event.population > 0 && <p className="effect-readout">+{event.population} inhabitants / new workers arrive unassigned.</p>}
     {eventChoices(id).map(choice => {
       const unmet = eventRequirements(state, id, choice.id);
+      const paid = payCost(state, choice.cost);
+      const limited = (Object.entries(choice.rewards) as [ResourceId, number][]).some(([resource, amount]) => resourceCapacity(paid, resource) - paid.resources[resource] < amount);
       return <div className="event-response" key={choice.id}>
         <p className="effect-readout">Cost // {costText(choice.cost)}{Object.keys(choice.rewards).length > 0 && <><br />Receive // {costText(choice.rewards)}</>}</p>
+        {limited && <p className="requirements-copy">Rewards stop at store capacity. Excess cannot be stored; earned lifetime Authority still counts.</p>}
         <button className="machine-button" aria-describedby={`event-${id}-${choice.id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "choose-event", event: id, choice: choice.id })}>{choice.label}</button>
         <p id={`event-${id}-${choice.id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Awaiting authorization / production continues"}</p>
       </div>;

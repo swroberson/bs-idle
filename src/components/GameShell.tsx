@@ -28,11 +28,11 @@ export function GameShell() {
   const [now, setNow] = useState(0);
   const [offlineStatus, setOfflineStatus] = useState<"pending" | "ready" | "failed">("pending");
   const [feedback, setFeedback] = useState("");
-  const [resourceDetailsOpen, setResourceDetailsOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const visible = useSyncExternalStore(subscribeVisibility, pageVisible, serverVisible);
   const reveals = game.state ? pendingIllustrations(game.state) : [];
   const endingPending = !!game.state && game.state.awakenedAt !== null && game.state.finaleStep < AWAKENING.passages.length;
-  const canReveal = visible && game.status === "active" && !game.error && !game.returnSummary && !resourceDetailsOpen;
+  const canReveal = visible && game.status === "active" && !game.error && !game.returnSummary && !detailsOpen;
   const endingActive = endingPending && canReveal;
   const revealActive = !endingPending && canReveal && reveals.length > 0;
 
@@ -81,14 +81,14 @@ export function GameShell() {
       </div>
       <p className="connection-status machine-label"><span className={`status-light ${game.status === "active" ? "is-active" : ""}`} aria-hidden="true" /><span>{status}</span></p>
     </header>
-    <div className="terminal-instruments">{game.state && <ResourceReadout state={game.state} onDialogChange={setResourceDetailsOpen} />}</div>
+    <div className="terminal-instruments">{game.state && <ResourceReadout state={game.state} onDialogChange={setDetailsOpen} />}</div>
     <main id="main" tabIndex={-1} aria-label={SECTIONS[shownSection]}>
       {game.returnSummary ? <ReturnPanel summary={game.returnSummary} dismiss={game.dismissSummary} /> : <>
         {game.error && <div role="alert" className="terminal-alert"><p className="machine-label">Record fault</p><p>{game.error}</p></div>}
         {game.status === "loading" && <p role="status" className="terminal-notice machine-label">Opening the Keeper’s register…</p>}
         {game.status === "waiting" && <div role="status" className="terminal-notice"><p className="machine-label">Access / held by another tab</p><h2>The register is open elsewhere.</h2><p>Close the other Buried Sun tab to continue here. This tab will then load your latest progress.</p></div>}
         {shownSection === "settings" && offlineStatus === "failed" && <p role="alert" className="terminal-alert">Offline shell unavailable. Revisit while online.</p>}
-        <GamePages game={game} section={shownSection} wait={wait} dispatch={dispatch} clearFeedback={() => setFeedback("")} chronicleVisible={visible && !endingPending && reveals.length === 0 && !resourceDetailsOpen} />
+        <GamePages game={game} section={shownSection} wait={wait} dispatch={dispatch} clearFeedback={() => setFeedback("")} chronicleVisible={visible && !endingPending && reveals.length === 0 && !detailsOpen} onDialogChange={setDetailsOpen} />
       </>}
     </main>
     <IllustrationReveal queue={reveals} active={revealActive} dispatch={dispatch} />

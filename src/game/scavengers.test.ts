@@ -60,9 +60,10 @@ describe("Scavenger dispatch", () => {
     old.version = 6;
     delete old.jobs.scavenger;
     delete old.eventChoices;
+    delete old.activeConstruction;
     old.activeExpedition = { destination: "old-cistern", workers: 2, startedAt: 0, returnsAt: 180000 };
     const state = decodeSave(JSON.stringify(old));
-    expect(state.version).toBe(7);
+    expect(state.version).toBe(8);
     expect(state.jobs.scavenger).toBe(0);
     expect(state.resources).toEqual(old.resources);
     expect(state.activeExpedition).toEqual(old.activeExpedition);

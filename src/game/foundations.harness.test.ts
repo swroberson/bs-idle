@@ -3,7 +3,8 @@ import { expect, it } from "vitest";
 import { createInitialState } from "./state";
 import { applyAction } from "./actions";
 import { reconcile } from "./simulation";
-import { availableWorkers, buildingRequirements, eventRequirements, researchRequirements } from "./requirements";
+import { availableWorkers, eventRequirements, researchRequirements } from "./requirements";
+import { releaseIdleCrew, startBuilding } from "./construction.test-support";
 import { decodeSave, encodeSave } from "./save";
 
 it("reaches the foundation survey from a fresh save through ordinary actions", () => {
@@ -13,13 +14,15 @@ it("reaches the foundation survey from a fresh save through ordinary actions", (
   for (let n = 0; n < 2; n++) state = applyAction(state, { type: "assign-worker", job: "lamplighter", delta: 1 }, 0);
   for (let second = 1; second <= 1800; second++) {
     const now = second * 1000;
-    state = reconcile(state, now).state;
+    const tick = reconcile(state, now);
+    state = tick.state;
+    for (const project of tick.summary.completedConstruction) milestones[project.id] = second;
+    state = releaseIdleCrew(state);
     const event = state.pendingEvents[0];
     if (event && !eventRequirements(state, event).length) state = applyAction(state, { type: "choose-event", event }, now);
     for (const id of ["fields", "oil-press", "market-stall", "scrivener-house", "ruined-cistern", "antiquities-house"] as const) {
-      if (!state.buildings[id] && !buildingRequirements(state, id).length) {
-        state = applyAction(state, { type: "build", building: id }, now);
-        milestones[id] = second;
+      if (!state.buildings[id]) {
+        state = startBuilding(state, id);
       }
     }
     if (state.buildings["scrivener-house"] && !state.jobs.scrivener) state = applyAction(state, { type: "assign-worker", job: "scrivener", delta: 1 }, now);

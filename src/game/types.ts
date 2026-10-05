@@ -18,7 +18,7 @@ export type IllustrationId = keyof typeof ILLUSTRATIONS;
 export type Cost = Partial<Record<ResourceId, number>>;
 
 export interface GameState {
-  version: 7;
+  version: 8;
   resources: Record<ResourceId, number>;
   population: number;
   jobs: Record<JobId, number>;
@@ -32,6 +32,7 @@ export interface GameState {
   readChronicle: ChronicleId[];
   dismissedIllustrations: IllustrationId[];
   activeExpedition: ActiveExpedition | null;
+  activeConstruction: ActiveConstruction | null;
   completedExpeditions: ExpeditionId[];
   expeditionLog: ExpeditionReturn[];
   lastSimulatedAt: number;
@@ -59,7 +60,14 @@ export interface ReturnSummary {
   changes: Record<ResourceId, number>;
   newEvents: EventId[];
   completedExpeditions: ExpeditionId[];
+  completedConstruction: ConstructionProject[];
+  fullStores: ResourceId[];
 }
+
+export type ConstructionProject =
+  | { kind: "building"; id: BuildingId }
+  | { kind: "research"; id: "restore-conduit" };
+export type ActiveConstruction = ConstructionProject & { workDone: number; startedAt: number };
 
 // Content prerequisites use stable IDs; the save boundary validates persisted IDs.
 export interface ContentRequirements {
@@ -71,7 +79,7 @@ export interface ContentRequirements {
 }
 export interface Modifiers {
   constructionCoinMultiplier?: number;
-  laborerDiscountBonus?: number;
+  constructionSpeedMultiplier?: number;
   expeditionFoodMultiplier?: number;
   knowledgeMultiplier?: number;
   foodMultiplier?: number;
@@ -80,13 +88,14 @@ export interface Modifiers {
 }
 export interface BuildingDefinition {
   name: string; description: string; effect?: string; completedEffect?: string; cost: Cost;
-  costGrowth: number; maxLevel: number; requirements: ContentRequirements;
+  costGrowth: number; maxLevel: number; requirements: ContentRequirements; workSeconds: number;
   foodPerForager?: number; oilPerSecond?: number; coinPerSecond?: number;
   authorityPerLamplighter?: number; chronicle?: ChronicleId;
+  storagePerLevel?: Cost;
 }
 export interface ResearchDefinition {
   name: string; text: string; description: string; effect: string; cost: Cost;
-  chronicle: ChronicleId; requirements: ContentRequirements; modifiers?: Modifiers;
+  chronicle: ChronicleId; requirements: ContentRequirements; modifiers?: Modifiers; workSeconds?: number;
 }
 interface EventBase {
   title: string; text: string; population: number;

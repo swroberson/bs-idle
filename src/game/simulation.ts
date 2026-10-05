@@ -5,6 +5,8 @@ import { RESEARCH } from "../content/research";
 import { AWAKENING } from "../content/awakening";
 import { queueEvents, secondsUntilEvent } from "./progression";
 import { completeExpedition } from "./expeditions";
+import { resourceCapacity, storedAmount } from "./storage";
+import { completeConstruction, constructionRate, constructionWork } from "./construction";
 import type { GameState, Modifiers, ResearchDefinition, ResourceId, ReturnSummary } from "./types";
 
 // Production bonuses multiply after the base worker + building output is added.
@@ -29,18 +31,20 @@ export function economyRates(state: GameState) {
   const oilDemand = state.awakenedAt !== null ? 0 : state.jobs.lamplighter * JOBS.lamplighter.oilPerSecond * efficiency * modifiers.oilDemandMultiplier;
   // At zero stores, lamps consume the available flow instead of oscillating on/off each tick.
   const lampFraction = state.resources.oil <= 0 && oilDemand > 0 ? Math.min(1, oilOutput / oilDemand) : 1;
-  return {
-    starving, lampsLimited: lampFraction < 1,
-    net: {
-      food: state.resources.food <= 0 ? Math.max(0, foodNet) : foodNet,
-      oil: oilOutput - oilDemand * lampFraction,
-      authority: state.jobs.lamplighter * (JOBS.lamplighter.authorityPerSecond + state.buildings["lamp-house"] * BUILDINGS["lamp-house"].authorityPerLamplighter) * efficiency * lampFraction,
-      coin: state.buildings["market-stall"] * BUILDINGS["market-stall"].coinPerSecond * efficiency,
-      knowledge: state.jobs.scrivener * JOBS.scrivener.knowledgePerSecond * efficiency * modifiers.knowledgeMultiplier,
-      relics: 0,
-      current: state.awakenedAt !== null ? AWAKENING.currentPerSecond * efficiency : 0,
-    },
+  const authorityProduction = state.jobs.lamplighter * (JOBS.lamplighter.authorityPerSecond + state.buildings["lamp-house"] * BUILDINGS["lamp-house"].authorityPerLamplighter) * efficiency * lampFraction;
+  const net: Record<ResourceId, number> = {
+    food: state.resources.food <= 0 ? Math.max(0, foodNet) : foodNet,
+    oil: oilOutput - oilDemand * lampFraction,
+    authority: authorityProduction,
+    coin: state.buildings["market-stall"] * BUILDINGS["market-stall"].coinPerSecond * efficiency,
+    knowledge: state.jobs.scrivener * JOBS.scrivener.knowledgePerSecond * efficiency * modifiers.knowledgeMultiplier,
+    relics: 0,
+    current: state.awakenedAt !== null ? AWAKENING.currentPerSecond * efficiency : 0,
   };
+  for (const id of Object.keys(net) as ResourceId[]) {
+    if (net[id] > 0 && state.resources[id] >= resourceCapacity(state, id)) net[id] = 0;
+  }
+  return { starving, efficiency, lampsLimited: lampFraction < 1, authorityProduction, net };
 }
 
 export function reconcile(state: GameState, now: number): { state: GameState; summary: ReturnSummary } {
@@ -51,6 +55,7 @@ export function reconcile(state: GameState, now: number): { state: GameState; su
   let cursor = state.lastSimulatedAt;
   const productionEnd = cursor + productionMs;
   const completedExpeditions: ReturnSummary["completedExpeditions"] = [];
+  const completedConstruction: ReturnSummary["completedConstruction"] = [];
   const finishParty = (at: number) => {
     const destination = next.activeExpedition?.destination;
     const finished = completeExpedition(next, at);
@@ -59,21 +64,35 @@ export function reconcile(state: GameState, now: number): { state: GameState; su
   };
   if (elapsedMs > 0) finishParty(cursor);
   while (cursor < productionEnd) {
-    const { net } = economyRates(next);
-    let seconds = Math.min((productionEnd - cursor) / 1000, secondsUntilEvent(next, net));
+    const { net, efficiency, authorityProduction } = economyRates(next);
+    const workRate = constructionRate(next, efficiency);
+    let seconds = Math.min((productionEnd - cursor) / 1000, secondsUntilEvent(next, net, authorityProduction));
+    if (next.activeConstruction && workRate > 0) {
+      seconds = Math.min(seconds, (constructionWork(next, next.activeConstruction) - next.activeConstruction.workDone) / workRate);
+    }
     if (next.activeExpedition) seconds = Math.min(seconds, (next.activeExpedition.returnsAt - cursor) / 1000);
     for (const id of ["food", "oil"] as const) {
       if (net[id] < 0 && next.resources[id] > 0) seconds = Math.min(seconds, next.resources[id] / -net[id]);
     }
     const resources = { ...next.resources };
     for (const id of Object.keys(resources) as ResourceId[]) {
-      resources[id] = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, resources[id] + net[id] * seconds));
+      resources[id] = storedAmount(next, id, net[id] * seconds);
     }
     // Snap only the exhausted resource at an exact boundary to remove floating-point dust.
     for (const id of ["food", "oil"] as const) {
       if (net[id] < 0 && seconds >= next.resources[id] / -net[id]) resources[id] = 0;
     }
-    next = { ...next, resources, lifetimeAuthority: Math.min(Number.MAX_SAFE_INTEGER, next.lifetimeAuthority + net.authority * seconds) };
+    next = { ...next, resources, lifetimeAuthority: Math.min(Number.MAX_SAFE_INTEGER, next.lifetimeAuthority + authorityProduction * seconds) };
+    if (next.activeConstruction && workRate > 0) {
+      const total = constructionWork(next, next.activeConstruction);
+      const remainingSeconds = (total - next.activeConstruction.workDone) / workRate;
+      const project = next.activeConstruction;
+      next = { ...next, activeConstruction: { ...project,
+        workDone: seconds >= remainingSeconds ? total : project.workDone + workRate * seconds } };
+      const finished = completeConstruction(next);
+      if (finished !== next) completedConstruction.push(project.kind === "building" ? { kind: "building", id: project.id } : { kind: "research", id: project.id });
+      next = finished;
+    }
     cursor = Math.min(productionEnd, cursor + seconds * 1000);
     finishParty(cursor);
     next = queueEvents(next);
@@ -88,5 +107,7 @@ export function reconcile(state: GameState, now: number): { state: GameState; su
     changes: Object.fromEntries((Object.keys(next.resources) as ResourceId[]).map(id => [id, next.resources[id] - state.resources[id]])) as ReturnSummary["changes"],
     newEvents: next.triggeredEvents.filter((id) => !state.triggeredEvents.includes(id)),
     completedExpeditions,
+    completedConstruction,
+    fullStores: (Object.keys(next.resources) as ResourceId[]).filter(id => resourceCapacity(next, id) < Number.MAX_SAFE_INTEGER && next.resources[id] >= resourceCapacity(next, id)),
   } };
 }

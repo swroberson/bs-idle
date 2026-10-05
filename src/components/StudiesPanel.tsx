@@ -3,8 +3,10 @@ import { useState } from "react";
 import { AWAKENING } from "@/content/awakening";
 import { awakeningRequirements } from "@/game/requirements";
 import { CatalogPager } from "./CatalogPager";
+import { ConstructionPanel } from "./ConstructionPanel";
+import { constructionSpeed } from "@/game/construction";
 import { costText, researchRequirements, prerequisiteRequirements } from "@/game/requirements";
-import type { GameAction, GameState, ResearchId } from "@/game/types";
+import type { GameAction, GameState, ResearchDefinition, ResearchId } from "@/game/types";
 
 export function StudiesPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
   const [page, setPage] = useState(0);
@@ -20,16 +22,19 @@ export function StudiesPanel({ state, active, dispatch }: { state: GameState; ac
       <p id="awakening-requirements" className="requirements-copy">{unmetAwakening.join(" · ") || "Recorded tests complete / joint seated"}</p>
     </div>}
     {items.slice(index, index + 1).map((id) => {
-      const research = RESEARCH[id];
+      const research: ResearchDefinition = RESEARCH[id];
       const complete = state.research.includes(id);
+      const constructing = state.activeConstruction?.kind === "research" && state.activeConstruction.id === id;
       const unmet = researchRequirements(state, id);
       return <article key={id} className="operation-row">
         <div className="operation-heading"><h3>{research.name}</h3><span className={`machine-label ${complete ? "activity-text" : ""}`}>{complete ? "Recorded" : "Available"}</span></div>
         <p className="narrative">{complete ? research.text : research.description}</p>
         {complete && <p className="effect-readout">{research.effect}</p>}
         {!complete && <>
-          <button className="machine-button" aria-describedby={`study-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "research", research: id })}>Investigate // {costText(research.cost)}</button>
-          <p id={`study-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Stores sufficient / ready"}</p>
+          {research.workSeconds && <ConstructionPanel state={state} active={active} dispatch={dispatch} />}
+          <button className="machine-button" aria-describedby={`study-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "research", research: id })}>{constructing ? "Restoration in progress" : `${research.workSeconds ? "Begin restoration" : "Investigate"} // ${costText(research.cost)}`}</button>
+          {research.workSeconds && !constructing && <p className="telemetry construction-cost">{research.workSeconds} work / {Math.ceil(research.workSeconds / constructionSpeed(state))}s with 1 Laborer at full output.</p>}
+          <p id={`study-${id}-requirements`} className="requirements-copy">{constructing ? "Supplies already committed" : unmet.join(" · ") || "Stores sufficient / ready"}</p>
         </>}
         {complete && <p className="requirements-copy">Investigation complete / discovery preserved in the Chronicle.</p>}
       </article>;

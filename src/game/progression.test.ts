@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { applyAction } from "./actions";
 import { createInitialState } from "./state";
 import { reconcile } from "./simulation";
+import { buildCompleted } from "./construction.test-support";
 import { decodeSave, encodeSave } from "./save";
 
 describe("opening progression", () => {
@@ -10,13 +11,16 @@ describe("opening progression", () => {
     expect(applyAction(initial, { type: "build", building: "fields" }, 0)).toBe(initial);
     const state = { ...initial, lifetimeAuthority: 30, resources: { ...initial.resources, food: 100, oil: 20, authority: 30 } };
     expect(applyAction(state, { type: "build", building: "oil-press" }, 0)).toBe(state);
-    const first = applyAction(state, { type: "build", building: "fields" }, 0);
+    state.jobs.laborer = 1;
+    const started = applyAction(state, { type: "build", building: "fields" }, 0);
+    expect(started.resources.food).toBe(80);
+    const first = reconcile(started, 30_000).state;
     expect(first.buildings.fields).toBe(1);
-    expect(first.resources.food).toBe(80);
+    expect(first.resources.food).toBeCloseTo(76.25);
     expect(first.resources.authority).toBe(25);
     expect(first.lifetimeAuthority).toBe(30);
-    const second = applyAction(first, { type: "build", building: "fields" }, 0);
-    expect(second.resources.food).toBe(46);
+    const second = buildCompleted(first, "fields");
+    expect(second.resources.food).toBeCloseTo(first.resources.food - 34 - 38 * .125);
     expect(second.resources.authority).toBe(16);
   });
 

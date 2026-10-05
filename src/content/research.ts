@@ -19,13 +19,13 @@ export const RESEARCH = {
   "crop-rotation": {
     name: "Crop Rotation", description: "Compare Nera's planting notes with the old garden boundaries.",
     text: "Each third bed is left fallow. In the empty beds, the roots of the neighboring plants turn toward the chapel.",
-    cost: { coin: 15, knowledge: 10 }, effect: "Increases all Forager Food output by 25%, including Fields bonuses.",
+    cost: { coin: 20, knowledge: 10 }, effect: "Increases all Forager Food output by 25%, including Fields bonuses.",
     modifiers: { foodMultiplier: 1.25 }, chronicle: "crop-rotation", requirements: { buildings: { "scrivener-house": 1 } },
   },
   "better-wicks": {
     name: "Better Wicks", description: "Try a tighter weave in the ordinary lamps. The third lamp must remain untouched.",
     text: "The new wicks draw less oil. Orso enters the saving in the ledger and leaves the third lamp's column blank.",
-    cost: { coin: 10, knowledge: 12 }, effect: "Reduces ordinary Lamplighter Oil consumption by 25%. Authority output is unchanged.",
+    cost: { coin: 15, knowledge: 12 }, effect: "Reduces ordinary Lamplighter Oil consumption by 25%. Authority output is unchanged.",
     modifiers: { oilDemandMultiplier: 0.75 }, chronicle: "better-wicks", requirements: { buildings: { "scrivener-house": 1 } },
   },
   "catalog-relics": {
@@ -60,20 +60,20 @@ export const RESEARCH = {
   },
   "restore-conduit": {
     name: "Restore the Conduit", description: "Lift the joining piece into its measured position. Secure its support and prepare the movable stone for a separate test.",
-    text: WARD_RECORDS["conduit-restored"].text, cost: { coin: 150, knowledge: 120, relics: 2, authority: 40 },
+    text: WARD_RECORDS["conduit-restored"].text, cost: { coin: 135, knowledge: 120, relics: 2, authority: 40 }, workSeconds: 120,
     effect: "Connection restored.", chronicle: "conduit-restored",
     requirements: { research: ["study-engine"], buildings: { "buried-engine": 1 } },
   },
   "iron-tools": {
     name: "Iron Tools", description: "Refit the garden tools and compare their work with the old edges.",
-    text: WARD_RECORDS["iron-tools"].text, cost: { coin: 15, knowledge: 12 },
+    text: WARD_RECORDS["iron-tools"].text, cost: { coin: 20, knowledge: 12 },
     effect: "All Forager Food output increases by 20%, multiplying with Crop Rotation.",
     modifiers: { foodMultiplier: 1.2 }, chronicle: "iron-tools", requirements: { buildings: { smithy: 1 } },
   },
   stoneworking: {
     name: "Stoneworking", description: "Sort the salvaged masonry at the Smithy. Dress the chipped edges and measure what can be laid again.",
     text: CHRONICLE.stoneworking.text, cost: { coin: 20, knowledge: 16 },
-    effect: "Building Coin costs decrease by 10%, multiplying with the capped Laborer discount. Other costs are unchanged; final Coin costs round up.",
+    effect: "Building Coin costs decrease by 10%. Other costs are unchanged; final Coin costs round up.",
     modifiers: { constructionCoinMultiplier: 0.9 }, chronicle: "stoneworking",
     requirements: { buildings: { smithy: 1, "scrivener-house": 1 } },
   },
@@ -99,8 +99,8 @@ export const RESEARCH = {
   "apprenticed-hands": {
     name: "Apprenticed Hands", description: "Pair the workers at the stone bench. Compare the carrying tally with the pieces dressed and laid.",
     text: CHRONICLE["apprenticed-hands"].text, cost: { coin: 25, knowledge: 20 },
-    effect: "Each Laborer reduces building Coin costs by 7.5%, within the existing 20% cap. Three reach the cap. Stoneworking still multiplies afterward; other costs are unchanged.",
-    modifiers: { laborerDiscountBonus: .025 }, chronicle: "apprenticed-hands",
+    effect: "Laborers perform construction and restoration work 25% faster, to 1.25 work/s each. Food shortages still halve output; costs are unchanged.",
+    modifiers: { constructionSpeedMultiplier: 1.25 }, chronicle: "apprenticed-hands",
     requirements: { buildings: { smithy: 1 }, research: ["stoneworking"] },
   },
   "collated-records": {

@@ -40,16 +40,11 @@ export function prerequisiteRequirements(state: GameState, requirements: Content
 }
 
 export function constructionDiscount(state: GameState) {
-  const perLaborer = state.research.reduce((discount, id) => {
-    const study: ResearchDefinition = RESEARCH[id];
-    return discount + (study.modifiers?.laborerDiscountBonus ?? 0);
-  }, BALANCE.laborerCoinDiscount as number);
-  const laborer = Math.min(BALANCE.laborerDiscountCap, state.jobs.laborer * perLaborer);
   const studyMultiplier = state.research.reduce((multiplier, id) => {
     const study: ResearchDefinition = RESEARCH[id];
     return multiplier * (study.modifiers?.constructionCoinMultiplier ?? 1);
   }, 1);
-  return { perLaborer, laborer, study: 1 - studyMultiplier, coinMultiplier: (1 - laborer) * studyMultiplier };
+  return { study: 1 - studyMultiplier, coinMultiplier: studyMultiplier };
 }
 
 export function buildingCost(state: GameState, id: BuildingId): Cost {
@@ -64,7 +59,11 @@ export function buildingCost(state: GameState, id: BuildingId): Cost {
 
 export function buildingRequirements(state: GameState, id: BuildingId): string[] {
   if (state.buildings[id] >= BUILDINGS[id].maxLevel) return ["Construction limit reached"];
-  return [...prerequisiteRequirements(state, BUILDINGS[id].requirements), ...costRequirements(state, buildingCost(state, id))];
+  return [...constructionRequirements(state), ...prerequisiteRequirements(state, BUILDINGS[id].requirements), ...costRequirements(state, buildingCost(state, id))];
+}
+
+function constructionRequirements(state: GameState): string[] {
+  return state.activeConstruction ? ["Construction project in progress"] : state.jobs.laborer === 0 ? ["Requires 1 assigned Laborer"] : [];
 }
 
 export function eventChoices(id: EventId) {
@@ -84,7 +83,8 @@ export function eventRequirements(state: GameState, id: EventId, choice?: string
 
 export function researchRequirements(state: GameState, id: ResearchId): string[] {
   if (state.research.includes(id)) return ["Investigation complete"];
-  return [...prerequisiteRequirements(state, RESEARCH[id].requirements), ...costRequirements(state, RESEARCH[id].cost)];
+  const research: ResearchDefinition = RESEARCH[id];
+  return [...(research.workSeconds ? constructionRequirements(state) : []), ...prerequisiteRequirements(state, research.requirements), ...costRequirements(state, research.cost)];
 }
 
 export function jobUnlocked(state: GameState, id: JobId): boolean {

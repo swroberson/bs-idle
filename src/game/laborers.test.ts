@@ -18,7 +18,7 @@ function workshop() {
 }
 
 describe("construction labor", () => {
-  it("reveals Laborers after the Smithy and shares the finite worker pool", () => {
+  it("reveals Laborers with Works and shares the finite worker pool", () => {
     const initial = createInitialState(0);
     expect(jobUnlocked(initial, "laborer")).toBe(false);
     expect(applyAction(initial, { type: "assign-worker", job: "laborer", delta: 1 }, 0)).toBe(initial);
@@ -30,29 +30,30 @@ describe("construction labor", () => {
     expect(availableWorkers(state)).toBe(1);
   });
 
-  it("discounts only escalated building Coin costs, caps Laborers and charges the displayed price", () => {
+  it("keeps building prices independent of crew size and charges supplies once", () => {
     const state = workshop();
     state.jobs.laborer = 1;
     expect(buildingCost(state, "market-stall")).toEqual({ food: 51, authority: 26 });
-    expect(buildingCost(state, "lamp-house")).toEqual({ coin: 19, authority: 15 });
+    expect(buildingCost(state, "lamp-house")).toEqual({ coin: 20, authority: 15 });
     state.jobs.laborer = 8;
-    expect(buildingCost(state, "lamp-house")).toEqual({ coin: 16, authority: 15 });
+    expect(buildingCost(state, "lamp-house")).toEqual({ coin: 20, authority: 15 });
     const built = applyAction(state, { type: "build", building: "lamp-house" }, 0);
-    expect(built.resources.coin).toBe(84);
+    expect(built.resources.coin).toBe(80);
     expect(built.resources.authority).toBe(85);
-    expect(buildingCost(built, "lamp-house")).toEqual({ coin: 28, authority: 26 });
+    expect(built.buildings["lamp-house"]).toBe(0);
+    expect(buildingCost(reconcile(built, 6000).state, "lamp-house")).toEqual({ coin: 34, authority: 26 });
     state.jobs.laborer = 0;
     expect(buildingCost(state, "lamp-house").coin).toBe(20);
   });
 
-  it("applies Stoneworking once, compounds discounts and leaves research costs intact", () => {
+  it("applies Stoneworking once and leaves research costs intact", () => {
     const state = workshop();
     state.jobs.laborer = 4;
     const studied = applyAction(state, { type: "research", research: "stoneworking" }, 0);
     expect(studied.resources.coin).toBe(80);
     expect(studied.resources.knowledge).toBe(84);
-    expect(buildingCost(studied, "lamp-house")).toEqual({ coin: 15, authority: 15 });
-    expect(buildingCost(studied, "buried-engine")).toEqual({ coin: 18, knowledge: 8 });
+    expect(buildingCost(studied, "lamp-house")).toEqual({ coin: 18, authority: 15 });
+    expect(buildingCost(studied, "buried-engine")).toEqual({ coin: 23, knowledge: 8 });
     expect(applyAction(studied, { type: "research", research: "stoneworking" }, 0)).toBe(studied);
     expect(studied.chronicle.filter(id => id === "stoneworking")).toHaveLength(1);
     expect(decodeSave(encodeSave(studied))).toEqual(studied);
@@ -68,20 +69,21 @@ describe("construction labor", () => {
     expect(offline.resources.food).toBe(0);
     expect(offline.resources.coin).toBeCloseTo(foreground.resources.coin);
     expect(offline.jobs.laborer).toBe(4);
-    expect(buildingCost(offline, "lamp-house").coin).toBe(16);
+    expect(buildingCost(offline, "lamp-house").coin).toBe(20);
   });
 
   it("migrates existing version-5 saves without altering resources, records or workers", () => {
     const old = JSON.parse(JSON.stringify(workshop()));
     old.version = 5;
     delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices;
+    delete old.activeConstruction;
     old.jobs = { forager: 3, lamplighter: 1, scrivener: 1 };
     old.buildings["ruined-cistern"] = 1;
     old.activeExpedition = { destination: "old-cistern", workers: 2, startedAt: 0, returnsAt: 180000 };
     old.readChronicle = ["appointment"];
     old.dismissedIllustrations = ["keeper-office"];
     const migrated = decodeSave(JSON.stringify(old));
-    expect(migrated.version).toBe(7);
+    expect(migrated.version).toBe(8);
     expect(migrated.jobs).toEqual({ ...old.jobs, laborer: 0, scavenger: 0 });
     expect(migrated.resources).toEqual(old.resources);
     expect(migrated.chronicle).toEqual(old.chronicle);

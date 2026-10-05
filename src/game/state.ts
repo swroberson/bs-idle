@@ -3,7 +3,7 @@ import type { GameState } from "./types";
 
 export function createInitialState(now: number): GameState {
   return {
-    version: 7,
+    version: 8,
     resources: { ...BALANCE.startingResources },
     population: BALANCE.startingPopulation,
     jobs: { forager: 0, lamplighter: 0, laborer: 0, scavenger: 0, scrivener: 0 },
@@ -17,6 +17,7 @@ export function createInitialState(now: number): GameState {
     readChronicle: [],
     dismissedIllustrations: [],
     activeExpedition: null,
+    activeConstruction: null,
     completedExpeditions: [],
     expeditionLog: [],
     lastSimulatedAt: now,

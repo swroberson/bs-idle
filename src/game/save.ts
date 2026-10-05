@@ -12,6 +12,7 @@ import { createInitialState } from "./state";
 import { ILLUSTRATIONS } from "../content/illustrations";
 import { pendingIllustrations } from "./illustrations";
 import { AWAKENING, WARD_RECORDS } from "../content/awakening";
+import { constructionWork } from "./construction";
 
 const OLD_RESOURCES = ["food", "oil", "authority", "coin", "knowledge", "relics"];
 const OLD_BUILDINGS = ["fields", "oil-press", "market-stall", "scrivener-house", "ruined-cistern", "antiquities-house"];
@@ -31,7 +32,7 @@ function oldIds(value: unknown, allowed: readonly string[]): boolean {
 
 function migrateIllustrations(state: GameState): GameState {
   const backfill = state.buildings["oil-press"] > 0 && !state.chronicle.includes("oil-press-built");
-  const next: GameState = { ...state, version: 7, dismissedIllustrations: [],
+  const next: GameState = { ...state, version: 8, dismissedIllustrations: [],
     chronicle: backfill ? [...state.chronicle, "oil-press-built"] : state.chronicle,
     readChronicle: backfill ? [...state.readChronicle, "oil-press-built"] : state.readChronicle };
   return { ...next, dismissedIllustrations: pendingIllustrations(next) };
@@ -94,7 +95,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   try { value = JSON.parse(text); }
   catch { throw new Error("This is not valid JSON. Choose a Buried Sun save or paste its complete text."); }
   if (!record(value)) throw new Error("The save must contain a game object.");
-  if (![1, 2, 3, 4, 5, 6, 7].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–7.");
+  if (![1, 2, 3, 4, 5, 6, 7, 8].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–8.");
   const originalVersion = value.version as number;
   const legacyIllustrations = originalVersion < 4;
   const chronicle = value.chronicle;
@@ -116,6 +117,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   if (originalVersion >= 4) expeditionKeys.push("dismissedIllustrations");
   if (originalVersion >= 5) expeditionKeys.push("awakenedAt", "finaleStep");
   if (originalVersion >= 7) expeditionKeys.push("eventChoices");
+  if (originalVersion >= 8) expeditionKeys.push("activeConstruction");
   if (Object.hasOwn(value, "readChronicle")) baseKeys.push("readChronicle");
   if (hasWorkers) baseKeys.push("workers");
   const legacy = value.version === 1 || value.version === 2;
@@ -173,6 +175,8 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   if (!record(value)) throw new Error("Invalid migrated save.");
   if (originalVersion < 7) value = { ...value, eventChoices: {} };
   if (!record(value)) throw new Error("Invalid migrated save.");
+  if (originalVersion < 8) value = { ...value, version: 8, activeConstruction: null };
+  if (!record(value)) throw new Error("Invalid migrated save.");
   if (!record(value.eventChoices)) throw new Error("Invalid civic response records.");
   if (!record(value.resources) || !ids(value.chronicle, CHRONICLE) ||
       !record(value.jobs) || !exactKeys(value.jobs, Object.keys(JOBS)) || !Object.values(value.jobs).every(timestamp) ||
@@ -207,6 +211,21 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
     }
   }
   validateRestoration(state);
+  if (value.activeConstruction !== null) {
+    const project = value.activeConstruction;
+    if (!record(project) || !exactKeys(project, ["kind", "id", "workDone", "startedAt"]) ||
+        !finiteNonnegative(project.workDone) || !timestamp(project.startedAt) || project.startedAt > state.lastSimulatedAt ||
+        typeof project.id !== "string" ||
+        (project.kind !== "building" && project.kind !== "research") ||
+        (project.kind === "building" && (!Object.hasOwn(BUILDINGS, project.id) ||
+          state.buildings[project.id as keyof typeof BUILDINGS] >= BUILDINGS[project.id as keyof typeof BUILDINGS].maxLevel ||
+          prerequisiteRequirements(state, BUILDINGS[project.id as keyof typeof BUILDINGS].requirements).length)) ||
+        (project.kind === "research" && (project.id !== "restore-conduit" || state.research.includes("restore-conduit") ||
+          prerequisiteRequirements(state, RESEARCH["restore-conduit"].requirements).length)) ||
+        project.workDone >= constructionWork(state, state.activeConstruction!)) {
+      throw new Error("Invalid save: construction work, project or prerequisites disagree.");
+    }
+  }
   if (!ids(value.completedExpeditions, EXPEDITIONS) || !Array.isArray(value.expeditionLog) || value.expeditionLog.length > BALANCE.expeditionLogLimit ||
       (Object.keys(JOBS) as (keyof typeof JOBS)[]).some(id => state.jobs[id] > 0 && !jobUnlocked(state, id))) throw new Error("Invalid expedition or worker records.");
   for (const id of Object.keys(EXPEDITIONS) as (keyof typeof EXPEDITIONS)[]) {

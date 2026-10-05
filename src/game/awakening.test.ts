@@ -5,23 +5,26 @@ import { economyRates, reconcile } from "./simulation";
 import { decodeSave, encodeSave } from "./save";
 import { resourceVisible } from "./requirements";
 import type { BuildingId, ExpeditionId, GameState, ResearchId } from "./types";
+import { buildCompleted, finishConstruction } from "./construction.test-support";
 import { pendingIllustrations } from "./illustrations";
+import { RESEARCH } from "../content/research";
 
 // Granted stores isolate action/validation behavior; the full-route harness uses none.
 function restoredWard(): GameState {
   let state = createInitialState(0);
   state.resources = { ...state.resources, food: 20000, oil: 20000, authority: 1000, coin: 1000, knowledge: 1000, relics: 20 };
   state.lifetimeAuthority = 1000;
-  const build = (building: BuildingId) => { state = applyAction(state, { type: "build", building }, state.lastSimulatedAt); };
-  const study = (research: ResearchId) => { state = applyAction(state, { type: "research", research }, state.lastSimulatedAt); };
+  state.jobs.laborer = 1;
+  const build = (building: BuildingId) => { state = buildCompleted(state, building); };
+  const study = (research: ResearchId) => { state = applyAction(state, { type: "research", research }, state.lastSimulatedAt); if (state.activeConstruction) state = finishConstruction(state); };
   const travel = (destination: ExpeditionId, duration: number) => {
     state = applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, state.lastSimulatedAt);
     state = applyAction(state, { type: "start-expedition", destination, workers: 1 }, state.lastSimulatedAt);
     state = reconcile(state, state.lastSimulatedAt + duration).state;
   };
   build("fields"); build("oil-press");
-  state = applyAction(state, { type: "choose-event", event: "household" }, 0);
-  state = applyAction(state, { type: "choose-event", event: "lamp-complaint" }, 0);
+  state = applyAction(state, { type: "choose-event", event: "household" }, state.lastSimulatedAt);
+  state = applyAction(state, { type: "choose-event", event: "lamp-complaint" }, state.lastSimulatedAt);
   study("examine-old-lamps"); study("ledger-keeping");
   build("market-stall"); build("scrivener-house"); build("ruined-cistern");
   travel("old-cistern", 180000); build("antiquities-house");
@@ -33,6 +36,26 @@ function restoredWard(): GameState {
 }
 
 describe("deliberate local awakening", () => {
+  it("commits restoration supplies once and withholds the discovery and awakening until crew completion", () => {
+    const state = restoredWard();
+    state.research = state.research.filter(id => id !== "restore-conduit");
+    state.chronicle = state.chronicle.filter(id => id !== "conduit-restored");
+    const now = state.lastSimulatedAt;
+    const started = applyAction(state, { type: "research", research: "restore-conduit" }, now);
+    expect(started.resources.coin).toBe(state.resources.coin - RESEARCH["restore-conduit"].cost.coin);
+    expect(started.resources.knowledge).toBe(state.resources.knowledge - 120);
+    expect(started.research).not.toContain("restore-conduit");
+    expect(started.chronicle).not.toContain("conduit-restored");
+    expect(applyAction(started, { type: "research", research: "restore-conduit" }, now)).toBe(started);
+    expect(applyAction(started, { type: "awaken-junction" }, now)).toBe(started);
+    const halfway = reconcile(started, now + 60_000).state;
+    expect(decodeSave(encodeSave(halfway))).toEqual(halfway);
+    const complete = reconcile(halfway, now + 120_000);
+    expect(complete.state.research).toContain("restore-conduit");
+    expect(complete.state.chronicle.filter(id => id === "conduit-restored")).toHaveLength(1);
+    expect(complete.summary.completedConstruction).toEqual([{ kind: "research", id: "restore-conduit" }]);
+    expect(complete.state.awakenedAt).toBeNull();
+  });
   it("earns chamber artwork through opening and finale artwork only through deliberate awakening", () => {
     expect(pendingIllustrations(createInitialState(0))).not.toContain("sealed-chamber");
     const ready = restoredWard();
@@ -66,6 +89,7 @@ describe("deliberate local awakening", () => {
   it("keeps Authority without Oil and accrues Current only after activation, with shortage rules", () => {
     const ready = restoredWard();
     ready.jobs.lamplighter = 2; ready.jobs.forager = 3;
+    ready.resources.authority = 0;
     ready.buildings["oil-press"] = 0; ready.resources.oil = 0;
     expect(economyRates(ready).net.authority).toBe(0);
     const awake = applyAction(ready, { type: "awaken-junction" }, ready.lastSimulatedAt);
@@ -106,7 +130,8 @@ describe("deliberate local awakening", () => {
   });
 
   it("reconciles foreground and offline through Food depletion, caps Current, and counts the interval once", () => {
-    const awake = applyAction(restoredWard(), { type: "awaken-junction" }, 720000);
+    const ready = restoredWard();
+    const awake = applyAction(ready, { type: "awaken-junction" }, ready.lastSimulatedAt);
     awake.resources.food = 1; awake.jobs.lamplighter = 1;
     const start = awake.lastSimulatedAt;
     let ticks = awake;
@@ -129,12 +154,13 @@ describe("deliberate local awakening", () => {
     old.completedExpeditions = ["old-cistern"];
     old.expeditionLog = old.expeditionLog.filter((entry: { destination: string }) => entry.destination === "old-cistern");
     old.version = 4; delete old.resources.current; delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices;
+    delete old.activeConstruction;
     for (const id of ["lamp-house", "smithy", "subterranean-works", "buried-engine"]) delete old.buildings[id];
     old.readChronicle = ["appointment"];
     old.dismissedIllustrations = ["keeper-office"];
     old.activeExpedition = { destination: "abandoned-farmstead", workers: 2, startedAt: old.lastSimulatedAt, returnsAt: old.lastSimulatedAt + 240000 };
     state = decodeSave(JSON.stringify(old));
-    expect(state.version).toBe(7);
+    expect(state.version).toBe(8);
     expect(state.resources).toEqual({ ...old.resources, current: 0 });
     expect(state.activeExpedition).toEqual(old.activeExpedition);
     expect(state.lastSimulatedAt).toBe(old.lastSimulatedAt);
@@ -150,11 +176,12 @@ describe("deliberate local awakening", () => {
 
   it("supports optional civic modifiers without requiring their findings for the ending", () => {
     let state = restoredWard();
-    const now = state.lastSimulatedAt;
     state.jobs.forager = 3; state.jobs.lamplighter = 1;
+    state.resources.food = 30;
     const base = economyRates(state).net;
-    for (const building of ["lamp-house", "smithy"] as const) state = applyAction(state, { type: "build", building }, now);
-    for (const research of ["crop-rotation", "iron-tools", "better-wicks", "improved-presses"] as const) state = applyAction(state, { type: "research", research }, now);
+    for (const building of ["lamp-house", "smithy"] as const) state = buildCompleted(state, building);
+    for (const research of ["crop-rotation", "iron-tools", "better-wicks", "improved-presses"] as const) state = applyAction(state, { type: "research", research }, state.lastSimulatedAt);
+    state.resources.food = 30; state.resources.oil = 20; state.resources.authority = 0;
     const rates = economyRates(state).net;
     expect(rates.food + state.population * .025).toBeCloseTo((base.food + state.population * .025) * 1.25 * 1.2);
     expect(rates.oil).toBeCloseTo(.1 * 1.25 - .075 * .75);

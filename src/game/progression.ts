@@ -5,13 +5,13 @@ import { BALANCE } from "../content/balance";
 
 // Eligibility can be reached and then lost before an offline interval ends.
 // Stop at the next threshold so the report remains pending after shortages.
-export function secondsUntilEvent(state: GameState, net: Record<ResourceId, number>): number {
+export function secondsUntilEvent(state: GameState, net: Record<ResourceId, number>, authorityProduction = net.authority): number {
   let nearest = Infinity;
   for (const id of Object.keys(EVENTS) as EventId[]) {
     const event: EventDefinition = EVENTS[id];
     if (state.triggeredEvents.includes(id) || prerequisiteRequirements(state, { ...event.requirements, lifetimeAuthority: 0 }).length ||
         (event.provisionedArrival && state.population + event.population > BALANCE.populationCap)) continue;
-    const thresholds = [[(event.requirements.lifetimeAuthority ?? 0) - state.lifetimeAuthority, net.authority]];
+    const thresholds = [[(event.requirements.lifetimeAuthority ?? 0) - state.lifetimeAuthority, authorityProduction]];
     if (event.provisionedArrival) {
       for (const [resource, amount] of Object.entries(event.cost) as [ResourceId, number][]) thresholds.push([amount - state.resources[resource], net[resource]]);
     }

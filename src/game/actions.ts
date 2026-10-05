@@ -1,5 +1,6 @@
 import { BALANCE } from "../content/balance";
-import type { BuildingDefinition, EventDefinition, GameAction, GameState, ResourceId } from "./types";
+import { storedAmount } from "./storage";
+import type { EventDefinition, GameAction, GameState, ResourceId } from "./types";
 import { BUILDINGS } from "../content/buildings";
 import { JOBS } from "../content/jobs";
 import { EVENTS } from "../content/events";
@@ -42,12 +43,13 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
   let next = reconcile(state, now).state;
   switch (action.type) {
     case "render-oil":
-      if (next.resources.food < BALANCE.emergencyOilFood) return next;
+      if (next.resources.food < BALANCE.emergencyOilFood || storedAmount(next, "oil", BALANCE.emergencyOil) === next.resources.oil) return next;
       next = { ...next, lastGatheredAt: now, resources: { ...next.resources, food: next.resources.food - BALANCE.emergencyOilFood,
-        oil: Math.min(Number.MAX_SAFE_INTEGER, next.resources.oil + BALANCE.emergencyOil) } };
+        oil: storedAmount(next, "oil", BALANCE.emergencyOil) } };
       break;
     case "gather-food":
-      next = { ...next, lastGatheredAt: now, resources: { ...next.resources, food: Math.min(Number.MAX_SAFE_INTEGER, next.resources.food + BALANCE.gatheringFood) } };
+      if (storedAmount(next, "food", BALANCE.gatheringFood) === next.resources.food) return next;
+      next = { ...next, lastGatheredAt: now, resources: { ...next.resources, food: storedAmount(next, "food", BALANCE.gatheringFood) } };
       break;
     case "assign-worker":
       if (!jobUnlocked(next, action.job)) return next;
@@ -56,12 +58,8 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
       break;
     case "build":
       if (buildingRequirements(next, action.building).length) return next;
-      const building: BuildingDefinition = BUILDINGS[action.building];
-      if (building.chronicle && next.buildings[action.building] === 0) next = { ...next, chronicle: [...next.chronicle, building.chronicle] };
-      if (action.building === "oil-press" && next.buildings["oil-press"] === 0) {
-        next = { ...next, chronicle: [...next.chronicle, "oil-press-built"] };
-      }
-      next = { ...payCost(next, buildingCost(next, action.building)), buildings: { ...next.buildings, [action.building]: next.buildings[action.building] + 1 } };
+      next = { ...payCost(next, buildingCost(next, action.building)),
+        activeConstruction: { kind: "building", id: action.building, workDone: 0, startedAt: now } };
       break;
     case "choose-event": {
       if (next.pendingEvents[0] !== action.event || eventRequirements(next, action.event, action.choice).length) return next;
@@ -69,7 +67,7 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
       const response = eventChoices(action.event).find(item => item.id === (action.choice ?? "accept"))!;
       next = payCost(next, response.cost);
       const resources = { ...next.resources };
-      for (const [id, amount] of Object.entries(response.rewards) as [ResourceId, number][]) resources[id] = Math.min(Number.MAX_SAFE_INTEGER, resources[id] + amount);
+      for (const [id, amount] of Object.entries(response.rewards) as [ResourceId, number][]) resources[id] = storedAmount(next, id, amount);
       next = { ...next, resources, lifetimeAuthority: Math.min(Number.MAX_SAFE_INTEGER, next.lifetimeAuthority + (response.rewards.authority ?? 0)),
         eventChoices: event.choices ? { ...next.eventChoices, [action.event]: response.id } : next.eventChoices,
         population: next.population + event.population, pendingEvents: next.pendingEvents.slice(1), chronicle: [...next.chronicle, event.chronicle] };
@@ -86,6 +84,11 @@ export function applyAction(state: GameState, action: GameAction, now: number): 
     }
     case "research":
       if (researchRequirements(next, action.research).length) return next;
+      if (action.research === "restore-conduit") {
+        next = { ...payCost(next, RESEARCH[action.research].cost),
+          activeConstruction: { kind: "research", id: action.research, workDone: 0, startedAt: now } };
+        break;
+      }
       next = { ...payCost(next, RESEARCH[action.research].cost), research: [...next.research, action.research], chronicle: [...next.chronicle, RESEARCH[action.research].chronicle] };
       break;
     case "awaken-junction":

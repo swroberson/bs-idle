@@ -69,12 +69,15 @@ describe("elapsed-time economy", () => {
 
   it("caps an absence and consumes the whole timestamp so reload cannot earn it twice", () => {
     const state = createInitialState(0);
-    state.jobs.forager = 5;
+    state.jobs = { ...state.jobs, forager: 2, lamplighter: 2 };
+    state.buildings["oil-press"] = 2;
     const now = 12 * 60 * 60 * 1000;
     const result = reconcile(state, now);
     expect(result.summary.elapsedMs).toBe(now);
     expect(result.summary.productionMs).toBe(BALANCE.offlineProductionCapMs);
-    expect(result.state.resources.food).toBeCloseTo(30 + .475 * 28_800);
+    expect(result.state.resources.food).toBe(BALANCE.storageCapacity.food);
+    // Lifetime output stays uncapped by storage, so this still proves the time cap.
+    expect(result.state.lifetimeAuthority).toBeCloseTo(.2 * 28_800);
     expect(result.state.lastSimulatedAt).toBe(now);
     expect(reconcile(result.state, now).state).toBe(result.state);
     expect(reconcile(result.state, -1000).state).toBe(result.state);

@@ -2,24 +2,27 @@ import { describe, expect, it } from "vitest";
 import { applyAction } from "./actions";
 import { createInitialState } from "./state";
 import { economyRates, reconcile } from "./simulation";
-import { buildingCost, constructionDiscount, expeditionCost } from "./requirements";
+import { buildingCost, expeditionCost } from "./requirements";
 import { decodeSave, encodeSave } from "./save";
 import type { ResearchId } from "./types";
+import { buildCompleted } from "./construction.test-support";
+import { constructionSpeed } from "./construction";
 import { writeFileSync } from "node:fs";
 
 function civicWard() {
   let state = createInitialState(0);
   state.resources = { ...state.resources, food: 1000, oil: 1000, coin: 1000, knowledge: 1000, authority: 1000 };
   state.lifetimeAuthority = 1000;
-  for (const building of ["fields", "oil-press"] as const) state = applyAction(state, { type: "build", building }, 0);
-  for (const event of ["household", "lamp-complaint"] as const) state = applyAction(state, { type: "choose-event", event }, 0);
-  for (const research of ["examine-old-lamps", "ledger-keeping"] as const) state = applyAction(state, { type: "research", research }, 0);
-  for (const building of ["market-stall", "scrivener-house", "ruined-cistern", "smithy"] as const) state = applyAction(state, { type: "build", building }, 0);
-  state = applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, 0);
-  state = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, 0);
-  state = reconcile(state, 180000).state;
-  state = applyAction(state, { type: "build", building: "antiquities-house" }, 180000);
-  for (const research of ["catalog-relics", "stoneworking"] as const) state = applyAction(state, { type: "research", research }, 180000);
+  state.jobs.laborer = 1;
+  for (const building of ["fields", "oil-press"] as const) state = buildCompleted(state, building);
+  for (const event of ["household", "lamp-complaint"] as const) state = applyAction(state, { type: "choose-event", event }, state.lastSimulatedAt);
+  for (const research of ["examine-old-lamps", "ledger-keeping"] as const) state = applyAction(state, { type: "research", research }, state.lastSimulatedAt);
+  for (const building of ["market-stall", "scrivener-house", "ruined-cistern", "smithy"] as const) state = buildCompleted(state, building);
+  state = applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, state.lastSimulatedAt);
+  state = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, state.lastSimulatedAt);
+  state = reconcile(state, state.lastSimulatedAt + 180000).state;
+  state = buildCompleted(state, "antiquities-house");
+  for (const research of ["catalog-relics", "stoneworking"] as const) state = applyAction(state, { type: "research", research }, state.lastSimulatedAt);
   return state;
 }
 
@@ -45,21 +48,18 @@ describe("civic studies", () => {
     expect(decodeSave(encodeSave(sent))).toEqual(sent);
   });
 
-  it("makes fewer Laborers reach the existing cap and leaves other costs intact", () => {
+  it("improves Laborer work speed without changing Stoneworking costs", () => {
     const state = study("apprenticed-hands");
-    state.jobs.laborer = 1;
-    expect(constructionDiscount(state).perLaborer).toBeCloseTo(.075);
-    expect(constructionDiscount(state).laborer).toBeCloseTo(.075);
+    expect(constructionSpeed(state)).toBeCloseTo(1.25);
+    expect(buildingCost(state, "lamp-house")).toEqual({ coin: 18, authority: 15 });
     state.jobs.laborer = 3;
-    expect(constructionDiscount(state).laborer).toBe(.2);
-    expect(buildingCost(state, "lamp-house")).toEqual({ coin: 15, authority: 15 });
-    state.jobs.laborer = 0;
     expect(buildingCost(state, "lamp-house").coin).toBe(18);
     expect(decodeSave(encodeSave(state))).toEqual(state);
   });
 
   it("improves Scrivener output once, retains shortage rules and foreground/offline consistency", () => {
     const state = study("collated-records");
+    state.resources.knowledge = 0;
     state.jobs.scrivener = 2;
     expect(economyRates(state).net.knowledge).toBeCloseTo(.2);
     state.resources.food = 1;
@@ -86,6 +86,7 @@ describe("deliberate civic responses", () => {
 
   it.each([["full-meal", 30, 10], ["small-meal", 10, 3]] as const)("records %s and its exact one-time Food/Authority exchange", (choice, food, authority) => {
     const state = study("provision-stores");
+    state.resources.authority = 0;
     const selected = applyAction(state, { type: "choose-event", event: "shared-table", choice }, state.lastSimulatedAt);
     expect(selected.resources.food).toBe(state.resources.food - food);
     expect(selected.resources.authority).toBe(state.resources.authority + authority);
@@ -100,6 +101,7 @@ describe("deliberate civic responses", () => {
 
   it.each(["provisions", "coin"] as const)("pays for spare oil with %s without changing future production", choice => {
     const state = study("apprenticed-hands");
+    state.resources.oil = 20;
     const chosen = applyAction(state, { type: "choose-event", event: "spare-oil", choice }, state.lastSimulatedAt);
     expect(chosen.resources.oil).toBe(state.resources.oil + 10);
     expect(chosen.resources.food).toBe(state.resources.food - (choice === "provisions" ? 20 : 0));
@@ -132,9 +134,11 @@ describe("deliberate civic responses", () => {
     expect(() => decodeSave(JSON.stringify(missing))).toThrow();
     const old = JSON.parse(JSON.stringify(pending));
     old.version = 6; delete old.jobs.scavenger; delete old.eventChoices;
+    delete old.activeConstruction;
     expect(() => decodeSave(JSON.stringify(old))).toThrow();
     const valid = JSON.parse(JSON.stringify(civicWard()));
     valid.version = 6; delete valid.jobs.scavenger; delete valid.eventChoices;
+    delete valid.activeConstruction;
     expect(decodeSave(JSON.stringify(valid)).eventChoices).toEqual({});
     if (process.env.BS_CAPTURE_SAVES) {
       writeFileSync("/tmp/buried-sun-civic.json", encodeSave(civicWard()));

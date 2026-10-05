@@ -3,7 +3,8 @@ import { expect, it } from "vitest";
 import { createInitialState } from "./state";
 import { applyAction } from "./actions";
 import { reconcile } from "./simulation";
-import { buildingRequirements, eventRequirements, researchRequirements } from "./requirements";
+import { eventRequirements, researchRequirements } from "./requirements";
+import { releaseIdleCrew, startBuilding } from "./construction.test-support";
 import { decodeSave, encodeSave } from "./save";
 
 it("reaches the opening discovery from a fresh save without grants or manual gathering", () => {
@@ -13,11 +14,13 @@ it("reaches the opening discovery from a fresh save without grants or manual gat
   for (let n = 0; n < 2; n++) state = applyAction(state, { type: "assign-worker", job: "lamplighter", delta: 1 }, 0);
   for (let second = 1; second <= 600; second++) {
     const now = second * 1000;
-    state = reconcile(state, now).state;
+    const tick = reconcile(state, now);
+    state = tick.state;
+    for (const project of tick.summary.completedConstruction) milestones[project.id] = second;
+    state = releaseIdleCrew(state);
     for (const id of ["fields", "oil-press"] as const) {
-      if (state.buildings[id] === 0 && buildingRequirements(state, id).length === 0) {
-        state = applyAction(state, { type: "build", building: id }, now);
-        milestones[id] = second;
+      if (state.buildings[id] === 0) {
+        state = startBuilding(state, id);
       }
     }
     const event = state.pendingEvents[0];

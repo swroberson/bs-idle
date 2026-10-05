@@ -5,22 +5,24 @@ import { createInitialState } from "./state";
 import { decodeSave, encodeSave } from "./save";
 import { reconcile } from "./simulation";
 import { readFileSync } from "node:fs";
+import { buildCompleted, finishConstruction } from "./construction.test-support";
 import { ILLUSTRATIONS } from "../content/illustrations";
 
 function accomplished() {
   let state = createInitialState(0);
   state.resources = { ...state.resources, food: 20_000, oil: 20_000, coin: 1000, authority: 1000 };
   state.lifetimeAuthority = 1000;
-  state = applyAction(state, { type: "build", building: "fields" }, 0);
-  state = applyAction(state, { type: "build", building: "oil-press" }, 0);
-  state = applyAction(state, { type: "choose-event", event: "household" }, 0);
-  state = applyAction(state, { type: "choose-event", event: "lamp-complaint" }, 0);
-  state = applyAction(state, { type: "research", research: "examine-old-lamps" }, 0);
-  state = applyAction(state, { type: "research", research: "ledger-keeping" }, 0);
+  state.jobs.laborer = 1;
+  state = buildCompleted(state, "fields");
+  state = buildCompleted(state, "oil-press");
+  state = applyAction(state, { type: "choose-event", event: "household" }, state.lastSimulatedAt);
+  state = applyAction(state, { type: "choose-event", event: "lamp-complaint" }, state.lastSimulatedAt);
+  state = applyAction(state, { type: "research", research: "examine-old-lamps" }, state.lastSimulatedAt);
+  state = applyAction(state, { type: "research", research: "ledger-keeping" }, state.lastSimulatedAt);
   for (const building of ["market-stall", "scrivener-house", "ruined-cistern"] as const) {
-    state = applyAction(state, { type: "build", building }, 0);
+    state = buildCompleted(state, building);
   }
-  return applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, 0);
+  return applyAction(state, { type: "assign-worker", job: "scavenger", delta: 1 }, state.lastSimulatedAt);
 }
 
 describe("illustrated accomplishments", () => {
@@ -33,49 +35,53 @@ describe("illustrated accomplishments", () => {
 
   it("does not reveal available content or failed actions", () => {
     const state = createInitialState(0);
-    expect(applyAction(state, { type: "build", building: "oil-press" }, 0)).toBe(state);
-    expect(applyAction(state, { type: "research", research: "examine-old-lamps" }, 0)).toBe(state);
-    expect(applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, 0)).toBe(state);
+    expect(applyAction(state, { type: "build", building: "oil-press" }, state.lastSimulatedAt)).toBe(state);
+    expect(applyAction(state, { type: "research", research: "examine-old-lamps" }, state.lastSimulatedAt)).toBe(state);
+    expect(applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, state.lastSimulatedAt)).toBe(state);
     expect(pendingIllustrations(state)).toEqual(["keeper-office"]);
   });
 
   it("records first construction and research in accomplishment order, without repeats", () => {
     const state = accomplished();
     expect(pendingIllustrations(state)).toEqual(["keeper-office", "oil-press", "lamp-examination"]);
-    const upgraded = applyAction(state, { type: "build", building: "oil-press" }, 0);
+    const upgraded = applyAction(state, { type: "build", building: "oil-press" }, state.lastSimulatedAt);
     expect(upgraded.chronicle.filter(id => id === "oil-press-built")).toHaveLength(1);
     expect(pendingIllustrations(upgraded)).toEqual(pendingIllustrations(state));
-    expect(applyAction(upgraded, { type: "research", research: "examine-old-lamps" }, 0)).toBe(upgraded);
+    const finished = finishConstruction(upgraded);
+    expect(finished.chronicle.filter(id => id === "oil-press-built")).toHaveLength(1);
+    expect(pendingIllustrations(finished)).toEqual(pendingIllustrations(state));
+    expect(applyAction(upgraded, { type: "research", research: "examine-old-lamps" }, upgraded.lastSimulatedAt)).toBe(upgraded);
   });
 
   it("reveals a first return offline and never replays a repeated expedition", () => {
-    const sent = applyAction(accomplished(), { type: "start-expedition", destination: "old-cistern", workers: 1 }, 0);
+    const state = accomplished();
+    const sent = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, state.lastSimulatedAt);
     expect(pendingIllustrations(sent)).not.toContain("cistern-find");
-    const returned = reconcile(sent, 180_000).state;
+    const returned = reconcile(sent, sent.lastSimulatedAt + 180_000).state;
     expect(pendingIllustrations(returned)).toEqual(["keeper-office", "oil-press", "lamp-examination", "cistern-find"]);
-    const dismissed = applyAction(returned, { type: "dismiss-illustrations", ids: pendingIllustrations(returned) }, 180_000);
-    const reassigned = applyAction(dismissed, { type: "assign-worker", job: "scavenger", delta: 1 }, 180_000);
-    const repeat = applyAction(reassigned, { type: "start-expedition", destination: "old-cistern", workers: 1 }, 180_000);
-    expect(pendingIllustrations(reconcile(repeat, 360_000).state)).toEqual([]);
+    const dismissed = applyAction(returned, { type: "dismiss-illustrations", ids: pendingIllustrations(returned) }, returned.lastSimulatedAt);
+    const reassigned = applyAction(dismissed, { type: "assign-worker", job: "scavenger", delta: 1 }, returned.lastSimulatedAt);
+    const repeat = applyAction(reassigned, { type: "start-expedition", destination: "old-cistern", workers: 1 }, returned.lastSimulatedAt);
+    expect(pendingIllustrations(reconcile(repeat, repeat.lastSimulatedAt + 180_000).state)).toEqual([]);
   });
 
   it("dismisses only the selected reveal and persists both pending and dismissed art", () => {
     const state = accomplished();
-    const next = applyAction(state, { type: "dismiss-illustrations", ids: ["keeper-office"] }, 0);
+    const next = applyAction(state, { type: "dismiss-illustrations", ids: ["keeper-office"] }, state.lastSimulatedAt);
     expect(pendingIllustrations(next)).toEqual(["oil-press", "lamp-examination"]);
     expect(next.readChronicle).toEqual([]);
     expect(next.resources).toEqual(state.resources);
     expect(decodeSave(encodeSave(next))).toEqual(next);
     expect(pendingIllustrations(decodeSave(encodeSave(next)))).toEqual(["oil-press", "lamp-examination"]);
-    expect(applyAction(next, { type: "dismiss-illustrations", ids: ["keeper-office"] }, 0)).toBe(next);
+    expect(applyAction(next, { type: "dismiss-illustrations", ids: ["keeper-office"] }, next.lastSimulatedAt)).toBe(next);
   });
 
   it("leaves a queue snapshot in the Chronicle without dismissing a later discovery", () => {
     const state = accomplished();
     const waiting = pendingIllustrations(state);
-    const sent = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, 0);
-    const returned = reconcile(sent, 180_000).state;
-    const skipped = applyAction(returned, { type: "dismiss-illustrations", ids: waiting }, 180_000);
+    const sent = applyAction(state, { type: "start-expedition", destination: "old-cistern", workers: 1 }, state.lastSimulatedAt);
+    const returned = reconcile(sent, sent.lastSimulatedAt + 180_000).state;
+    const skipped = applyAction(returned, { type: "dismiss-illustrations", ids: waiting }, returned.lastSimulatedAt);
     expect(pendingIllustrations(skipped)).toEqual(["cistern-find"]);
     expect(skipped.chronicle).toEqual(returned.chronicle);
     expect(skipped.readChronicle).toEqual([]);
@@ -83,7 +89,7 @@ describe("illustrated accomplishments", () => {
 
   it("continues the economy while a reveal is waiting", () => {
     let state = createInitialState(0);
-    for (let i = 0; i < 2; i++) state = applyAction(state, { type: "assign-worker", job: "forager", delta: 1 }, 0);
+    for (let i = 0; i < 2; i++) state = applyAction(state, { type: "assign-worker", job: "forager", delta: 1 }, state.lastSimulatedAt);
     const later = reconcile(state, 10_000).state;
     expect(later.resources.food).toBeGreaterThan(state.resources.food);
     expect(pendingIllustrations(later)).toEqual(["keeper-office"]);
@@ -92,18 +98,18 @@ describe("illustrated accomplishments", () => {
   it("reveals the Smithy only after its first construction and persists dismissal", () => {
     const before = accomplished();
     expect(pendingIllustrations(before)).not.toContain("smithy");
-    const built = applyAction(before, { type: "build", building: "smithy" }, 0);
+    const built = buildCompleted(before, "smithy");
     expect(pendingIllustrations(built)).toContain("smithy");
-    const dismissed = applyAction(built, { type: "dismiss-illustrations", ids: ["smithy"] }, 0);
+    const dismissed = applyAction(built, { type: "dismiss-illustrations", ids: ["smithy"] }, built.lastSimulatedAt);
     expect(pendingIllustrations(decodeSave(encodeSave(dismissed)))).not.toContain("smithy");
-    expect(applyAction(dismissed, { type: "build", building: "smithy" }, 0)).toBe(dismissed);
+    expect(applyAction(dismissed, { type: "build", building: "smithy" }, dismissed.lastSimulatedAt)).toBe(dismissed);
     expect(dismissed.chronicle.filter(id => id === "smithy-built")).toHaveLength(1);
   });
 
   it.each([["unknown"], [null], [{}], ["__proto__"], ["oil-press"], ["keeper-office", "keeper-office"], null, "keeper-office"])(
     "rejects invalid or unearned dismissal actions: %j", ids => {
       const state = createInitialState(0);
-      expect(applyAction(state, { type: "dismiss-illustrations", ids } as never, 0)).toBe(state);
+      expect(applyAction(state, { type: "dismiss-illustrations", ids } as never, state.lastSimulatedAt)).toBe(state);
     },
   );
 });
@@ -127,10 +133,11 @@ describe("illustration save migration", () => {
     const old = JSON.parse(JSON.stringify(state));
     delete old.dismissedIllustrations;
     delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices; delete old.resources.current;
+    delete old.activeConstruction;
     for (const id of ["lamp-house", "smithy", "subterranean-works", "buried-engine"]) delete old.buildings[id];
     const chronicle = state.chronicle.filter(id => id !== "oil-press-built");
     const migrated = decodeSave(JSON.stringify({ ...old, version: 3, chronicle, readChronicle: ["appointment"] }));
-    expect(migrated.version).toBe(7);
+    expect(migrated.version).toBe(8);
     expect(migrated.resources).toEqual(state.resources);
     expect(migrated.lastSimulatedAt).toBe(state.lastSimulatedAt);
     expect(migrated.chronicle).toEqual([...chronicle, "oil-press-built"]);

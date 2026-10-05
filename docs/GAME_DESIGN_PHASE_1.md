@@ -73,6 +73,24 @@ The first useful action should be available immediately. Provide a small manual 
 
 Use Knowledge and Relics as spendable currencies. For Authority, distinguish current spendable stock from lifetime earned totals when a discovery requires evidence of progress. Spending a resource must not erase a milestone already reached.
 
+Limit accumulated supplies equally in active and offline play. Initial capacities
+are 80 Food, 40 Oil, 40 Authority, 40 Coin and 30 Knowledge. Completed Fields
+add 40 Food capacity per level; Oil Presses add 40 Oil; Market Stalls add 20 Coin
+and 10 Authority; Lamp Houses add 20 Authority. The Scrivener's House and House
+of Antiquities each add 15 Knowledge capacity. Completing the Buried Engine
+adds 100 Coin and 90 Knowledge capacity so restoration supplies fit without
+requiring optional improvements. Relics and Current have no gameplay storage
+limit. These numbers remain provisional.
+
+At capacity, additional gains stop while consumption, lamps, work and expedition
+timers continue. Lifetime Authority still records lamp output and event rewards,
+even when the spendable store is full. Preserve any surplus from older saves;
+it can be spent normally but cannot grow until it falls below capacity. Expedition
+logs record only supplies actually stored, while discoveries and returning workers
+are applied regardless of available storage. Display capacities and actual net
+store rates; explain full stores in resource details and return reports. Do not
+advertise capacities for resources the player has not discovered.
+
 ### Population and jobs
 
 Population is a count of inhabitants, not a consumable currency. Workers assigned to jobs or expeditions come from the same pool. Idle inhabitants still consume food.
@@ -81,13 +99,13 @@ Population is a count of inhabitants, not a consumable currency. Workers assigne
 |---|---|
 | Forager | Produces Food; later benefits from Fields |
 | Lamplighter | Consumes Oil and produces Authority |
-| Laborer | Reduces construction costs within a defined cap |
+| Laborer | Performs work on the active construction or restoration project |
 | Scavenger | Becomes eligible for expeditions that recover Relics |
 | Scrivener | Produces Knowledge once scholarship is unlocked |
 
 Workers on expeditions are unavailable for ordinary jobs until they return. Phase 1 uses automatic Coin and Oil production from the corresponding buildings to avoid introducing more jobs than the opening needs.
 
-For the initial version, construction completes immediately when purchased. Apply the Laborer discount to eligible Coin costs only, with a visible maximum discount. Keep scarce Relic and Knowledge requirements intact. All numerical rates and discounts belong in content or balance definitions.
+Construction uses one active project with an adjustable Laborer crew, available alongside initial Works. Pay displayed supplies upfront; apply the building or physical restoration result only when its required work is finished. Removing all Laborers pauses work without loss, and workers remain assigned after completion. Each Laborer performs 1 work/s before study modifiers and Food-shortage penalties. Ordinary projects begin at 30–60 work; larger installations at 90. Work follows the eight-hour offline production cap, with completion boundaries splitting the simulation so new production starts at the correct time. Stoneworking retains its building Coin reduction; Apprenticed Hands improves work speed. Keep scarce Relic and Knowledge requirements intact. All numerical work, rates, costs and modifiers belong in content or balance definitions.
 
 New population arrives through one-time narrative household events, gated by sufficient Authority, provisions, and a population cap. Phase 1 does not need a separate housing system.
 

@@ -1,6 +1,6 @@
 # Buried Sun: Narrative Bible
 
-**Edition:** 1.7 — October 4, 2026
+**Edition:** 1.8 — October 4, 2026
 
 **Audience:** authors and agents; contains end-of-story spoilers  
 **Status:** approved story foundations, provisional chapter outline, and an audit of existing content
@@ -338,12 +338,9 @@ both representations consistently.
 ### Ordinary construction and another household — October 2, 2026
 
 The user requested Laborers and Stoneworking, followed by another household
-before further catalog expansion. These are optional civic developments in
-Chapter 1, independent of the archaeological spine.
+before further catalog expansion. Stoneworking and the household remain optional civic developments in Chapter 1. The October 4 revision makes Laborer crews part of ordinary construction from initial Works, without adding a new narrative prerequisite or changing the archaeological spine.
 
-- `laborer` becomes assignable after the Smithy. Its work is preparing stone
-  and carrying materials; the capped Coin discount is a game rule, not evidence
-  of an unfamiliar system. No new building or special worker ancestry is added.
+- `laborer` now becomes assignable alongside initial Works (October 4 crew revision), replacing the earlier Smithy gate and capped Coin discount. Its work remains preparing stone and carrying materials. Buildings and conduit restoration record their established results only after the crew completes the work. Stoneworking keeps its Coin saving; Apprenticed Hands improves crew speed. These are game rules, not evidence of an unfamiliar system. No new building, worker ancestry, history or mystery interpretation is added.
 - `stoneworking` requires the Smithy and Scrivener's House. Its matching study
   and Chronicle text records dressing chipped stone and setting reusable pieces
   aside. It does not interpret inherited materials or anomalous architecture.
@@ -671,3 +668,4 @@ narrative automatically.
 | 2026-10-04 | Edition 1.5: user approved the detailed pixel Keeper's Office, requested darkness outside its doorway, then directed applying that style to the other illustrations and correcting the Oil Press handle connection. | Replaced all four illustration assets with detailed pixel art retaining realistic proportions, rich amber lighting, enclosed viewpoints and established contents. Press turning bar now connects to the screw hub beneath the fixed beam. Updated AGENTS.md and docs/ART.md. Captions, chronology, clues, mysteries, reveal limits, gameplay and saves unchanged. |
 | 2026-10-04 | Edition 1.6: user approved the proposed Smithy, Sealed Chamber and Awakening art batch, then requested no people in the pictures, only workstations and discoveries. | Added three illustrations bound to existing accomplished Chronicle records; removed the Oil Press worker and cistern hand. All seven images omit figures and body parts. The finale uses neutral white light; its art follows the existing staged passages. Existing captions, local lamp relationship, clue chronology, mysteries, mechanical rewards and saves are preserved. Unoccupied compositions imply no disappearance or change to the settlement's population. |
 | 2026-10-04 | Edition 1.7: user requested a Sealed Chamber picture revision after comparing its odd closure with the discovery text. | Revised the fitted slab's profile and surround, simplified ordinary tackle to a rope sling, quieted the ancient black material and reduced the bench-like interior shape. No exposed pivot mechanism, people, new explanation or later platform. Caption, access sequence, clues, mysteries, reveal limits and gameplay unchanged. Exact edit prompts in docs/ART_CHAMBER_REVISION.md. |
+| 2026-10-04 | Edition 1.8: user approved trying assigned construction crews and introducing Laborers alongside the initial construction mechanic. | Replaced the instantaneous worker discount with one adjustable, pausable construction project, early Laborer availability, crew-based conduit restoration and version-8 persistence. Existing supplies, discoveries and illustrations are committed at their appropriate start/completion boundaries; awakening remains deliberate. Existing prose, household chronology, clues and reveal limits are preserved. Apprenticed Hands changes work speed; Stoneworking retains its Coin saving. No major lore or new interpretation. |

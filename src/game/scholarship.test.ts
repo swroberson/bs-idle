@@ -3,6 +3,7 @@ import { createInitialState } from "./state";
 import { applyAction } from "./actions";
 import { economyRates } from "./simulation";
 import { decodeSave, encodeSave } from "./save";
+import { buildCompleted } from "./construction.test-support";
 import { resourceVisible } from "./requirements";
 
 function openingSave() {
@@ -16,7 +17,7 @@ describe("scholarship and save compatibility", () => {
   it("migrates a version-2 discovery without changing stores, jobs or elapsed time", () => {
     const old = openingSave();
     const migrated = decodeSave(JSON.stringify(old), 999000);
-    expect(migrated.version).toBe(7);
+    expect(migrated.version).toBe(8);
     expect(migrated.lastSimulatedAt).toBe(old.lastSimulatedAt);
     expect(migrated.resources).toEqual({ ...createInitialState(0).resources, ...old.resources });
     expect(migrated.jobs).toEqual({ ...old.jobs, scrivener: 0, laborer: 0, scavenger: 0 });
@@ -38,19 +39,22 @@ describe("scholarship and save compatibility", () => {
     state.resources.authority = 60;
     expect(applyAction(state, { type: "build", building: "market-stall" }, now)).toBe(state);
     state = applyAction(state, { type: "research", research: "ledger-keeping" }, now);
-    state = applyAction(state, { type: "build", building: "market-stall" }, now);
+    state.jobs.laborer = 1;
+    state = buildCompleted(state, "market-stall");
     state.resources.coin = 100;
-    state = applyAction(state, { type: "build", building: "scrivener-house" }, now);
-    state = applyAction(state, { type: "assign-worker", job: "scrivener", delta: 1 }, now);
+    state = buildCompleted(state, "scrivener-house");
+    state = applyAction(state, { type: "assign-worker", job: "scrivener", delta: 1 }, state.lastSimulatedAt);
     state.resources.knowledge = 100;
     const before = economyRates(state).net;
-    state = applyAction(state, { type: "research", research: "crop-rotation" }, now);
+    state = applyAction(state, { type: "research", research: "crop-rotation" }, state.lastSimulatedAt);
     expect(economyRates(state).net.food + state.population * .025).toBeCloseTo((before.food + state.population * .025) * 1.25);
-    state = applyAction(state, { type: "research", research: "better-wicks" }, now);
+    state = applyAction(state, { type: "research", research: "better-wicks" }, state.lastSimulatedAt);
     expect(economyRates(state).net.oil).toBeCloseTo(.1 - .15 * .75);
-    expect(applyAction(state, { type: "research", research: "better-wicks" }, now)).toBe(state);
+    expect(applyAction(state, { type: "research", research: "better-wicks" }, state.lastSimulatedAt)).toBe(state);
     expect(decodeSave(encodeSave(state))).toEqual(state);
     state.resources.food = 0;
+    state.resources.coin = 0;
+    state.resources.knowledge = 0;
     state.jobs.forager = 0;
     expect(economyRates(state).net.coin).toBeCloseTo(.05);
     expect(economyRates(state).net.knowledge).toBeCloseTo(.04);
