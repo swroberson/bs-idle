@@ -12,6 +12,7 @@ import { queueEvents } from "./progression";
 import { ILLUSTRATIONS } from "../content/illustrations";
 import { AWAKENING } from "../content/awakening";
 import { awakeningRequirements } from "./requirements";
+import { availableStudies, availableWorks } from "./catalogs";
 
 export function gatheringWaitMs(state: GameState, now: number): number {
   return state.lastGatheredAt === null ? 0 : Math.max(0, state.lastGatheredAt + BALANCE.gatheringCooldownMs - now);
@@ -19,6 +20,14 @@ export function gatheringWaitMs(state: GameState, now: number): number {
 
 export function applyAction(state: GameState, action: GameAction, now: number): GameState {
   if (!Number.isSafeInteger(now) || now < state.lastSimulatedAt || now < 0) return state;
+  if (action.type === "view-work") {
+    if (!availableWorks(state).includes(action.id) || state.seenWorks.includes(action.id)) return state;
+    return { ...state, seenWorks: [...state.seenWorks, action.id] };
+  }
+  if (action.type === "view-study") {
+    if (!availableStudies(state).includes(action.id) || state.seenStudies.includes(action.id)) return state;
+    return { ...state, seenStudies: [...state.seenStudies, action.id] };
+  }
   if (action.type === "advance-awakening") {
     if (state.awakenedAt === null || !Number.isInteger(action.step) || action.step !== state.finaleStep || action.step >= AWAKENING.passages.length) return state;
     return { ...state, finaleStep: state.finaleStep + 1 };

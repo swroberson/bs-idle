@@ -77,8 +77,9 @@ describe("assigned construction crews", () => {
     const old = JSON.parse(JSON.stringify(ready()));
     old.version = 7;
     delete old.activeConstruction;
+    delete old.seenWorks; delete old.seenStudies;
     const migrated = decodeSave(JSON.stringify(old));
-    expect(migrated.version).toBe(8);
+    expect(migrated.version).toBe(9);
     expect(migrated.activeConstruction).toBeNull();
     expect(migrated.resources).toEqual(old.resources);
     expect(migrated.jobs).toEqual(old.jobs);
@@ -145,6 +146,7 @@ describe("assigned construction crews", () => {
   it("requires a construction field in current saves and rejects projects smuggled into version 7", () => {
     const value = JSON.parse(JSON.stringify(ready()));
     delete value.activeConstruction;
+    delete value.seenWorks; delete value.seenStudies;
     expect(() => decodeSave(JSON.stringify(value))).toThrow();
     value.version = 7;
     value.activeConstruction = null;

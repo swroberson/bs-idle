@@ -4,7 +4,8 @@ import { awakeningRequirements } from "@/game/requirements";
 import { CatalogPager } from "./CatalogPager";
 import { ConstructionPanel } from "./ConstructionPanel";
 import { constructionSpeed } from "@/game/construction";
-import { researchRequirements, prerequisiteRequirements } from "@/game/requirements";
+import { researchRequirements } from "@/game/requirements";
+import { availableStudies } from "@/game/catalogs";
 import { ResourceAmounts } from "./ResourceAmounts";
 import type { GameAction, GameState, ResearchDefinition, ResearchId } from "@/game/types";
 
@@ -12,7 +13,7 @@ export function StudiesPanel({ state, active, dispatch, selected, select }: {
   state: GameState; active: boolean; dispatch: (action: GameAction) => void;
   selected: ResearchId | null; select: (id: ResearchId) => void;
 }) {
-  const items = (Object.keys(RESEARCH) as ResearchId[]).filter(id => state.research.includes(id) || prerequisiteRequirements(state, RESEARCH[id].requirements).length === 0);
+  const items = availableStudies(state);
   const index = Math.max(0, items.findIndex(id => id === selected));
   const awakeningReady = state.research.includes("restore-conduit") && state.awakenedAt === null;
   const unmetAwakening = awakeningRequirements(state);
@@ -25,22 +26,18 @@ export function StudiesPanel({ state, active, dispatch, selected, select }: {
     </div>}
     {items.slice(index, index + 1).map((id) => {
       const research: ResearchDefinition = RESEARCH[id];
-      const complete = state.research.includes(id);
       const constructing = state.activeConstruction?.kind === "research" && state.activeConstruction.id === id;
       const unmet = researchRequirements(state, id);
       return <article key={id} className="operation-row">
-        <div className="operation-heading"><h3>{research.name}</h3><span className={`machine-label ${complete ? "activity-text" : ""}`}>{complete ? "Recorded" : "Available"}</span></div>
-        <p className="narrative">{complete ? research.text : research.description}</p>
-        {complete && <p className="effect-readout">{research.effect}</p>}
-        {!complete && <>
-          {research.workSeconds && <ConstructionPanel state={state} active={active} dispatch={dispatch} />}
-          <button className="machine-button" aria-describedby={`study-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "research", research: id })}>{constructing ? "Restoration in progress" : <><span>{research.workSeconds ? "Begin restoration" : "Investigate"} {"//"}</span><ResourceAmounts amounts={research.cost} /></>}</button>
-          {research.workSeconds && !constructing && <p className="telemetry construction-cost">{research.workSeconds} work / {Math.ceil(research.workSeconds / constructionSpeed(state))}s with 1 Laborer at full output.</p>}
-          <p id={`study-${id}-requirements`} className="requirements-copy">{constructing ? "Supplies already committed" : unmet.join(" · ") || "Stores sufficient / ready"}</p>
-        </>}
-        {complete && <p className="requirements-copy">Investigation complete / discovery preserved in the Chronicle.</p>}
+        <div className="operation-heading"><h3>{research.name}</h3><span className="machine-label">Available</span></div>
+        <p className="narrative">{research.description}</p>
+        {research.workSeconds && <ConstructionPanel state={state} active={active} dispatch={dispatch} />}
+        <button className="machine-button" aria-describedby={`study-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "research", research: id })}>{constructing ? "Restoration in progress" : <><span>{research.workSeconds ? "Begin restoration" : "Investigate"} {"//"}</span><ResourceAmounts amounts={research.cost} /></>}</button>
+        {research.workSeconds && !constructing && <p className="telemetry construction-cost">{research.workSeconds} work / {Math.ceil(research.workSeconds / constructionSpeed(state))}s with 1 Laborer at full output.</p>}
+        <p id={`study-${id}-requirements`} className="requirements-copy">{constructing ? "Supplies already committed" : unmet.join(" · ") || "Stores sufficient / ready"}</p>
       </article>;
     })}
-    <CatalogPager name="Studies" labels={items.map(id => RESEARCH[id].name)} index={index} select={page => select(items[page])} />
+    {items.length === 0 && !awakeningReady && <p className="terminal-notice machine-label">No Studies available.</p>}
+    <CatalogPager name="Studies" labels={items.map(id => RESEARCH[id].name)} index={index} select={page => select(items[page])} unseen={items.map(id => !state.seenStudies.includes(id))} />
   </section>;
 }

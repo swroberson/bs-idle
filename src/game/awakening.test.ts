@@ -155,12 +155,13 @@ describe("deliberate local awakening", () => {
     old.expeditionLog = old.expeditionLog.filter((entry: { destination: string }) => entry.destination === "old-cistern");
     old.version = 4; delete old.resources.current; delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices;
     delete old.activeConstruction;
+    delete old.seenWorks; delete old.seenStudies;
     for (const id of ["lamp-house", "smithy", "subterranean-works", "buried-engine"]) delete old.buildings[id];
     old.readChronicle = ["appointment"];
     old.dismissedIllustrations = ["keeper-office"];
     old.activeExpedition = { destination: "abandoned-farmstead", workers: 2, startedAt: old.lastSimulatedAt, returnsAt: old.lastSimulatedAt + 240000 };
     state = decodeSave(JSON.stringify(old));
-    expect(state.version).toBe(8);
+    expect(state.version).toBe(9);
     expect(state.resources).toEqual({ ...old.resources, current: 0 });
     expect(state.activeExpedition).toEqual(old.activeExpedition);
     expect(state.lastSimulatedAt).toBe(old.lastSimulatedAt);

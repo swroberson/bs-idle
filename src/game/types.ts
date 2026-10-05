@@ -18,7 +18,7 @@ export type IllustrationId = keyof typeof ILLUSTRATIONS;
 export type Cost = Partial<Record<ResourceId, number>>;
 
 export interface GameState {
-  version: 8;
+  version: 9;
   resources: Record<ResourceId, number>;
   population: number;
   jobs: Record<JobId, number>;
@@ -30,6 +30,8 @@ export interface GameState {
   research: ResearchId[];
   chronicle: ChronicleId[];
   readChronicle: ChronicleId[];
+  seenWorks: BuildingId[];
+  seenStudies: ResearchId[];
   dismissedIllustrations: IllustrationId[];
   activeExpedition: ActiveExpedition | null;
   activeConstruction: ActiveConstruction | null;
@@ -46,6 +48,8 @@ export type GameAction =
   | { type: "advance-awakening"; step: number }
   | { type: "dismiss-illustrations"; ids: IllustrationId[] }
   | { type: "read-chronicle"; id: ChronicleId }
+  | { type: "view-work"; id: BuildingId }
+  | { type: "view-study"; id: ResearchId }
   | { type: "gather-food" }
   | { type: "render-oil" }
   | { type: "assign-worker"; job: JobId; delta: 1 | -1 }

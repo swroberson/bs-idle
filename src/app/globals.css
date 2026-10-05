@@ -286,6 +286,7 @@ button, a, input, textarea { outline-offset: -3px; }
 .catalog-option.is-focused { background: #30372a; outline: 1px solid var(--color-muted); outline-offset: -1px; }
 .catalog-option:hover { background: #242a20; }
 .catalog-option-mark { width: .5rem; flex-shrink: 0; color: var(--color-muted); }
+.catalog-option > .attention-badge { margin-left: auto; }
 .catalog-controls > .telemetry { white-space: nowrap; }
 .expedition-selector { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .awakening-reveal { border-color: var(--color-lamp); }

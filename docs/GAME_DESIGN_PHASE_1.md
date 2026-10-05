@@ -164,7 +164,7 @@ The required story chain is:
 
 Other research and expedition discoveries can supply prerequisites along this chain. The final restoration cost should take approximately 10–20 minutes to accumulate at the expected late-game production level, subject to playtesting.
 
-Keep completed research accessible so the player can reread discoveries. Before completion, show the activity, exact cost, and unmet requirements without previewing findings, effects, or future unlocks. After completion, show findings and exact mechanical effects alongside atmospheric prose. Existing economy rules remain understandable.
+Completed research leaves the Studies list; keep its findings and exact mechanical effects accessible in Chronicle so the player can reread discoveries. Before completion, show the activity, exact cost, and unmet requirements without previewing findings, effects, or future unlocks. Existing economy rules remain understandable.
 
 ## 7. Narrative events
 
@@ -249,7 +249,7 @@ Keep these facts easy to find:
 
 Avoid dense desktop tables, hover-only explanations, or tiny assignment buttons. Support keyboard navigation, readable contrast, reduced motion, and status cues that do not depend on color alone. Illustration is optional; no art pipeline is required for the first build.
 
-The terminal should fit within the viewport during ordinary play, keeping stores and navigation visible. Prefer focused views and pagination to growing lists. Preserve scrolling as an accessibility fallback for enlarged text, short landscape screens, and unusually long content. Chronicle has no new-entry badge; popups notify the player of new records. Viewing an entry acknowledges only that entry and persists its acknowledgement. Other sections use the same badge language for situations needing attention, such as unresolved choices or empty stores. Do not flag every affordable purchase or suggest the next action. Mechanical costs, effects and unavailable requirements remain explicit; players discover the path themselves.
+The terminal should fit within the viewport during ordinary play, keeping stores and navigation visible. Prefer focused views and pagination to growing lists. Preserve scrolling as an accessibility fallback for enlarged text, short landscape screens, and unusually long content. Chronicle has no new-entry badge; popups notify the player of new records. Viewing an entry acknowledges only that entry and persists its acknowledgement. Works and Studies badges count newly available entries until individually viewed in a visible, active tab. Works omit buildings at their maximum level; Studies omit completed investigations. Other sections use the same badge language for situations needing attention, such as unresolved choices or empty stores. Do not flag additional building levels, every affordable purchase, or suggest the next action. Mechanical costs, effects and unavailable requirements remain explicit; players discover the path themselves.
 
 ## 11. Technical architecture
 

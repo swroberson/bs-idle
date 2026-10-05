@@ -6,7 +6,7 @@ import type { GameAction } from "@/game/types";
 
 export function actionFeedback(action: GameAction): string {
   switch (action.type) {
-    case "read-chronicle": case "dismiss-illustrations": case "advance-awakening": return "";
+    case "read-chronicle": case "view-work": case "view-study": case "dismiss-illustrations": case "advance-awakening": return "";
     case "awaken-junction": return "Junction // active";
     case "gather-food": return "Provisions gathered // stores updated";
     case "render-oil": return "Lamp fuel rendered // stores updated";

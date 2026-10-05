@@ -2,9 +2,10 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
+import { AttentionBadge } from "./AttentionBadge";
 
-export function CatalogSelect({ labels, index, select, name }: {
-  labels: string[]; index: number; select: (index: number) => void; name: string;
+export function CatalogSelect({ labels, index, select, name, unseen }: {
+  labels: string[]; index: number; select: (index: number) => void; name: string; unseen?: boolean[];
 }) {
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(index);
@@ -26,13 +27,15 @@ export function CatalogSelect({ labels, index, select, name }: {
       list.style.width = `${width}px`;
       const desired = Math.min(256, list.scrollHeight);
       const region = trigger.closest("#main")?.getBoundingClientRect();
-      const below = Math.min(window.innerHeight - 16, region?.bottom ?? window.innerHeight - 16) - rect.bottom - 4;
-      const above = rect.top - Math.max(16, region?.top ?? 16) - 4;
+      const top = Math.max(16, region?.top ?? 16);
+      const bottom = Math.min(window.innerHeight - 16, region?.bottom ?? window.innerHeight - 16);
+      const below = bottom - rect.bottom - 4;
+      const above = rect.top - top - 4;
       const upwards = below < desired && above > below;
-      const height = Math.max(44, Math.min(desired, upwards ? above : below));
+      const height = Math.max(44, Math.min(desired, upwards ? above : below, bottom - top));
       list.style.maxHeight = `${height}px`;
       list.style.left = `${Math.max(16, Math.min(rect.left, window.innerWidth - width - 16))}px`;
-      list.style.top = `${upwards ? rect.top - height - 4 : rect.bottom + 4}px`;
+      list.style.top = `${Math.max(top, Math.min(upwards ? rect.top - height - 4 : rect.bottom + 4, bottom - height))}px`;
     };
     position();
     const onScroll = (event: Event) => {
@@ -109,9 +112,10 @@ export function CatalogSelect({ labels, index, select, name }: {
       <span>{labels[index]}</span><span className="catalog-select-mark" aria-hidden="true">{open ? "−" : "⌄"}</span>
     </button>
     {open && createPortal(<div ref={listRef} id={listId} className="catalog-options" role="listbox" aria-label={`${name} entries`} onMouseDown={event => event.preventDefault()}>
-      {labels.map((label, i) => <div key={label} id={`${listId}-${i}`} role="option" aria-selected={focused === i} className={`catalog-option${focused === i ? " is-focused" : ""}`}
+      {labels.map((label, i) => <div key={label} id={`${listId}-${i}`} role="option" aria-label={`${label}${unseen?.[i] ? ", new entry" : ""}`} aria-selected={focused === i} className={`catalog-option${focused === i ? " is-focused" : ""}`}
         onClick={() => { choose(i); triggerRef.current?.focus({ preventScroll: true }); }}>
         <span aria-hidden="true" className="catalog-option-mark">{index === i ? "▪" : ""}</span><span>{label}</span>
+        {unseen?.[i] && <AttentionBadge count={1} label="new entry" />}
       </div>)}
     </div>, document.body)}
   </>;

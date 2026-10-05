@@ -482,8 +482,14 @@ Chronicle tabs do not display a new-entry badge; new-entry popups provide the
 notification. Persist acknowledgement in the save and acknowledge only the
 entry actually viewed in a visible, active tab.
 Use the same badge convention wherever attention is required: pending choices,
-empty stores, or record faults. Do not badge ordinary affordable
+newly available Works or Studies, empty stores, or record faults. Works and
+Studies count unseen entries, acknowledging only the entry actually displayed
+in a visible, active tab without a covering dialog. Persist acknowledgement.
+Do not badge additional building levels or ordinary affordable
 purchases or routine cooldown completion as recommended next actions.
+
+Works lists omit buildings at their maximum level. Studies lists omit completed
+investigations; their findings and exact effects remain readable in Chronicle.
 
 Do not show objectives, next-step hints, recommended actions, or tutorial
 prompts. Let players discover what to do. Before an action, describe the work

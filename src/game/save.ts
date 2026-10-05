@@ -13,6 +13,7 @@ import { ILLUSTRATIONS } from "../content/illustrations";
 import { pendingIllustrations } from "./illustrations";
 import { AWAKENING, WARD_RECORDS } from "../content/awakening";
 import { constructionWork } from "./construction";
+import { knownStudies, knownWorks } from "./catalogs";
 
 const OLD_RESOURCES = ["food", "oil", "authority", "coin", "knowledge", "relics"];
 const OLD_BUILDINGS = ["fields", "oil-press", "market-stall", "scrivener-house", "ruined-cistern", "antiquities-house"];
@@ -32,7 +33,7 @@ function oldIds(value: unknown, allowed: readonly string[]): boolean {
 
 function migrateIllustrations(state: GameState): GameState {
   const backfill = state.buildings["oil-press"] > 0 && !state.chronicle.includes("oil-press-built");
-  const next: GameState = { ...state, version: 8, dismissedIllustrations: [],
+  const next: GameState = { ...state, version: 9, dismissedIllustrations: [],
     chronicle: backfill ? [...state.chronicle, "oil-press-built"] : state.chronicle,
     readChronicle: backfill ? [...state.readChronicle, "oil-press-built"] : state.readChronicle };
   return { ...next, dismissedIllustrations: pendingIllustrations(next) };
@@ -95,7 +96,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   try { value = JSON.parse(text); }
   catch { throw new Error("This is not valid JSON. Choose a Buried Sun save or paste its complete text."); }
   if (!record(value)) throw new Error("The save must contain a game object.");
-  if (![1, 2, 3, 4, 5, 6, 7, 8].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–8.");
+  if (![1, 2, 3, 4, 5, 6, 7, 8, 9].includes(value.version as number)) throw new Error("Unsupported save version. This game supports versions 1–9.");
   const originalVersion = value.version as number;
   const legacyIllustrations = originalVersion < 4;
   const chronicle = value.chronicle;
@@ -118,6 +119,7 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   if (originalVersion >= 5) expeditionKeys.push("awakenedAt", "finaleStep");
   if (originalVersion >= 7) expeditionKeys.push("eventChoices");
   if (originalVersion >= 8) expeditionKeys.push("activeConstruction");
+  if (originalVersion >= 9) expeditionKeys.push("seenWorks", "seenStudies");
   if (Object.hasOwn(value, "readChronicle")) baseKeys.push("readChronicle");
   if (hasWorkers) baseKeys.push("workers");
   const legacy = value.version === 1 || value.version === 2;
@@ -145,11 +147,12 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
   if (value.version === 1) {
     if (value.chronicle.length !== 1) throw new Error("Invalid scaffold chronicle.");
     if (migrationAt !== undefined && !timestamp(migrationAt)) throw new Error("Invalid migration timestamp.");
-    return migrateIllustrations({ ...createInitialState(Math.max(value.lastSimulatedAt as number, migrationAt ?? 0)),
+    const migrated = migrateIllustrations({ ...createInitialState(Math.max(value.lastSimulatedAt as number, migrationAt ?? 0)),
       resources: { ...createInitialState(0).resources, ...value.resources } as GameState["resources"], population: value.population as number,
       readChronicle: readChronicle as GameState["readChronicle"],
       jobs: { ...createInitialState(0).jobs, ...(hasWorkers ? value.workers as object : {}) },
       lifetimeAuthority: value.resources.authority as number, lastGatheredAt: value.lastGatheredAt as number | null });
+    return { ...migrated, seenWorks: knownWorks(migrated), seenStudies: knownStudies(migrated) };
   }
   if (value.version === 2) {
     if (!record(value.jobs) || !exactKeys(value.jobs, ["forager", "lamplighter"]) ||
@@ -265,8 +268,14 @@ export function decodeSave(text: string, migrationAt?: number): GameState {
       !result.dismissedIllustrations.every(id => result.chronicle.includes(ILLUSTRATIONS[id].chronicle))) {
     throw new Error("Invalid save data: illustration dismissals are malformed or unearned.");
   }
+  const works = knownWorks(result);
+  const studies = knownStudies(result);
+  if (originalVersion >= 9 && (!ids(result.seenWorks, BUILDINGS) || !ids(result.seenStudies, RESEARCH) ||
+      !result.seenWorks.every(id => works.includes(id)) || !result.seenStudies.every(id => studies.includes(id)))) {
+    throw new Error("Invalid save data: catalog acknowledgements are malformed or unearned.");
+  }
   // Validation above covers every field. Return a fresh JSON object, not user references.
-  return result;
+  return { ...result, version: 9, seenWorks: originalVersion < 9 ? works : result.seenWorks, seenStudies: originalVersion < 9 ? studies : result.seenStudies };
 }
 
 export function encodeSave(state: GameState): string {

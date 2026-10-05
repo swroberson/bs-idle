@@ -134,10 +134,11 @@ describe("illustration save migration", () => {
     delete old.dismissedIllustrations;
     delete old.awakenedAt; delete old.finaleStep; delete old.jobs.laborer; delete old.jobs.scavenger; delete old.eventChoices; delete old.resources.current;
     delete old.activeConstruction;
+    delete old.seenWorks; delete old.seenStudies;
     for (const id of ["lamp-house", "smithy", "subterranean-works", "buried-engine"]) delete old.buildings[id];
     const chronicle = state.chronicle.filter(id => id !== "oil-press-built");
     const migrated = decodeSave(JSON.stringify({ ...old, version: 3, chronicle, readChronicle: ["appointment"] }));
-    expect(migrated.version).toBe(8);
+    expect(migrated.version).toBe(9);
     expect(migrated.resources).toEqual(state.resources);
     expect(migrated.lastSimulatedAt).toBe(state.lastSimulatedAt);
     expect(migrated.chronicle).toEqual([...chronicle, "oil-press-built"]);

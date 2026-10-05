@@ -135,10 +135,12 @@ describe("deliberate civic responses", () => {
     const old = JSON.parse(JSON.stringify(pending));
     old.version = 6; delete old.jobs.scavenger; delete old.eventChoices;
     delete old.activeConstruction;
+    delete old.seenWorks; delete old.seenStudies;
     expect(() => decodeSave(JSON.stringify(old))).toThrow();
     const valid = JSON.parse(JSON.stringify(civicWard()));
     valid.version = 6; delete valid.jobs.scavenger; delete valid.eventChoices;
     delete valid.activeConstruction;
+    delete valid.seenWorks; delete valid.seenStudies;
     expect(decodeSave(JSON.stringify(valid)).eventChoices).toEqual({});
     if (process.env.BS_CAPTURE_SAVES) {
       writeFileSync("/tmp/buried-sun-civic.json", encodeSave(civicWard()));

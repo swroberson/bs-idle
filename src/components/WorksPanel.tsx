@@ -1,7 +1,8 @@
 import { BUILDINGS } from "@/content/buildings";
 import { RESEARCH } from "@/content/research";
 import { CatalogPager } from "./CatalogPager";
-import { buildingCost, buildingRequirements, constructionDiscount, prerequisiteRequirements, resourceVisible } from "@/game/requirements";
+import { buildingCost, buildingRequirements, constructionDiscount, resourceVisible } from "@/game/requirements";
+import { availableWorks } from "@/game/catalogs";
 import { ResourceAmounts } from "./ResourceAmounts";
 import { constructionSpeed, constructionWork } from "@/game/construction";
 import { ConstructionPanel } from "./ConstructionPanel";
@@ -12,7 +13,7 @@ export function WorksPanel({ state, active, dispatch, onDialogChange, selected, 
   state: GameState; active: boolean; dispatch: (action: GameAction) => void; onDialogChange: (open: boolean) => void;
   selected: BuildingId | null; select: (id: BuildingId) => void;
 }) {
-  const items = (Object.keys(BUILDINGS) as BuildingId[]).filter(id => state.buildings[id] > 0 || prerequisiteRequirements(state, BUILDINGS[id].requirements).length === 0);
+  const items = availableWorks(state);
   const index = Math.max(0, items.findIndex(id => id === selected));
   const discount = constructionDiscount(state);
   const crew = <>
@@ -44,13 +45,14 @@ export function WorksPanel({ state, active, dispatch, onDialogChange, selected, 
         {effect && <p className="effect-readout">{effect}</p>}
         {Object.keys(storage).length > 0 && <p className="effect-readout">Each level // store capacity +<ResourceAmounts amounts={storage} /></p>}
         <button className="machine-button" aria-describedby={`build-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "build", building: id })}>
-          {level >= building.maxLevel ? "Construction limit reached" : <><span>{level === 0 ? "Construct" : "Expand"} {"//"}</span><ResourceAmounts amounts={buildingCost(state, id)} /></>}
+          <span>{level === 0 ? "Construct" : "Expand"} {"//"}</span><ResourceAmounts amounts={buildingCost(state, id)} />
         </button>
-        {level < building.maxLevel && <p className="telemetry construction-cost">{work} work / {Math.ceil(work / constructionSpeed(state))}s with 1 Laborer at full output.</p>}
+        <p className="telemetry construction-cost">{work} work / {Math.ceil(work / constructionSpeed(state))}s with 1 Laborer at full output.</p>
         <p id={`build-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Stores and crew sufficient / ready"}</p>
       </article>;
     })}
-    <CatalogPager name="Works" labels={items.map(id => BUILDINGS[id].name)} index={index} select={page => select(items[page])} />
+    {items.length === 0 && <p className="terminal-notice machine-label">No Works available.</p>}
+    <CatalogPager name="Works" labels={items.map(id => BUILDINGS[id].name)} index={index} select={page => select(items[page])} unseen={items.map(id => !state.seenWorks.includes(id))} />
     {discount.study > 0 && <p className="requirements-copy">Stoneworking / building Coin −{Math.round(discount.study * 100)}%. Final Coin costs round up; other costs unchanged.</p>}
     <p className="module-note machine-label">Construction and automatic production are halved during Food shortages.</p>
   </section>;

@@ -14,6 +14,7 @@ import { pendingIllustrations } from "@/game/illustrations";
 import { IllustrationReveal } from "./IllustrationReveal";
 import { AwakeningReveal } from "./AwakeningReveal";
 import { AWAKENING } from "@/content/awakening";
+import { availableStudies, availableWorks } from "@/game/catalogs";
 
 function subscribeVisibility(onChange: () => void) {
   document.addEventListener("visibilitychange", onChange);
@@ -60,16 +61,34 @@ export function GameShell() {
   const pending = game.state?.pendingEvents.length ?? 0;
   const faults = Number(Boolean(game.error)) + Number(offlineStatus === "failed");
   const returns = game.returnSummary?.completedExpeditions.length ?? 0;
+  const works = game.state ? availableWorks(game.state) : [];
+  const studies = game.state ? availableStudies(game.state) : [];
+  const newWorks = works.filter(id => !game.state?.seenWorks.includes(id)).length;
+  const newStudies = studies.filter(id => !game.state?.seenStudies.includes(id)).length;
+  const workId = works.find(id => id === selectedWork) ?? works[0];
+  const studyId = studies.find(id => id === selectedStudy) ?? studies[0];
+  const catalogVisible = canReveal && !endingPending && reveals.length === 0;
+
+  useEffect(() => {
+    if (!catalogVisible || !game.state) return;
+    if (shownSection === "works" && !game.state.activeConstruction && workId && !game.state.seenWorks.includes(workId)) {
+      game.dispatch({ type: "view-work", id: workId });
+    }
+    if (shownSection === "studies" && studyId && !game.state.seenStudies.includes(studyId)) {
+      game.dispatch({ type: "view-study", id: studyId });
+    }
+  }, [catalogVisible, game, shownSection, workId, studyId]);
+
   const attention = {
     ward: { count: pending + emptyStores, label: "reports or empty stores", warning: emptyStores > 0 },
-    works: { count: 0, label: "reports" }, studies: { count: 0, label: "reports" },
+    works: { count: newWorks, label: "new entries" }, studies: { count: newStudies, label: "new entries" },
     expeditions: { count: returns, label: "returned parties" },
     chronicle: { count: 0, label: "entries" },
     settings: { count: faults, label: "record faults", warning: true },
   };
   const dispatch = (action: GameAction) => {
     if (!game.dispatch(action)) return;
-    if (action.type !== "read-chronicle" && action.type !== "dismiss-illustrations" && action.type !== "advance-awakening") setFeedback(actionFeedback(action));
+    if (action.type !== "read-chronicle" && action.type !== "view-work" && action.type !== "view-study" && action.type !== "dismiss-illustrations" && action.type !== "advance-awakening") setFeedback(actionFeedback(action));
     if (action.type === "advance-awakening" && action.step === AWAKENING.passages.length - 1) setSection("ward");
   };
 
@@ -100,6 +119,6 @@ export function GameShell() {
       </button>)}
     </nav>
     <footer className="terminal-footer machine-label"><span role="status">{feedback || `Register // ${game.state ? "Local" : "—"}`}</span><span>{game.state && game.state.awakenedAt !== null ? "Outer Ward // Story complete" : offlineStatus === "ready" ? "Offline shell // ready" : "Outer Ward // I"}</span></footer>
-    <p className="sr-only" role="status" aria-atomic="true">{pending ? `Ward: ${pending} pending reports.` : ""}{emptyStores ? ` Ward: ${emptyStores} empty stores.` : ""}{returns ? ` Expeditions: ${returns} returned parties.` : ""}{faults ? ` Records: ${faults} faults.` : ""}</p>
+    <p className="sr-only" role="status" aria-atomic="true">{pending ? `Ward: ${pending} pending reports.` : ""}{emptyStores ? ` Ward: ${emptyStores} empty stores.` : ""}{newWorks ? ` Works: ${newWorks} new entries.` : ""}{newStudies ? ` Studies: ${newStudies} new entries.` : ""}{returns ? ` Expeditions: ${returns} returned parties.` : ""}{faults ? ` Records: ${faults} faults.` : ""}</p>
   </div>;
 }
