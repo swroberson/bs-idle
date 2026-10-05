@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { BALANCE } from "@/content/balance";
 import { EXPEDITIONS } from "@/content/expeditions";
-import { availableWorkers, costText, expeditionCost, expeditionRequirements } from "@/game/requirements";
+import { availableWorkers, expeditionCost, expeditionRequirements } from "@/game/requirements";
+import { ResourceAmounts } from "./ResourceAmounts";
 import type { ExpeditionId, GameAction, GameState } from "@/game/types";
 
 export function ExpeditionDispatchDialog({ destination, state, active, dispatch, onClose, onDialogChange }: {
@@ -48,7 +49,7 @@ export function ExpeditionDispatchDialog({ destination, state, active, dispatch,
         if (!active || unmet.length > 0) return;
         dispatch({ type: "start-expedition", destination, workers });
         dialogRef.current?.close();
-      }}>Dispatch // {costText(expeditionCost(state, destination, workers))}</button>
+      }}><span>Dispatch //</span><ResourceAmounts amounts={expeditionCost(state, destination, workers)} /></button>
     </div>
     <p id="dispatch-requirements" className="requirements-copy" role="status">{unmet.join(" · ") || "Provisions sufficient"}</p>
   </dialog>;

@@ -2,6 +2,7 @@ import { BALANCE } from "@/content/balance";
 import type { GameAction, GameState } from "@/game/types";
 import { resourceCapacity } from "@/game/storage";
 import { formatCompactNumber } from "./formatNumber";
+import { ResourceAmount } from "./ResourceAmounts";
 
 export function ProvisionsPanel({ state, wait, active, gather, dispatch }: {
   state: GameState; wait: number; active: boolean; gather: () => void; dispatch: (action: GameAction) => void;
@@ -15,7 +16,7 @@ export function ProvisionsPanel({ state, wait, active, gather, dispatch }: {
         <div className="region-heading"><h3 id="provisions-heading" className="machine-label">Manual / Provisions</h3><span className={`machine-label ${active && ready ? "activity-text" : ""}`}>{!active ? "Unavailable" : ready ? "Ready" : "Recovering"}</span></div>
         <p className="narrative gathering-copy">There is still food growing among the abandoned gardens.</p>
         <button className="machine-button gather-control" disabled={!active || !ready || full} aria-describedby="gather-status" onClick={gather}>
-          <span>Gather provisions</span><span className="control-yield">+{formatCompactNumber(foodYield)} Food <span aria-hidden="true">↗</span></span>
+          <span>Gather provisions</span><span className="control-yield"><ResourceAmount resource="food">+{formatCompactNumber(foodYield)}</ResourceAmount> <span aria-hidden="true">↗</span></span>
         </button>
         <div className="cooldown-track" aria-hidden="true"><div style={{ width: `${progress * 100}%` }} /></div>
         <div id="gather-status" className="action-readout">
@@ -26,7 +27,7 @@ export function ProvisionsPanel({ state, wait, active, gather, dispatch }: {
         {state.awakenedAt === null && state.resources.oil <= BALANCE.emergencyOil && <div className="fuel-recovery">
           <p className="machine-label">Emergency / Lamp fuel</p>
           <p className="requirements-copy">Render a little Oil from provisions. Shares the gathering recovery interval.</p>
-          <button className="machine-button" disabled={!active || !ready || state.resources.food < BALANCE.emergencyOilFood} aria-describedby="fuel-requirement" onClick={() => dispatch({ type: "render-oil" })}>Render Oil // {BALANCE.emergencyOilFood} Food → {BALANCE.emergencyOil} Oil</button>
+          <button className="machine-button" disabled={!active || !ready || state.resources.food < BALANCE.emergencyOilFood} aria-describedby="fuel-requirement" onClick={() => dispatch({ type: "render-oil" })}><span>Render Oil //</span><span className="resource-conversion"><ResourceAmount resource="food">{BALANCE.emergencyOilFood}</ResourceAmount> → <ResourceAmount resource="oil">{BALANCE.emergencyOil}</ResourceAmount></span></button>
           <p className="requirements-copy" id="fuel-requirement">{!ready ? `${seconds}s recovery` : state.resources.food < BALANCE.emergencyOilFood ? `Food ${state.resources.food.toFixed(1)} / ${BALANCE.emergencyOilFood}` : "Stores sufficient / ready"}</p>
         </div>}
       </section>;

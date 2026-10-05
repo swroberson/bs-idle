@@ -5,7 +5,8 @@ import { awakeningRequirements } from "@/game/requirements";
 import { CatalogPager } from "./CatalogPager";
 import { ConstructionPanel } from "./ConstructionPanel";
 import { constructionSpeed } from "@/game/construction";
-import { costText, researchRequirements, prerequisiteRequirements } from "@/game/requirements";
+import { researchRequirements, prerequisiteRequirements } from "@/game/requirements";
+import { ResourceAmounts } from "./ResourceAmounts";
 import type { GameAction, GameState, ResearchDefinition, ResearchId } from "@/game/types";
 
 export function StudiesPanel({ state, active, dispatch }: { state: GameState; active: boolean; dispatch: (action: GameAction) => void }) {
@@ -32,7 +33,7 @@ export function StudiesPanel({ state, active, dispatch }: { state: GameState; ac
         {complete && <p className="effect-readout">{research.effect}</p>}
         {!complete && <>
           {research.workSeconds && <ConstructionPanel state={state} active={active} dispatch={dispatch} />}
-          <button className="machine-button" aria-describedby={`study-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "research", research: id })}>{constructing ? "Restoration in progress" : `${research.workSeconds ? "Begin restoration" : "Investigate"} // ${costText(research.cost)}`}</button>
+          <button className="machine-button" aria-describedby={`study-${id}-requirements`} disabled={!active || unmet.length > 0} onClick={() => dispatch({ type: "research", research: id })}>{constructing ? "Restoration in progress" : <><span>{research.workSeconds ? "Begin restoration" : "Investigate"} {"//"}</span><ResourceAmounts amounts={research.cost} /></>}</button>
           {research.workSeconds && !constructing && <p className="telemetry construction-cost">{research.workSeconds} work / {Math.ceil(research.workSeconds / constructionSpeed(state))}s with 1 Laborer at full output.</p>}
           <p id={`study-${id}-requirements`} className="requirements-copy">{constructing ? "Supplies already committed" : unmet.join(" · ") || "Stores sufficient / ready"}</p>
         </>}

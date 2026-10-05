@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { BALANCE } from "@/content/balance";
 import { EXPEDITIONS } from "@/content/expeditions";
-import { costText, expeditionCost, expeditionRequirements, prerequisiteRequirements } from "@/game/requirements";
+import { expeditionCost, expeditionRequirements, prerequisiteRequirements } from "@/game/requirements";
+import { ResourceAmounts } from "./ResourceAmounts";
 import type { ExpeditionId, GameAction, GameState } from "@/game/types";
 import { CatalogPager } from "./CatalogPager";
 import { ExpeditionDispatchDialog } from "./ExpeditionDispatchDialog";
@@ -41,7 +42,7 @@ export function ExpeditionPanel({ state, active, dispatch, onDialogChange }: { s
       return <article key={id} className="operation-row">
         <div className="operation-heading"><h3>{destination.name}</h3><span className="machine-label">{state.completedExpeditions.includes(id) ? "Surveyed" : "Unvisited"}</span></div>
         <p className="narrative">{destination.description}</p>
-        <p className="effect-readout">Duration // {duration(destination.durationMs)}<br />1–3 {staffing} reserved until return<br />Provisions for 1 inhabitant // {costText(expeditionCost(state, id, 1))}</p>
+        <p className="effect-readout">Duration // {duration(destination.durationMs)}<br />1–3 {staffing} reserved until return<br />Provisions for 1 inhabitant // <ResourceAmounts amounts={expeditionCost(state, id, 1)} /></p>
         <button className="machine-button" disabled={!active || unmet.length > 0} aria-haspopup="dialog" aria-describedby={`expedition-${id}-requirements`} onClick={() => setDestinationToDispatch(id)}>Dispatch expedition</button>
         <p id={`expedition-${id}-requirements`} className="requirements-copy">{unmet.join(" · ") || "Party available / provisions sufficient"}</p>
       </article>;
@@ -52,7 +53,7 @@ export function ExpeditionPanel({ state, active, dispatch, onDialogChange }: { s
     {state.expeditionLog.length === 0 && <p className="module-note machine-label">No parties returned.</p>}
     {entries.slice(index, index + 1).map(entry => <div className="expedition-return" key={entry.startedAt}>
       <p className="machine-label">{EXPEDITIONS[entry.destination].name} {"//"} {entry.workers} returned</p>
-      <p className="effect-readout">{costText(entry.rewards)}{entry.firstDiscovery ? " · New finding recorded" : ""}</p>
+      <p className="effect-readout"><ResourceAmounts amounts={entry.rewards} empty="No supplies returned" />{entry.firstDiscovery ? " · New finding recorded" : ""}</p>
     </div>)}
     <CatalogPager name="Returns" labels={entries.map((entry, i) => `${entries.length - i} / ${EXPEDITIONS[entry.destination].name}`)} index={index} select={setPage} />
     </>}
